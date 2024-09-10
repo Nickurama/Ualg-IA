@@ -16,13 +16,14 @@ public class Main
 			System.out.println("no solution found");
 			return;
 		}
+		// o
 
 		while(it.hasNext())
 		{
 			BestFirst.State i = it.next();
 			System.out.println(i);
 			if (!it.hasNext())
-				System.out.println(i.getCost());
+				System.out.println((int)Math.round(i.getCost()));
 		}
 	}
 }
