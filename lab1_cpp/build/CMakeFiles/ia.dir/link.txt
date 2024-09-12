@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/ia.dir/src/Main.cpp.o -o ia

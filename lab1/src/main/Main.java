@@ -16,7 +16,6 @@ public class Main
 			System.out.println("no solution found");
 			return;
 		}
-		// o
 
 		while(it.hasNext())
 		{
