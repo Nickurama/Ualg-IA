@@ -1,4 +1,10 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/ia.dir/src/BestFirst.cpp.o"
+  "CMakeFiles/ia.dir/src/BestFirst.cpp.o.d"
+  "CMakeFiles/ia.dir/src/Board.cpp.o"
+  "CMakeFiles/ia.dir/src/Board.cpp.o.d"
+  "CMakeFiles/ia.dir/src/ILayout.cpp.o"
+  "CMakeFiles/ia.dir/src/ILayout.cpp.o.d"
   "CMakeFiles/ia.dir/src/Main.cpp.o"
   "CMakeFiles/ia.dir/src/Main.cpp.o.d"
   "ia"

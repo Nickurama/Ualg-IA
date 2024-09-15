@@ -16,7 +16,10 @@ target_include_directories(ia PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 # list(FILTER TEST_FILES EXCLUDE REGEX ".*src/Main.cpp$")
 # add_executable(tests ${TEST_FILES})
 # target_include_directories(tests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-project(cmake_test VERSION 0.0.1 LANGUAGES CXX)
+
+
+
+project(cmake_test VERSION 0.0.1)
 file(GLOB_RECURSE TEST_FILES test/*.cpp src/*.cpp)
 list(FILTER TEST_FILES EXCLUDE REGEX ".*src/Main.cpp$")
 add_executable(tests ${TEST_FILES})

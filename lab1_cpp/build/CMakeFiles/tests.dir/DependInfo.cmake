@@ -8,6 +8,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp" "CMakeFiles/tests.dir/src/BestFirst.cpp.o" "gcc" "CMakeFiles/tests.dir/src/BestFirst.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp" "CMakeFiles/tests.dir/src/Board.cpp.o" "gcc" "CMakeFiles/tests.dir/src/Board.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp" "CMakeFiles/tests.dir/src/ILayout.cpp.o" "gcc" "CMakeFiles/tests.dir/src/ILayout.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/test/BestFirstTests.cpp" "CMakeFiles/tests.dir/test/BestFirstTests.cpp.o" "gcc" "CMakeFiles/tests.dir/test/BestFirstTests.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/test/BoardTests.cpp" "CMakeFiles/tests.dir/test/BoardTests.cpp.o" "gcc" "CMakeFiles/tests.dir/test/BoardTests.cpp.o.d"
   "/home/luna/Documents/uni_code/IA/lab1_cpp/test/TestMain.cpp" "CMakeFiles/tests.dir/test/TestMain.cpp.o" "gcc" "CMakeFiles/tests.dir/test/TestMain.cpp.o.d"
   )
 

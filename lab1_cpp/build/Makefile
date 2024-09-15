@@ -142,6 +142,87 @@ tests/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
 
+src/BestFirst.o: src/BestFirst.cpp.o
+.PHONY : src/BestFirst.o
+
+# target to build an object file
+src/BestFirst.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/BestFirst.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/BestFirst.cpp.o
+.PHONY : src/BestFirst.cpp.o
+
+src/BestFirst.i: src/BestFirst.cpp.i
+.PHONY : src/BestFirst.i
+
+# target to preprocess a source file
+src/BestFirst.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/BestFirst.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/BestFirst.cpp.i
+.PHONY : src/BestFirst.cpp.i
+
+src/BestFirst.s: src/BestFirst.cpp.s
+.PHONY : src/BestFirst.s
+
+# target to generate assembly for a file
+src/BestFirst.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/BestFirst.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/BestFirst.cpp.s
+.PHONY : src/BestFirst.cpp.s
+
+src/Board.o: src/Board.cpp.o
+.PHONY : src/Board.o
+
+# target to build an object file
+src/Board.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/Board.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/Board.cpp.o
+.PHONY : src/Board.cpp.o
+
+src/Board.i: src/Board.cpp.i
+.PHONY : src/Board.i
+
+# target to preprocess a source file
+src/Board.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/Board.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/Board.cpp.i
+.PHONY : src/Board.cpp.i
+
+src/Board.s: src/Board.cpp.s
+.PHONY : src/Board.s
+
+# target to generate assembly for a file
+src/Board.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/Board.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/Board.cpp.s
+.PHONY : src/Board.cpp.s
+
+src/ILayout.o: src/ILayout.cpp.o
+.PHONY : src/ILayout.o
+
+# target to build an object file
+src/ILayout.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ILayout.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ILayout.cpp.o
+.PHONY : src/ILayout.cpp.o
+
+src/ILayout.i: src/ILayout.cpp.i
+.PHONY : src/ILayout.i
+
+# target to preprocess a source file
+src/ILayout.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ILayout.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ILayout.cpp.i
+.PHONY : src/ILayout.cpp.i
+
+src/ILayout.s: src/ILayout.cpp.s
+.PHONY : src/ILayout.s
+
+# target to generate assembly for a file
+src/ILayout.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ILayout.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ILayout.cpp.s
+.PHONY : src/ILayout.cpp.s
+
 src/Main.o: src/Main.cpp.o
 .PHONY : src/Main.o
 
@@ -165,6 +246,54 @@ src/Main.s: src/Main.cpp.s
 src/Main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/Main.cpp.s
 .PHONY : src/Main.cpp.s
+
+test/BestFirstTests.o: test/BestFirstTests.cpp.o
+.PHONY : test/BestFirstTests.o
+
+# target to build an object file
+test/BestFirstTests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BestFirstTests.cpp.o
+.PHONY : test/BestFirstTests.cpp.o
+
+test/BestFirstTests.i: test/BestFirstTests.cpp.i
+.PHONY : test/BestFirstTests.i
+
+# target to preprocess a source file
+test/BestFirstTests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BestFirstTests.cpp.i
+.PHONY : test/BestFirstTests.cpp.i
+
+test/BestFirstTests.s: test/BestFirstTests.cpp.s
+.PHONY : test/BestFirstTests.s
+
+# target to generate assembly for a file
+test/BestFirstTests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BestFirstTests.cpp.s
+.PHONY : test/BestFirstTests.cpp.s
+
+test/BoardTests.o: test/BoardTests.cpp.o
+.PHONY : test/BoardTests.o
+
+# target to build an object file
+test/BoardTests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BoardTests.cpp.o
+.PHONY : test/BoardTests.cpp.o
+
+test/BoardTests.i: test/BoardTests.cpp.i
+.PHONY : test/BoardTests.i
+
+# target to preprocess a source file
+test/BoardTests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BoardTests.cpp.i
+.PHONY : test/BoardTests.cpp.i
+
+test/BoardTests.s: test/BoardTests.cpp.s
+.PHONY : test/BoardTests.s
+
+# target to generate assembly for a file
+test/BoardTests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BoardTests.cpp.s
+.PHONY : test/BoardTests.cpp.s
 
 test/TestMain.o: test/TestMain.cpp.o
 .PHONY : test/TestMain.o
@@ -200,9 +329,24 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... ia"
 	@echo "... tests"
+	@echo "... src/BestFirst.o"
+	@echo "... src/BestFirst.i"
+	@echo "... src/BestFirst.s"
+	@echo "... src/Board.o"
+	@echo "... src/Board.i"
+	@echo "... src/Board.s"
+	@echo "... src/ILayout.o"
+	@echo "... src/ILayout.i"
+	@echo "... src/ILayout.s"
 	@echo "... src/Main.o"
 	@echo "... src/Main.i"
 	@echo "... src/Main.s"
+	@echo "... test/BestFirstTests.o"
+	@echo "... test/BestFirstTests.i"
+	@echo "... test/BestFirstTests.s"
+	@echo "... test/BoardTests.o"
+	@echo "... test/BoardTests.i"
+	@echo "... test/BoardTests.s"
 	@echo "... test/TestMain.o"
 	@echo "... test/TestMain.i"
 	@echo "... test/TestMain.s"

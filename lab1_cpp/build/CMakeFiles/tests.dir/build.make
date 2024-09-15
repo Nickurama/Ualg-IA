@@ -69,10 +69,80 @@ include CMakeFiles/tests.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/tests.dir/flags.make
 
+CMakeFiles/tests.dir/src/BestFirst.cpp.o: CMakeFiles/tests.dir/flags.make
+CMakeFiles/tests.dir/src/BestFirst.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp
+CMakeFiles/tests.dir/src/BestFirst.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/tests.dir/src/BestFirst.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/src/BestFirst.cpp.o -MF CMakeFiles/tests.dir/src/BestFirst.cpp.o.d -o CMakeFiles/tests.dir/src/BestFirst.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp
+
+CMakeFiles/tests.dir/src/BestFirst.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/tests.dir/src/BestFirst.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp > CMakeFiles/tests.dir/src/BestFirst.cpp.i
+
+CMakeFiles/tests.dir/src/BestFirst.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/tests.dir/src/BestFirst.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp -o CMakeFiles/tests.dir/src/BestFirst.cpp.s
+
+CMakeFiles/tests.dir/src/Board.cpp.o: CMakeFiles/tests.dir/flags.make
+CMakeFiles/tests.dir/src/Board.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp
+CMakeFiles/tests.dir/src/Board.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/tests.dir/src/Board.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/src/Board.cpp.o -MF CMakeFiles/tests.dir/src/Board.cpp.o.d -o CMakeFiles/tests.dir/src/Board.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp
+
+CMakeFiles/tests.dir/src/Board.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/tests.dir/src/Board.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp > CMakeFiles/tests.dir/src/Board.cpp.i
+
+CMakeFiles/tests.dir/src/Board.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/tests.dir/src/Board.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp -o CMakeFiles/tests.dir/src/Board.cpp.s
+
+CMakeFiles/tests.dir/src/ILayout.cpp.o: CMakeFiles/tests.dir/flags.make
+CMakeFiles/tests.dir/src/ILayout.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp
+CMakeFiles/tests.dir/src/ILayout.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/tests.dir/src/ILayout.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/src/ILayout.cpp.o -MF CMakeFiles/tests.dir/src/ILayout.cpp.o.d -o CMakeFiles/tests.dir/src/ILayout.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp
+
+CMakeFiles/tests.dir/src/ILayout.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/tests.dir/src/ILayout.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp > CMakeFiles/tests.dir/src/ILayout.cpp.i
+
+CMakeFiles/tests.dir/src/ILayout.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/tests.dir/src/ILayout.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp -o CMakeFiles/tests.dir/src/ILayout.cpp.s
+
+CMakeFiles/tests.dir/test/BestFirstTests.cpp.o: CMakeFiles/tests.dir/flags.make
+CMakeFiles/tests.dir/test/BestFirstTests.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/test/BestFirstTests.cpp
+CMakeFiles/tests.dir/test/BestFirstTests.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/tests.dir/test/BestFirstTests.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/test/BestFirstTests.cpp.o -MF CMakeFiles/tests.dir/test/BestFirstTests.cpp.o.d -o CMakeFiles/tests.dir/test/BestFirstTests.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/test/BestFirstTests.cpp
+
+CMakeFiles/tests.dir/test/BestFirstTests.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/tests.dir/test/BestFirstTests.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab1_cpp/test/BestFirstTests.cpp > CMakeFiles/tests.dir/test/BestFirstTests.cpp.i
+
+CMakeFiles/tests.dir/test/BestFirstTests.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/tests.dir/test/BestFirstTests.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab1_cpp/test/BestFirstTests.cpp -o CMakeFiles/tests.dir/test/BestFirstTests.cpp.s
+
+CMakeFiles/tests.dir/test/BoardTests.cpp.o: CMakeFiles/tests.dir/flags.make
+CMakeFiles/tests.dir/test/BoardTests.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/test/BoardTests.cpp
+CMakeFiles/tests.dir/test/BoardTests.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/tests.dir/test/BoardTests.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/test/BoardTests.cpp.o -MF CMakeFiles/tests.dir/test/BoardTests.cpp.o.d -o CMakeFiles/tests.dir/test/BoardTests.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/test/BoardTests.cpp
+
+CMakeFiles/tests.dir/test/BoardTests.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/tests.dir/test/BoardTests.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab1_cpp/test/BoardTests.cpp > CMakeFiles/tests.dir/test/BoardTests.cpp.i
+
+CMakeFiles/tests.dir/test/BoardTests.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/tests.dir/test/BoardTests.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab1_cpp/test/BoardTests.cpp -o CMakeFiles/tests.dir/test/BoardTests.cpp.s
+
 CMakeFiles/tests.dir/test/TestMain.cpp.o: CMakeFiles/tests.dir/flags.make
 CMakeFiles/tests.dir/test/TestMain.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/test/TestMain.cpp
 CMakeFiles/tests.dir/test/TestMain.cpp.o: CMakeFiles/tests.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/tests.dir/test/TestMain.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/tests.dir/test/TestMain.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/tests.dir/test/TestMain.cpp.o -MF CMakeFiles/tests.dir/test/TestMain.cpp.o.d -o CMakeFiles/tests.dir/test/TestMain.cpp.o -c /home/luna/Documents/uni_code/IA/lab1_cpp/test/TestMain.cpp
 
 CMakeFiles/tests.dir/test/TestMain.cpp.i: cmake_force
@@ -85,15 +155,25 @@ CMakeFiles/tests.dir/test/TestMain.cpp.s: cmake_force
 
 # Object files for target tests
 tests_OBJECTS = \
+"CMakeFiles/tests.dir/src/BestFirst.cpp.o" \
+"CMakeFiles/tests.dir/src/Board.cpp.o" \
+"CMakeFiles/tests.dir/src/ILayout.cpp.o" \
+"CMakeFiles/tests.dir/test/BestFirstTests.cpp.o" \
+"CMakeFiles/tests.dir/test/BoardTests.cpp.o" \
 "CMakeFiles/tests.dir/test/TestMain.cpp.o"
 
 # External object files for target tests
 tests_EXTERNAL_OBJECTS =
 
+tests: CMakeFiles/tests.dir/src/BestFirst.cpp.o
+tests: CMakeFiles/tests.dir/src/Board.cpp.o
+tests: CMakeFiles/tests.dir/src/ILayout.cpp.o
+tests: CMakeFiles/tests.dir/test/BestFirstTests.cpp.o
+tests: CMakeFiles/tests.dir/test/BoardTests.cpp.o
 tests: CMakeFiles/tests.dir/test/TestMain.cpp.o
 tests: CMakeFiles/tests.dir/build.make
 tests: CMakeFiles/tests.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable tests"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/luna/Documents/uni_code/IA/lab1_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable tests"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/tests.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

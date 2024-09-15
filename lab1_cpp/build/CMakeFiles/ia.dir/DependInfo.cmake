@@ -8,6 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/BestFirst.cpp" "CMakeFiles/ia.dir/src/BestFirst.cpp.o" "gcc" "CMakeFiles/ia.dir/src/BestFirst.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/Board.cpp" "CMakeFiles/ia.dir/src/Board.cpp.o" "gcc" "CMakeFiles/ia.dir/src/Board.cpp.o.d"
+  "/home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp" "CMakeFiles/ia.dir/src/ILayout.cpp.o" "gcc" "CMakeFiles/ia.dir/src/ILayout.cpp.o.d"
   "/home/luna/Documents/uni_code/IA/lab1_cpp/src/Main.cpp" "CMakeFiles/ia.dir/src/Main.cpp.o" "gcc" "CMakeFiles/ia.dir/src/Main.cpp.o.d"
   )
 
