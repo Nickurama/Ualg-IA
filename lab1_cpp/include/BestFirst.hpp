@@ -10,7 +10,7 @@ public:
 	class State
 	{
 	public:
-		explicit State(std::unique_ptr<ILayout>& layout, const State* father);
+		explicit State(std::unique_ptr<ILayout> layout, const State* father);
 		State(State&& s);
 		double getCost() const;
 		friend std::ostream& operator<<(std::ostream& os, const State& state);
@@ -26,7 +26,7 @@ public:
 		double m_cost;
 	};
 
-	typedef std::list<const BestFirst::State* >::iterator bf_iter;
+	typedef std::list<const BestFirst::State*>::iterator bf_iter;
 	BestFirst();
 	BestFirst(const BestFirst&) = delete;
 	BestFirst& operator=(const BestFirst& rhs) = delete;

@@ -24,7 +24,7 @@ int main()
 	}
 
 	for (BestFirst::bf_iter it = startIt; it != endIt; it++)
-		std::cout << *it << '\n';
+		std::cout << **it << '\n';
 	const BestFirst::State *lastState = *(--endIt);
 	std::cout << static_cast<int>(std::round(lastState->getCost())) << std::endl;
 

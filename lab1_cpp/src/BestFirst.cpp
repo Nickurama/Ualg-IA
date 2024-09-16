@@ -2,7 +2,7 @@
 #include <iostream>
 
 // accepts null father
-BestFirst::State::State(std::unique_ptr<ILayout>& layout, const State* father)
+BestFirst::State::State(std::unique_ptr<ILayout> layout, const State* father)
 	: m_layout(std::move(layout)),
 	m_father(father),
 	m_cost(0.0)
@@ -22,7 +22,7 @@ BestFirst::State::State(State&& s)
 
 std::ostream& operator<<(std::ostream& os, const BestFirst::State& state)
 {
-	return os << state.layout();
+	return os << *state.layout();
 }
 
 const BestFirst::State* BestFirst::State::father() const { return m_father; }
@@ -53,8 +53,27 @@ const ILayout* BestFirst::State::layout() const {
 
 std::list<std::unique_ptr<BestFirst::State>> BestFirst::sucessors(const BestFirst::State& state)
 {
+	std::cout << "making sucessors" << std::endl;
 	std::list<std::unique_ptr<State>> sucessors;
 	std::list<std::unique_ptr<ILayout>> children = state.layout()->children();
+	std::cout << "the parent address:\n" << state.father() << std::endl;
+	if (state.father() != nullptr)
+	{
+		std::cout << "the parent layout address:\n" << state.father()->layout() << std::endl;
+		std::cout << "the parent cost:\n" << state.father()->getCost() << std::endl;
+		// ERROR!
+		std::cout << "the parent layout:\n" << *state.father()->layout() << std::endl;
+	}
+	else
+	{
+		std::cout << "no parent" << std::endl;
+	}
+
+	for (std::unique_ptr<ILayout>& child : children)
+	{
+		std::cout << "the sucessor layout:" << std::endl;
+		std::cout << *child << std::endl;
+	}
 
 	std::list<std::unique_ptr<ILayout>>::iterator it;
 	std::cout << "before loop" << std::endl;
@@ -62,15 +81,15 @@ std::list<std::unique_ptr<BestFirst::State>> BestFirst::sucessors(const BestFirs
 	{
 		std::cout << "start loop" << std::endl;
 		std::cout << "father:" << state.father() << std::endl;
-		// if (state.father() != nullptr)
-		// 	std::cout << "layout:" << *state.father()->layout() << std::endl;
+		if (state.father() != nullptr)
+			std::cout << "layout:" << *state.father()->layout() << std::endl;
 		if (state.father() == nullptr || **it != *state.father()->layout())
 		{
 			std::cout << "in if" << std::endl;
 			// State* st = new State(*it, &state);
 			// std::unique_ptr<State> pst(st);
 			// sucessors.emplace_front(std::move(pst));
-			sucessors.emplace_front(std::make_unique<State>(State(*it, &state)));
+			sucessors.emplace_front(std::make_unique<State>(State(std::move(*it), &state)));
 		}
 	}
 	return sucessors;
@@ -80,8 +99,8 @@ std::pair<BestFirst::bf_iter, BestFirst::bf_iter> BestFirst::solve(const ILayout
 {
 	// m_solution = goal;
 	// init();
-	std::unique_ptr<ILayout> startCpy = start.copy();
-	m_open.push(std::make_unique<State>(State(startCpy, nullptr)));
+	// std::unique_ptr<ILayout> startCpy = start.copy();
+	m_open.push(std::make_unique<State>(State(start.copy(), nullptr)));
 	std::list<std::unique_ptr<State>> sucessors;
 
 	int count = 0;

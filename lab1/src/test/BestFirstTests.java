@@ -30,7 +30,7 @@ class BestFirstTests
 		BestFirst.State state1 = it.next();
 		BestFirst.State state2 = it.next();
 
-		// Arrange
+		// Assert
 		assertEquals(initial, state0.layout());
 		assertEquals(middle, state1.layout());
 		assertEquals(goal, state2.layout());
@@ -58,7 +58,7 @@ class BestFirstTests
 		while(it.hasNext())
 			currState = it.next();
 
-		// Arrange
+		// Assert
 		assertEquals(goal, currState.layout());
 		assertEquals(expectedCost, currState.getCost());
 	}
