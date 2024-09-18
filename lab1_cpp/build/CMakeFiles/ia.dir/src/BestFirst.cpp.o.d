@@ -199,4 +199,5 @@ CMakeFiles/ia.dir/src/BestFirst.cpp.o: \
  /usr/include/c++/14.2.1/bits/enable_special_members.h \
  /usr/include/c++/14.2.1/bits/node_handle.h \
  /usr/include/c++/14.2.1/bits/erase_if.h /usr/include/c++/14.2.1/iostream \
- /usr/include/c++/14.2.1/istream /usr/include/c++/14.2.1/bits/istream.tcc
+ /usr/include/c++/14.2.1/istream /usr/include/c++/14.2.1/bits/istream.tcc \
+ /usr/include/c++/14.2.1/sstream /usr/include/c++/14.2.1/bits/sstream.tcc

@@ -1,4 +1,0 @@
-./src/ILayout.cpp:3:1:ILayout::~ILayout()	16	static
-./src/ILayout.cpp:3:1:virtual ILayout::~ILayout()	32	static
-./src/ILayout.cpp:5:6:bool ILayout::operator!=(const ILayout&) const	32	static
-./src/ILayout.cpp:10:15:std::ostream& operator<<(std::ostream&, const ILayout&)	32	static

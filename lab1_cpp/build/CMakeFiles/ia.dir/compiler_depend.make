@@ -147,6 +147,7 @@ CMakeFiles/ia.dir/src/BestFirst.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp
   /usr/include/c++/14.2.1/bits/shared_ptr.h \
   /usr/include/c++/14.2.1/bits/shared_ptr_atomic.h \
   /usr/include/c++/14.2.1/bits/shared_ptr_base.h \
+  /usr/include/c++/14.2.1/bits/sstream.tcc \
   /usr/include/c++/14.2.1/bits/std_abs.h \
   /usr/include/c++/14.2.1/bits/std_mutex.h \
   /usr/include/c++/14.2.1/bits/stl_algobase.h \
@@ -213,6 +214,7 @@ CMakeFiles/ia.dir/src/BestFirst.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp
   /usr/include/c++/14.2.1/pstl/glue_memory_defs.h \
   /usr/include/c++/14.2.1/pstl/pstl_config.h \
   /usr/include/c++/14.2.1/queue \
+  /usr/include/c++/14.2.1/sstream \
   /usr/include/c++/14.2.1/stdexcept \
   /usr/include/c++/14.2.1/streambuf \
   /usr/include/c++/14.2.1/string \
@@ -1091,8 +1093,6 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 
 /home/luna/Documents/uni_code/IA/lab1_cpp/src/ILayout.cpp:
 
-/usr/include/c++/14.2.1/sstream:
-
 /usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include/syslimits.h:
 
 /usr/include/bits/flt-eval-method.h:
@@ -1146,6 +1146,10 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 /usr/include/c++/14.2.1/bits/memory_resource.h:
 
 /usr/include/c++/14.2.1/bits/locale_classes.h:
+
+/usr/include/syscall.h:
+
+/usr/include/c++/14.2.1/bits/concept_check.h:
 
 /usr/include/c++/14.2.1/bits/char_traits.h:
 
@@ -1303,10 +1307,6 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 
 /usr/include/asm-generic/errno.h:
 
-/usr/include/c++/14.2.1/bits/concept_check.h:
-
-/usr/include/syscall.h:
-
 /usr/include/bits/endian.h:
 
 /usr/include/c++/14.2.1/concepts:
@@ -1338,10 +1338,6 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 /usr/include/c++/14.2.1/bits/locale_classes.tcc:
 
 /usr/include/bits/struct_mutex.h:
-
-/usr/include/c++/14.2.1/bits/sstream.tcc:
-
-/usr/include/c++/14.2.1/bits/alloc_traits.h:
 
 /usr/include/c++/14.2.1/tr1/special_function_util.h:
 
@@ -1487,6 +1483,10 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 
 /usr/include/c++/14.2.1/bits/shared_ptr.h:
 
+/usr/include/c++/14.2.1/bits/alloc_traits.h:
+
+/usr/include/c++/14.2.1/bits/sstream.tcc:
+
 /usr/include/c++/14.2.1/bits/std_mutex.h:
 
 /usr/include/c++/14.2.1/ext/numeric_traits.h:
@@ -1598,6 +1598,8 @@ CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab1_cpp/src/
 /usr/include/c++/14.2.1/pstl/pstl_config.h:
 
 /usr/include/c++/14.2.1/queue:
+
+/usr/include/c++/14.2.1/sstream:
 
 /usr/include/bits/timex.h:
 

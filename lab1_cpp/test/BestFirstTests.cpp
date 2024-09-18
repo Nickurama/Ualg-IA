@@ -63,3 +63,55 @@ TEST_CASE("should solve 2")
 	CHECK(goal == last);
 	CHECK(expectedCost == lastState->getCost());
 }
+// TEST_CASE("should solve 3")
+// {
+// 	// Arrange
+// 	BestFirst bestFirst;
+// 	Board initial(	"123"
+// 					"456"
+// 					"780");
+//
+// 	Board goal(		"087"
+// 					"654"
+// 					"321");
+//
+// 	double expectedCost = 12.0;
+//
+// 	// Act
+// 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bestFirst.solve(initial, goal);
+// 	// BestFirst::bf_iter curr = itPair.first;
+// 	BestFirst::bf_iter end = itPair.second;
+//
+// 	const BestFirst::State* lastState = *(--end);
+// 	Board last = *dynamic_cast<const Board*>(lastState->layout());
+//
+// 	// Assert
+// 	CHECK(goal == last);
+// 	CHECK(expectedCost == lastState->getCost());
+// }
+// TEST_CASE("should solve 4")
+// {
+// 	// Arrange
+// 	BestFirst bestFirst;
+// 	Board initial(	"123"
+// 					"456"
+// 					"780");
+//
+// 	Board goal(		"123"
+// 					"405"
+// 					"786");
+//
+// 	double expectedCost = 2.0;
+//
+// 	// Act
+// 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bestFirst.solve(initial, goal);
+// 	// BestFirst::bf_iter curr = itPair.first;
+// 	BestFirst::bf_iter end = itPair.second;
+//
+// 	const BestFirst::State* lastState = *(--end);
+// 	Board last = *dynamic_cast<const Board*>(lastState->layout());
+//
+// 	// Assert
+// 	CHECK(goal == last);
+// 	CHECK(expectedCost == lastState->getCost());
+// }
