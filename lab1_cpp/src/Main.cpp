@@ -11,8 +11,6 @@ int main()
 	std::cin >> startStr >> goalStr;
 	Board start(startStr), goal(goalStr);
 
-	std::cout << "here!" << std::endl;
-
 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bf.solve(start, goal);
 	BestFirst::bf_iter startIt = itPair.first;
 	BestFirst::bf_iter endIt = itPair.second;

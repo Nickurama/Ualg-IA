@@ -38,20 +38,21 @@ private:
 	struct MapEqual { bool operator()(const ILayout* x, const ILayout* y) const; };
 	// the map needs pointer for polymorphism
 	// it also has ownership of (part of) states
-	std::unordered_map<const ILayout *, std::unique_ptr<State>, MapHash, MapEqual> m_closed; // needs pointer for polymorphism
+	std::unordered_map<const ILayout *, std::shared_ptr<State>, MapHash, MapEqual> m_closed; // needs pointer for polymorphism
 	// State& m_current;
 	// ILayout& m_solution;
 	std::list<const State *> m_solutionList;
 	static std::list<std::unique_ptr<State>> sucessors(const State& state);
 	// void init();
-	struct QueueCmp{ bool operator()(const std::unique_ptr<State>& x, const std::unique_ptr<State>& y) const; };
+	struct QueueCmp{ bool operator()(const std::shared_ptr<State>& x, const std::shared_ptr<State>& y) const; };
 	static void debugPrint(std::string text, int indent);
 	static void debugPrintState(const BestFirst::State *state, int indent);
-	static void debugPrintOpen(std::priority_queue<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>, QueueCmp>& queue, int indent);
-	static void debugPrintClosed(const std::unordered_map<const ILayout *, std::unique_ptr<State>, MapHash, MapEqual>& map, int indent);
+	static void debugPrintOpen(std::priority_queue<std::shared_ptr<State>, std::vector<std::shared_ptr<State>>, QueueCmp>& queue, int indent);
+	static void debugPrintClosed(const std::unordered_map<const ILayout *, std::shared_ptr<State>, MapHash, MapEqual>& map, int indent);
 	
 protected:
 	// also has ownership of (part of) states
-	std::priority_queue<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>, QueueCmp> m_open;
+	std::priority_queue<std::shared_ptr<State>, std::vector<std::shared_ptr<State>>, QueueCmp> m_open;
+	std::unordered_map<const ILayout *, std::shared_ptr<State>, MapHash, MapEqual> m_openMap;
 	// std::priority_queue<std::unique_ptr<State>, std::vector<std::unique_ptr<State>>, bool(*)(const State&, const State&)> m_open;
 };

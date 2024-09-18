@@ -65,6 +65,13 @@ class BestFirst
 		openMap.put(state.layout, state);
 	}
 
+	private State openPop()
+	{
+		State result = open.remove();
+		openMap.remove(result.layout);
+		return result;
+	}
+
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		objective = goal;
@@ -76,7 +83,8 @@ class BestFirst
 
 		while (!open.isEmpty())
 		{
-			current = open.remove();
+			// current = open.remove();
+			current = openPop();
 			if (current.layout.equals(goal))
 			{
 				List<State> solution = new LinkedList<State>();
