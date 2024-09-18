@@ -3,6 +3,7 @@ import java.util.*;
 class BestFirst
 {
 	protected Queue<State> open;
+	private Map<ILayout, State> openMap;
 	private Map<ILayout, State> closed;
 	private State current;
 	private ILayout objective;
@@ -58,12 +59,19 @@ class BestFirst
 		return sucessors;
 	}
 
+	private void openAdd(State state)
+	{
+		open.add(state);
+		openMap.put(state.layout, state);
+	}
+
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		objective = goal;
 		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.getCost() - s2.getCost()));
 		closed = new HashMap<ILayout, State>();
-		open.add(new State(start, null));
+		openMap = new HashMap<ILayout, State>();
+		openAdd(new State(start, null));
 		List<State> sucessors;
 
 		while (!open.isEmpty())
@@ -81,12 +89,12 @@ class BestFirst
 				}
 				return solution.reversed().iterator();
 			}
+			closed.put(current.layout, current);
 
 			sucessors = sucessors(current);
-			closed.put(current.layout, current);
 			for (State sucessor : sucessors)
-				if (!closed.containsKey(sucessor.layout))
-					open.add(sucessor);
+				if (!closed.containsKey(sucessor.layout) && !openMap.containsKey(sucessor.layout))
+					openAdd(sucessor);
 		}
 		return null;
 	}
