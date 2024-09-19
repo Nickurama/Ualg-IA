@@ -7,6 +7,7 @@ project(ia VERSION 1.0)
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 add_executable(ia ${SRC_FILES})
 target_include_directories(ia PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_options(ia PRIVATE -Wall -Werror -Wpedantic -O5)
 
 
 

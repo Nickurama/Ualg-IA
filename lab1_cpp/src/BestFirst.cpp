@@ -54,15 +54,42 @@ const ILayout* BestFirst::State::layout() const {
 	return m_layout.get();
 }
 
-std::list<std::unique_ptr<BestFirst::State>> BestFirst::sucessors(const BestFirst::State& state)
+std::vector<std::unique_ptr<BestFirst::State>> BestFirst::sucessors(const BestFirst::State& state)
 {
-	std::list<std::unique_ptr<State>> sucessors;
-	std::list<std::unique_ptr<ILayout>> children = state.layout()->children();
+	// timing
+	// static std::chrono::nanoseconds time_total(0);
+	// static std::chrono::nanoseconds before_time(0);
+	// static std::chrono::nanoseconds after_time(0);
+	// static int count = 0;
+	// auto start_time = std::chrono::high_resolution_clock::now();
+	// timing
+	
+	std::vector<std::unique_ptr<ILayout>> children = state.layout()->children();
 
-	std::list<std::unique_ptr<ILayout>>::iterator it;
-	for (it = children.begin(); it != children.end(); it++)
-		if (state.father() == nullptr || **it != *state.father()->layout())
-			sucessors.emplace_front(std::make_unique<State>(std::move(*it), &state));
+	// timing
+	// auto mid_time = std::chrono::high_resolution_clock::now();
+	// timing
+
+	// std::list<std::unique_ptr<State>> sucessors;
+	std::vector<std::unique_ptr<State>> sucessors;
+	sucessors.reserve(10);
+	for (std::unique_ptr<ILayout>& child : children)
+		if (state.father() == nullptr || *child != *state.father()->layout())
+			sucessors.emplace_back(std::make_unique<State>(std::move(child), &state));
+
+	// timing
+	// auto end_time = std::chrono::high_resolution_clock::now();
+	// time_total += std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time);
+	// before_time += std::chrono::duration_cast<std::chrono::nanoseconds>(mid_time - start_time);
+	// after_time += std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - mid_time);
+	// if (count++ > 181438)
+	// {
+	// 	std::cout << "sucessors: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total).count() << "ms\n";
+	// 	std::cout << "before: " << std::chrono::duration_cast<std::chrono::milliseconds>(before_time).count() << "ms\n";
+	// 	std::cout << "after: " << std::chrono::duration_cast<std::chrono::milliseconds>(after_time).count() << "ms\n";
+	// }
+	// timing
+
 	return sucessors;
 }
 
@@ -106,10 +133,10 @@ void BestFirst::debugPrintState(const State *state, int indent)
 	std::stringstream ss;
 
 	debugPrint("[Layout]", indent);
-		ss = std::stringstream();
-		ss << state;
-		debugPrint(ss.str(), indent + 1);
-		ss = std::stringstream();
+	ss = std::stringstream();
+	ss << state;
+	debugPrint(ss.str(), indent + 1);
+	ss = std::stringstream();
 	state->layout()->print(ss);
 	debugPrint(ss.str(), indent + 1);
 
@@ -169,25 +196,18 @@ void BestFirst::debugPrintClosed(const std::unordered_map<const ILayout *, std::
 
 std::pair<BestFirst::bf_iter, BestFirst::bf_iter> BestFirst::solve(const ILayout& start, const ILayout& goal)
 {
-	std::chrono::microseconds time_total_full(0);
-	std::chrono::microseconds time_total_init(0);
-	std::chrono::microseconds time_total_sucessors(0);
-	std::chrono::microseconds time_total_map_operations(0);
-	std::chrono::microseconds time_total_state_sucessors(0);
+	std::chrono::nanoseconds time_total_full(0);
+	// std::chrono::nanoseconds time_total_sucessors(0);
+	// std::chrono::nanoseconds time_total_map_operations(0);
+	// std::chrono::nanoseconds time_total_state_sucessors(0);
 
 
 	auto start_full = std::chrono::high_resolution_clock::now();
 
-	auto start_init = std::chrono::high_resolution_clock::now();
-
 	std::shared_ptr<State> first(std::make_shared<State>(start.copy(), nullptr));
 	m_open.push(first);
 	m_openMap[first->layout()] = first;
-	std::list<std::unique_ptr<State>> sucessors;
-
-	auto end_init = std::chrono::high_resolution_clock::now();
-	time_total_init += std::chrono::duration_cast<std::chrono::microseconds>(end_init - start_init);
-
+	std::vector<std::unique_ptr<State>> sucessors;
 
 	// int count = 0;
 
@@ -224,22 +244,22 @@ std::pair<BestFirst::bf_iter, BestFirst::bf_iter> BestFirst::solve(const ILayout
 		// WARNING: very dangerous cast, but std::priority_queue does not allow
 		// moving out of the queue. Do NOT use either the queue or attempt to
 		// modify the variable from the old pointer after this.
-		auto start_sucessors = std::chrono::high_resolution_clock::now();
+		// auto start_sucessors = std::chrono::high_resolution_clock::now();
 		sucessors = BestFirst::sucessors(*curr);
-		auto end_sucessors = std::chrono::high_resolution_clock::now();
-		time_total_sucessors += std::chrono::duration_cast<std::chrono::microseconds>(end_sucessors - start_sucessors);
+		// auto end_sucessors = std::chrono::high_resolution_clock::now();
+		// time_total_sucessors += std::chrono::duration_cast<std::chrono::nanoseconds>(end_sucessors - start_sucessors);
 
-		auto start_map_operations = std::chrono::high_resolution_clock::now();
+		// auto start_map_operations = std::chrono::high_resolution_clock::now();
 		m_openMap.erase(curr->layout());
 		m_closed[curr->layout()] = std::move(const_cast<std::shared_ptr<State>&>(curr));
 		// WARNING: CANNOT USE CURR AFTER HERE
 		m_open.pop();
-		auto end_map_operations = std::chrono::high_resolution_clock::now();
-		time_total_map_operations += std::chrono::duration_cast<std::chrono::microseconds>(end_map_operations - start_map_operations);
+		// auto end_map_operations = std::chrono::high_resolution_clock::now();
+		// time_total_map_operations += std::chrono::duration_cast<std::chrono::nanoseconds>(end_map_operations - start_map_operations);
 
 		// debugPrint("[Sucessors]", 0);
 		// int n = 0;
-		auto start_state_sucessors = std::chrono::high_resolution_clock::now();
+		// auto start_state_sucessors = std::chrono::high_resolution_clock::now();
 		for (std::unique_ptr<State>& sucessor : sucessors)
 		{
 			// debugPrint("[Sucessor " + std::to_string(n++) + "]", 1);
@@ -255,21 +275,15 @@ std::pair<BestFirst::bf_iter, BestFirst::bf_iter> BestFirst::solve(const ILayout
 				m_openMap[sharedSucc->layout()] = sharedSucc;
 				m_open.push(sharedSucc);
 			}
-			else
-			{
-				// debugPrint("True", 3);
-			}
+			// else
+			// {
+			// 	debugPrint("True", 3);
+			// }
 		}
-		auto end_state_sucessors = std::chrono::high_resolution_clock::now();
-		time_total_state_sucessors += std::chrono::duration_cast<std::chrono::microseconds>(end_state_sucessors - start_state_sucessors);
 	}
 	auto end_full = std::chrono::high_resolution_clock::now();
-	time_total_full += std::chrono::duration_cast<std::chrono::microseconds>(end_full - start_full);
+	time_total_full += std::chrono::duration_cast<std::chrono::nanoseconds>(end_full - start_full);
 
-	std::cout << "Init time: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total_init).count() << "ms\n";
-	std::cout << "Sucessors time: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total_sucessors).count() << "ms\n";
-	std::cout << "Map operations time: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total_map_operations).count() << "ms\n";
-	std::cout << "State Sucessors time: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total_state_sucessors).count() << "ms\n";
 	std::cout << "Full time: " << std::chrono::duration_cast<std::chrono::milliseconds>(time_total_full).count() << "ms\n";
 	return std::pair<BestFirst::bf_iter, BestFirst::bf_iter>(nullptr, nullptr);
 }

@@ -42,7 +42,7 @@ private:
 	// State& m_current;
 	// ILayout& m_solution;
 	std::list<const State *> m_solutionList;
-	static std::list<std::unique_ptr<State>> sucessors(const State& state);
+	static std::vector<std::unique_ptr<State>> sucessors(const State& state);
 	// void init();
 	struct QueueCmp{ bool operator()(const std::shared_ptr<State>& x, const std::shared_ptr<State>& y) const; };
 	static void debugPrint(std::string text, int indent);

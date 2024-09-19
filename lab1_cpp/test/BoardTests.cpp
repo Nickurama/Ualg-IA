@@ -131,9 +131,9 @@ TEST_CASE("should be goal when is equal")
 	CHECK(isGoal2);
 }
 
-bool test_find(std::list<std::unique_ptr<ILayout>>::iterator begin, std::list<std::unique_ptr<ILayout>>::iterator end, const ILayout& expected)
+bool test_find(std::vector<std::unique_ptr<ILayout>>::iterator begin, std::vector<std::unique_ptr<ILayout>>::iterator end, const ILayout& expected)
 {
-	for (std::list<std::unique_ptr<ILayout>>::iterator it = begin; it != end; it++)
+	for (std::vector<std::unique_ptr<ILayout>>::iterator it = begin; it != end; it++)
 		if (**it == expected)
 			return true;
 	return false;
@@ -149,7 +149,7 @@ TEST_CASE("should get 4 children")
 	Board expectedChild3("134258607");
 
 	// Act
-	std::list<std::unique_ptr<ILayout>> children = b.children();
+	std::vector<std::unique_ptr<ILayout>> children = b.children();
 
 	// Arrange
 	CHECK(children.size() == 4);
@@ -167,7 +167,7 @@ TEST_CASE("should get 2 children on bottom left")
 	Board expectedChild1("634218507");
 
 	// Act
-	std::list<std::unique_ptr<ILayout>> children = b.children();
+	std::vector<std::unique_ptr<ILayout>> children = b.children();
 
 	// Arrange
 	CHECK(children.size() == 2);
@@ -183,7 +183,7 @@ TEST_CASE("should get 2 children on top right")
 	Board expectedChild1("638210357");
 
 	// Act
-	std::list<std::unique_ptr<ILayout>> children = b.children();
+	std::vector<std::unique_ptr<ILayout>> children = b.children();
 
 	// Arrange
 	CHECK(children.size() == 2);

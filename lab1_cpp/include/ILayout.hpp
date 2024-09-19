@@ -1,12 +1,13 @@
 #pragma once
 #include <list>
 #include <memory>
+#include <vector>
 
 class ILayout
 {
 public:
 	virtual ~ILayout();
-	virtual std::list<std::unique_ptr<ILayout>> children() const = 0;
+	virtual std::vector<std::unique_ptr<ILayout>> children() const = 0;
 	virtual bool isGoal(const ILayout& layout) const = 0;
 	virtual double getCost() const = 0;
 	virtual void print(std::ostream& stream) const = 0;
