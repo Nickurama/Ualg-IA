@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.List;
 
-class Board implements ILayout, Cloneable
+class Board implements ILayout
 {
 	private static final int dim = 3;
 	private int board[][];
@@ -75,6 +75,7 @@ class Board implements ILayout, Cloneable
 		return this.toString().hashCode();
 	}
 
+	@Override
 	public List<ILayout> children()
 	{
 		int zeroRow = -1;
@@ -166,11 +167,13 @@ class Board implements ILayout, Cloneable
 		return result;
 	}
 
+	@Override
 	public boolean isGoal(ILayout that)
 	{
 		return this.equals(that);
 	}
 
+	@Override
 	public double getCost()
 	{
 		return 1;

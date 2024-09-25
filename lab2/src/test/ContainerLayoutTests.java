@@ -215,7 +215,6 @@ public class ContainerLayoutTests
 	{
 		// Arrange
 		ContainerLayout cs = new ContainerLayout("BA EF C");
-		List<ILayout> children = cs.children();
 		boolean threw = false;
 
 		// Act
@@ -306,29 +305,37 @@ public class ContainerLayoutTests
 		ContainerLayout b3 = new ContainerLayout("F3 E14B4");
 		ContainerLayout b4 = new ContainerLayout("F5 E4B33");
 		ContainerLayout b5 = new ContainerLayout("F EB");
+		ContainerLayout b6 = new ContainerLayout("EB F");
 		
 		// Act
 		boolean simmetry0 = b0.equals(b1) && b1.equals(b0);
 		boolean simmetry1 = b2.equals(b3) && b3.equals(b2);
 		boolean simmetry2 = b3.equals(b4) && b4.equals(b3);
 		boolean simmetry3 = b3.equals(b5) && b5.equals(b3);
+		boolean simmetry4 = b3.equals(b6) && b6.equals(b3);
 		int hash0 = b0.hashCode();
 		int hash1 = b1.hashCode();
 		int hash2 = b2.hashCode();
 		int hash3 = b3.hashCode();
 		int hash4 = b4.hashCode();
 		int hash5 = b5.hashCode();
+		int hash6 = b6.hashCode();
 
 		// Arrange
 		assertTrue(simmetry0);
 		assertTrue(simmetry1);
 		assertTrue(simmetry2);
 		assertTrue(simmetry3);
+		assertTrue(simmetry4);
+
 		assertEquals(hash0, hash1);
 		assertEquals(hash2, hash3);
+		System.out.println(hash0);
+		System.out.println(hash2);
 		assertNotEquals(hash0, hash2);
 		assertEquals(hash3, hash4);
 		assertEquals(hash3, hash5);
+		assertEquals(hash3, hash6);
 	}
 
 	@Test
@@ -370,7 +377,7 @@ public class ContainerLayoutTests
 		// Arrange
 		ContainerLayout cs = new ContainerLayout("B1A1 E14F9927");
 		ContainerLayout expectedChild0 = new ContainerLayout("A1 B1 E14F9927");
-		ContainerLayout expectedChild1 = new ContainerLayout("B1 E14F9927B1");
+		ContainerLayout expectedChild1 = new ContainerLayout("B1 E14F9927A1");
 		ContainerLayout expectedChild2 = new ContainerLayout("F9927 B1A1 E14");
 		ContainerLayout expectedChild3 = new ContainerLayout("B1A1F9927 E14");
 

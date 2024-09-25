@@ -96,7 +96,7 @@ size_t Board::calcHash() const
 	std::size_t hash = 0;
 	for (int i = 0; i < DIM; i++)
 		for (int j = 0; j < DIM; j++)
-			hash = hash * 97 + std::hash<int>()(m_board[i][j]);
+			hash = hash * 97 + std::hash<int>()(m_board[i][j]) + 1;
 	return hash;
 }
 

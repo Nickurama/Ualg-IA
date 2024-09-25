@@ -8,7 +8,7 @@ public class Main
 		Scanner sc = new Scanner(System.in);
 		BestFirst s = new BestFirst();
 
-		Iterator<BestFirst.State> it = s.solve(new Board(sc.next()), new Board(sc.next()));
+		Iterator<BestFirst.State> it = s.solve(new ContainerLayout(sc.nextLine()), new ContainerLayout(sc.nextLine()));
 		sc.close();
 
 		if (it == null)
