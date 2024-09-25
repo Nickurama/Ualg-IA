@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/luna/Documents/uni_code/IA/lab1_cpp/include
+CXX_INCLUDES = -I/home/luna/Documents/uni_code/IA/lab2_cpp/include
 
 CXX_FLAGS = -std=gnu++20
 

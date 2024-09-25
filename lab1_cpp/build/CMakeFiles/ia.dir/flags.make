@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/luna/Documents/uni_code/IA/lab1_cpp/include
 
-CXX_FLAGS = -Wall -Werror -Wpedantic -O5
+CXX_FLAGS = -std=gnu++20 -Wall -Werror -Wpedantic -O5
 
