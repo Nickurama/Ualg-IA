@@ -74,7 +74,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("");
+			new ContainerLayout("");
 		}
 		catch (Exception e)
 		{
@@ -94,7 +94,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("A1 B-3");
+			new ContainerLayout("A1 B-3");
 		}
 		catch (Exception e)
 		{
@@ -114,7 +114,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("A1 A2");
+			new ContainerLayout("A1 A2");
 		}
 		catch (Exception e)
 		{
@@ -134,7 +134,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("A B1C2");
+			new ContainerLayout("A B1C2");
 		}
 		catch (Exception e)
 		{
@@ -154,7 +154,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("A1 CB1");
+			new ContainerLayout("A1 CB1");
 		}
 		catch (Exception e)
 		{
@@ -174,7 +174,7 @@ public class ContainerLayoutTests
 		// Act
 		try
 		{
-			ContainerLayout cs = new ContainerLayout("A1 B C1");
+			new ContainerLayout("A1 B C1");
 		}
 		catch (Exception e)
 		{
@@ -281,17 +281,12 @@ public class ContainerLayoutTests
 		// Arrange
 		ContainerLayout b0 = new ContainerLayout("B1A1 E14F9927");
 		ContainerLayout b1 = new ContainerLayout("F3 E14B4");
-		// ContainerLayout b2 = new ContainerLayout("F3 E13B4");
 		
 		// Act
 		boolean simmetry0 = b0.equals(b1) || b1.equals(b0);
-		// boolean simmetry1 = b0.equals(b2) || b2.equals(b0);
-		// boolean simmetry2 = b1.equals(b2) || b2.equals(b1);
 
 		// Arrange
 		assertFalse(simmetry0);
-		// assertFalse(simmetry1);
-		// assertFalse(simmetry2);
 		assertNotEquals(b0, "B1A1 E14F9927");
 	}
 
@@ -330,8 +325,6 @@ public class ContainerLayoutTests
 
 		assertEquals(hash0, hash1);
 		assertEquals(hash2, hash3);
-		System.out.println(hash0);
-		System.out.println(hash2);
 		assertNotEquals(hash0, hash2);
 		assertEquals(hash3, hash4);
 		assertEquals(hash3, hash5);
