@@ -304,6 +304,7 @@ std::unique_ptr<ContainerLayout> ContainerLayout::moveContainer(int from, int to
 		if (to >= 0) // place on top of container
 			moved->m_containerOnTopIndex[to] = from;
 	}
+	moved->m_hasHash = false;
 	return moved;
 }
 
