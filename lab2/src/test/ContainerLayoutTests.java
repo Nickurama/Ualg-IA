@@ -48,10 +48,11 @@ public class ContainerLayoutTests
 		assertEquals(expected, obtained);
 	}
 
+	@Test
 	public void testConstructor3()
 	{
 		// Arrange
-		ContainerLayout cs = new ContainerLayout("A C B");
+		ContainerLayout cs = new ContainerLayout("AC B");
 		StringWriter writer = new StringWriter();
 		PrintWriter pw = new PrintWriter ( writer ) ;
 		pw.println("[A, C]");
@@ -66,6 +67,7 @@ public class ContainerLayoutTests
 		assertEquals(expected, obtained);
 	}
 
+	@Test
 	public void shouldThrowWhenConstructingEmptyString()
 	{
 		// Arrange
@@ -351,6 +353,7 @@ public class ContainerLayoutTests
 		assertTrue(isGoal2);
 	}
 
+	@Test
 	public void shouldGetOneChildSameAsParent()
 	{
 		// Arrange
@@ -360,8 +363,7 @@ public class ContainerLayoutTests
 		List<ILayout> children = cs.children();
 
 		// Arrange
-		assertEquals(children.size(), 1);
-		assertTrue(children.contains(cs));
+		assertTrue(children.isEmpty());
 	}
 
 	@Test

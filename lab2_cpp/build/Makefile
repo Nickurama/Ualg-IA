@@ -196,6 +196,33 @@ src/Board.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/Board.cpp.s
 .PHONY : src/Board.cpp.s
 
+src/ContainerLayout.o: src/ContainerLayout.cpp.o
+.PHONY : src/ContainerLayout.o
+
+# target to build an object file
+src/ContainerLayout.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ContainerLayout.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ContainerLayout.cpp.o
+.PHONY : src/ContainerLayout.cpp.o
+
+src/ContainerLayout.i: src/ContainerLayout.cpp.i
+.PHONY : src/ContainerLayout.i
+
+# target to preprocess a source file
+src/ContainerLayout.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ContainerLayout.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ContainerLayout.cpp.i
+.PHONY : src/ContainerLayout.cpp.i
+
+src/ContainerLayout.s: src/ContainerLayout.cpp.s
+.PHONY : src/ContainerLayout.s
+
+# target to generate assembly for a file
+src/ContainerLayout.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/ContainerLayout.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/ContainerLayout.cpp.s
+.PHONY : src/ContainerLayout.cpp.s
+
 src/ILayout.o: src/ILayout.cpp.o
 .PHONY : src/ILayout.o
 
@@ -295,6 +322,30 @@ test/BoardTests.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/BoardTests.cpp.s
 .PHONY : test/BoardTests.cpp.s
 
+test/ContainerLayoutTests.o: test/ContainerLayoutTests.cpp.o
+.PHONY : test/ContainerLayoutTests.o
+
+# target to build an object file
+test/ContainerLayoutTests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/ContainerLayoutTests.cpp.o
+.PHONY : test/ContainerLayoutTests.cpp.o
+
+test/ContainerLayoutTests.i: test/ContainerLayoutTests.cpp.i
+.PHONY : test/ContainerLayoutTests.i
+
+# target to preprocess a source file
+test/ContainerLayoutTests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/ContainerLayoutTests.cpp.i
+.PHONY : test/ContainerLayoutTests.cpp.i
+
+test/ContainerLayoutTests.s: test/ContainerLayoutTests.cpp.s
+.PHONY : test/ContainerLayoutTests.s
+
+# target to generate assembly for a file
+test/ContainerLayoutTests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/ContainerLayoutTests.cpp.s
+.PHONY : test/ContainerLayoutTests.cpp.s
+
 test/TestMain.o: test/TestMain.cpp.o
 .PHONY : test/TestMain.o
 
@@ -335,6 +386,9 @@ help:
 	@echo "... src/Board.o"
 	@echo "... src/Board.i"
 	@echo "... src/Board.s"
+	@echo "... src/ContainerLayout.o"
+	@echo "... src/ContainerLayout.i"
+	@echo "... src/ContainerLayout.s"
 	@echo "... src/ILayout.o"
 	@echo "... src/ILayout.i"
 	@echo "... src/ILayout.s"
@@ -347,6 +401,9 @@ help:
 	@echo "... test/BoardTests.o"
 	@echo "... test/BoardTests.i"
 	@echo "... test/BoardTests.s"
+	@echo "... test/ContainerLayoutTests.o"
+	@echo "... test/ContainerLayoutTests.i"
+	@echo "... test/ContainerLayoutTests.s"
 	@echo "... test/TestMain.o"
 	@echo "... test/TestMain.i"
 	@echo "... test/TestMain.s"

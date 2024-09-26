@@ -1,6 +1,7 @@
 #include "doctest.hpp"
 #include "Board.hpp"
 #include "BestFirst.hpp"
+#include "ContainerLayout.hpp"
 #include <iostream>
 
 TEST_CASE("should solve")
@@ -272,6 +273,96 @@ TEST_CASE("mooshak5")
 	Board last = *dynamic_cast<const Board*>(lastState->layout());
 
 	// Assert
+	CHECK(goal == last);
+	CHECK(expectedCost == lastState->getCost());
+}
+
+TEST_CASE("Should solve container layout")
+{
+	// Arrange
+	BestFirst bestFirst;
+	ContainerLayout initial("A1C1 "
+							"B1");
+
+	ContainerLayout goal(	"A "
+							"B "
+							"C");
+
+	double expectedCost = 1.0;
+
+	// Act
+	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bestFirst.solve(initial, goal);
+	BestFirst::bf_iter end = itPair.second;
+
+	const BestFirst::State* lastState = *(--end);
+	ContainerLayout last = *dynamic_cast<const ContainerLayout*>(lastState->layout());
+
+	// Assert
+	CHECK(goal == last);
+	CHECK(expectedCost == lastState->getCost());
+}
+
+TEST_CASE("Should solve container layout when initial is the same as goal")
+{
+	// Arrange
+	BestFirst bestFirst;
+	ContainerLayout initial("A1B1C1");
+
+	ContainerLayout goal("A1B1C1");
+
+	double expectedCost = 0.0;
+
+	// Act
+	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bestFirst.solve(initial, goal);
+	BestFirst::bf_iter end = itPair.second;
+
+	const BestFirst::State* lastState = *(--end);
+	ContainerLayout last = *dynamic_cast<const ContainerLayout*>(lastState->layout());
+
+	// Assert
+	CHECK(goal == last);
+	CHECK(expectedCost == lastState->getCost());
+}
+
+TEST_CASE("Should solve container layout 2")
+{
+	// Arrange
+	BestFirst bestFirst;
+	ContainerLayout initial("A1B1 "
+							"C3D1");
+
+	ContainerLayout goal(	"DA "
+							"BC");
+
+	ContainerLayout expected1(	"A "
+								"B "
+								"CD");
+
+	ContainerLayout expected2(	"A "
+								"B "
+								"C "
+								"D");
+
+	ContainerLayout expected3(	"B "
+								"C "
+								"DA");
+
+	double expectedCost = 6.0;
+
+	// Act
+	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bestFirst.solve(initial, goal);
+	BestFirst::bf_iter curr = itPair.first;
+	BestFirst::bf_iter end = itPair.second;
+
+	const BestFirst::State* lastState = *(--end);
+	ContainerLayout last = *dynamic_cast<const ContainerLayout*>(lastState->layout());
+
+	// Assert
+	CHECK(*dynamic_cast<const ContainerLayout*>((*curr++)->layout()) == initial);
+	CHECK(*dynamic_cast<const ContainerLayout*>((*curr++)->layout()) == expected1);
+	CHECK(*dynamic_cast<const ContainerLayout*>((*curr++)->layout()) == expected2);
+	CHECK(*dynamic_cast<const ContainerLayout*>((*curr++)->layout()) == expected3);
+	CHECK(*dynamic_cast<const ContainerLayout*>((*curr++)->layout()) == goal);
 	CHECK(goal == last);
 	CHECK(expectedCost == lastState->getCost());
 }

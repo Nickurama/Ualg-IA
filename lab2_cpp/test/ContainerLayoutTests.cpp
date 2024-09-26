@@ -1,4 +1,3 @@
-#pragma once
 #include "doctest.hpp"
 #include "ContainerLayout.hpp"
 #include <string>
@@ -46,7 +45,7 @@ TEST_CASE("Test constructor 3")
 							"[B]\n";
 
 	// Act
-	ContainerLayout b("A B C");
+	ContainerLayout b("AC B");
 	std::stringstream ss;
 	ss << b;
 	std::string bStr = ss.str();
@@ -112,7 +111,7 @@ TEST_CASE("Should throw when duplicate container")
 	CHECK(threw);
 }
 
-TEST_CASE("Should throw when mixing cost with cost (1)")
+TEST_CASE("Should throw when mixing cost with no cost (1)")
 {
 	// Arrange
 	bool threw = false;
@@ -120,26 +119,7 @@ TEST_CASE("Should throw when mixing cost with cost (1)")
 	// Act
 	try
 	{
-		ContainerLayout cs("A1 B1C2");
-	}
-	catch (std::exception& e)
-	{
-		threw = true;
-	}
-
-	// Assert
-	CHECK(threw);
-}
-
-TEST_CASE("Should throw when mixing cost with cost (1)")
-{
-	// Arrange
-	bool threw = false;
-
-	// Act
-	try
-	{
-		ContainerLayout cs("A1 B1C2");
+		ContainerLayout cs("A B1C2");
 	}
 	catch (std::exception& e)
 	{
@@ -355,8 +335,7 @@ TEST_CASE("Should get one child, same as parent")
 	std::vector<std::unique_ptr<ILayout>> children = cs.children();
 
 	// Assert
-	CHECK(children.size() == 1);
-	CHECK(*children[0] == cs);
+	CHECK(children.empty());
 }
 
 bool test_find(const std::vector<std::unique_ptr<ILayout>>& vect, const ILayout& expected)

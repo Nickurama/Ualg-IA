@@ -97,10 +97,24 @@ CMakeFiles/ia.dir/src/Board.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ia.dir/src/Board.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab2_cpp/src/Board.cpp -o CMakeFiles/ia.dir/src/Board.cpp.s
 
+CMakeFiles/ia.dir/src/ContainerLayout.cpp.o: CMakeFiles/ia.dir/flags.make
+CMakeFiles/ia.dir/src/ContainerLayout.cpp.o: /home/luna/Documents/uni_code/IA/lab2_cpp/src/ContainerLayout.cpp
+CMakeFiles/ia.dir/src/ContainerLayout.cpp.o: CMakeFiles/ia.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ia.dir/src/ContainerLayout.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ia.dir/src/ContainerLayout.cpp.o -MF CMakeFiles/ia.dir/src/ContainerLayout.cpp.o.d -o CMakeFiles/ia.dir/src/ContainerLayout.cpp.o -c /home/luna/Documents/uni_code/IA/lab2_cpp/src/ContainerLayout.cpp
+
+CMakeFiles/ia.dir/src/ContainerLayout.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ia.dir/src/ContainerLayout.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/luna/Documents/uni_code/IA/lab2_cpp/src/ContainerLayout.cpp > CMakeFiles/ia.dir/src/ContainerLayout.cpp.i
+
+CMakeFiles/ia.dir/src/ContainerLayout.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ia.dir/src/ContainerLayout.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/luna/Documents/uni_code/IA/lab2_cpp/src/ContainerLayout.cpp -o CMakeFiles/ia.dir/src/ContainerLayout.cpp.s
+
 CMakeFiles/ia.dir/src/ILayout.cpp.o: CMakeFiles/ia.dir/flags.make
 CMakeFiles/ia.dir/src/ILayout.cpp.o: /home/luna/Documents/uni_code/IA/lab2_cpp/src/ILayout.cpp
 CMakeFiles/ia.dir/src/ILayout.cpp.o: CMakeFiles/ia.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ia.dir/src/ILayout.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ia.dir/src/ILayout.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ia.dir/src/ILayout.cpp.o -MF CMakeFiles/ia.dir/src/ILayout.cpp.o.d -o CMakeFiles/ia.dir/src/ILayout.cpp.o -c /home/luna/Documents/uni_code/IA/lab2_cpp/src/ILayout.cpp
 
 CMakeFiles/ia.dir/src/ILayout.cpp.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/ia.dir/src/ILayout.cpp.s: cmake_force
 CMakeFiles/ia.dir/src/Main.cpp.o: CMakeFiles/ia.dir/flags.make
 CMakeFiles/ia.dir/src/Main.cpp.o: /home/luna/Documents/uni_code/IA/lab2_cpp/src/Main.cpp
 CMakeFiles/ia.dir/src/Main.cpp.o: CMakeFiles/ia.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ia.dir/src/Main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ia.dir/src/Main.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ia.dir/src/Main.cpp.o -MF CMakeFiles/ia.dir/src/Main.cpp.o.d -o CMakeFiles/ia.dir/src/Main.cpp.o -c /home/luna/Documents/uni_code/IA/lab2_cpp/src/Main.cpp
 
 CMakeFiles/ia.dir/src/Main.cpp.i: cmake_force
@@ -129,6 +143,7 @@ CMakeFiles/ia.dir/src/Main.cpp.s: cmake_force
 ia_OBJECTS = \
 "CMakeFiles/ia.dir/src/BestFirst.cpp.o" \
 "CMakeFiles/ia.dir/src/Board.cpp.o" \
+"CMakeFiles/ia.dir/src/ContainerLayout.cpp.o" \
 "CMakeFiles/ia.dir/src/ILayout.cpp.o" \
 "CMakeFiles/ia.dir/src/Main.cpp.o"
 
@@ -137,11 +152,12 @@ ia_EXTERNAL_OBJECTS =
 
 ia: CMakeFiles/ia.dir/src/BestFirst.cpp.o
 ia: CMakeFiles/ia.dir/src/Board.cpp.o
+ia: CMakeFiles/ia.dir/src/ContainerLayout.cpp.o
 ia: CMakeFiles/ia.dir/src/ILayout.cpp.o
 ia: CMakeFiles/ia.dir/src/Main.cpp.o
 ia: CMakeFiles/ia.dir/build.make
 ia: CMakeFiles/ia.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable ia"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable ia"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ia.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

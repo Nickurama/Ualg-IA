@@ -1,5 +1,6 @@
 #include "BestFirst.hpp"
 #include "Board.hpp"
+#include "ContainerLayout.hpp"
 #include <cmath>
 #include <iostream>
 
@@ -8,8 +9,12 @@ int main()
 	BestFirst bf;
 	
 	std::string startStr, goalStr;
-	std::cin >> startStr >> goalStr;
-	Board start(startStr), goal(goalStr);
+	// std::cin >> startStr >> goalStr;
+	// Board start(startStr), goal(goalStr);
+
+	getline(std::cin, startStr);
+	getline(std::cin, goalStr);
+	ContainerLayout start(startStr), goal(goalStr);
 
 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bf.solve(start, goal);
 	BestFirst::bf_iter startIt = itPair.first;

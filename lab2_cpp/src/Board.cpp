@@ -65,10 +65,11 @@ void Board::print(std::ostream& os) const
 bool Board::operator==(const ILayout& rhs) const
 {
 	if (this == &rhs) return true;
-	const Board& other = dynamic_cast<const Board&>(rhs);
+	const Board* other = dynamic_cast<const Board*>(&rhs);
+	if (other == nullptr)
+		return false;
 
-	return std::memcmp(m_board, other.m_board, DIM * DIM * sizeof(int)) == 0;
-	return true;
+	return std::memcmp(m_board, other->m_board, DIM * DIM * sizeof(int)) == 0;
 }
 
 size_t Board::calcHash() const

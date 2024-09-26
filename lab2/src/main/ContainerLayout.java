@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 class ContainerLayout implements ILayout
@@ -14,6 +13,9 @@ class ContainerLayout implements ILayout
 
 	public ContainerLayout(String str) throws IllegalArgumentException
 	{
+		if (str.isEmpty())
+			throw new IllegalArgumentException("String cannot be empty.");
+
 		this.cost = 0.0;
 		
 		this.containersCost = new int[BUCKET_SIZE];
@@ -118,7 +120,7 @@ class ContainerLayout implements ILayout
 			throw new IllegalArgumentException("Expected numeric character.");
 	}
 
-	// returns if the next container has a "previous" container
+	// returns the next container's "bottom" container
 	private int addContainer(int key, int cost, int next, int previous) throws IllegalArgumentException
 	{
 		if (this.contains(key))
