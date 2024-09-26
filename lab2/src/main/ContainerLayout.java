@@ -277,13 +277,29 @@ class ContainerLayout implements ILayout
 		return false;
 	}
 
+	static final long containsPowerBase = 11;
+	static final long bottomPowerBase = 23;
+	static final long topPowerBase = 37;
 	@Override
 	public int hashCode()
 	{
 		int hash = 0;
+
+		long containsPower = 1;
+		long bottomPower = 1;
+		long topPower = 1;
 		for (int i = 0; i < BUCKET_SIZE; i++)
+		{
+			containsPower *= containsPowerBase;
+			bottomPower *= bottomPowerBase;
+			topPower *= topPowerBase;
 			if (this.contains(i))
-				hash = hash * 97 + i + 1;
+			{
+				hash += containsPower;
+				hash += containerOnBottomIndex[i] * bottomPower;
+				hash += containerOnTopIndex[i] * topPower;
+			}
+		}
 		return hash;
 	}
 

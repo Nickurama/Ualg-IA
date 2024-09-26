@@ -277,6 +277,7 @@ TEST_CASE("Should have hash properties")
 	ContainerLayout b4("F5 E4B33");
 	ContainerLayout b5("F EB");
 	ContainerLayout b6("EB F");
+	ContainerLayout b7("FE B");
 	
 	// Act
 	bool simmetry0 = b0 == b1 && b1 == b0;
@@ -284,6 +285,7 @@ TEST_CASE("Should have hash properties")
 	bool simmetry2 = b3 == b4 && b4 == b3;
 	bool simmetry3 = b3 == b5 && b5 == b3;
 	bool simmetry4 = b3 == b6 && b6 == b3;
+	bool simmetry5 = b5 == b7 && b7 == b5;
 	size_t hash0 = b0.hash();
 	size_t hash1 = b1.hash();
 	size_t hash2 = b2.hash();
@@ -291,6 +293,7 @@ TEST_CASE("Should have hash properties")
 	size_t hash4 = b4.hash();
 	size_t hash5 = b5.hash();
 	size_t hash6 = b6.hash();
+	size_t hash7 = b7.hash();
 
 	// Arrange
 	CHECK(simmetry0);
@@ -298,6 +301,7 @@ TEST_CASE("Should have hash properties")
 	CHECK(simmetry2);
 	CHECK(simmetry3);
 	CHECK(simmetry4);
+	CHECK(!simmetry5);
 
 	CHECK(hash0 == hash1);
 	CHECK(hash2 == hash3);
@@ -305,6 +309,7 @@ TEST_CASE("Should have hash properties")
 	CHECK(hash3 == hash4);
 	CHECK(hash3 == hash5);
 	CHECK(hash3 == hash6);
+	CHECK(hash5 != hash7);
 }
 
 TEST_CASE("Should be goal when equals")

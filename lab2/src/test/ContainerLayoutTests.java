@@ -303,6 +303,7 @@ public class ContainerLayoutTests
 		ContainerLayout b4 = new ContainerLayout("F5 E4B33");
 		ContainerLayout b5 = new ContainerLayout("F EB");
 		ContainerLayout b6 = new ContainerLayout("EB F");
+		ContainerLayout b7 = new ContainerLayout("FE B");
 		
 		// Act
 		boolean simmetry0 = b0.equals(b1) && b1.equals(b0);
@@ -310,6 +311,7 @@ public class ContainerLayoutTests
 		boolean simmetry2 = b3.equals(b4) && b4.equals(b3);
 		boolean simmetry3 = b3.equals(b5) && b5.equals(b3);
 		boolean simmetry4 = b3.equals(b6) && b6.equals(b3);
+		boolean simmetry5 = b5.equals(b7) && b7.equals(b5);
 		int hash0 = b0.hashCode();
 		int hash1 = b1.hashCode();
 		int hash2 = b2.hashCode();
@@ -317,6 +319,7 @@ public class ContainerLayoutTests
 		int hash4 = b4.hashCode();
 		int hash5 = b5.hashCode();
 		int hash6 = b6.hashCode();
+		int hash7 = b7.hashCode();
 
 		// Arrange
 		assertTrue(simmetry0);
@@ -324,6 +327,7 @@ public class ContainerLayoutTests
 		assertTrue(simmetry2);
 		assertTrue(simmetry3);
 		assertTrue(simmetry4);
+		assertFalse(simmetry5);
 
 		assertEquals(hash0, hash1);
 		assertEquals(hash2, hash3);
@@ -331,6 +335,7 @@ public class ContainerLayoutTests
 		assertEquals(hash3, hash4);
 		assertEquals(hash3, hash5);
 		assertEquals(hash3, hash6);
+		assertNotEquals(hash5, hash7);
 	}
 
 	@Test

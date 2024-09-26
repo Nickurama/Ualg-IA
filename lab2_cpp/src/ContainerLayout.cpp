@@ -327,14 +327,31 @@ std::unique_ptr<ILayout> ContainerLayout::copy() const
 
 std::size_t ContainerLayout::hash() const
 {
+	static const std::size_t containsPowerBase = 11;
+	static const std::size_t bottomPowerBase = 23;
+	static const std::size_t topPowerBase = 37;
+
 	if (m_hasHash)
 		return m_hash;
 
 	m_hasHash = true;
 	m_hash = 0;
+
+	std::size_t containsPower = 1;
+	std::size_t bottomPower = 1;
+	std::size_t topPower = 1;
 	for (int i = 0; i < BUCKET_SIZE; i++)
+	{
+		containsPower *= containsPowerBase;
+		bottomPower *= bottomPowerBase;
+		topPower *= topPowerBase;
 		if (contains(i))
-			m_hash = m_hash * 97 + i + 1;
+		{
+			m_hash += containsPower; // boolean value
+			m_hash += m_containerOnBottomIndex[i] * bottomPower;
+			m_hash += m_containerOnTopIndex[i] * topPower;
+		}
+	}
 	return m_hash;
 }
 

@@ -16,6 +16,7 @@ int main()
 	getline(std::cin, startStr);
 	getline(std::cin, goalStr);
 	ContainerLayout start(startStr), goal(goalStr);
+	std::cout << "equals: " << (start == goal) << std::endl;
 
 	auto time_start = std::chrono::high_resolution_clock::now();
 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bf.solve(start, goal);
