@@ -19,8 +19,12 @@ class ContainerLayout : public ILayout
 	private:
 		static const int BUCKET_SIZE = 26;
 
-		mutable bool m_hasHash;
+		static const std::size_t HASH_CONTAINS_POWER = 11;
+		static const std::size_t HASH_BOTTOM_POWER = 23;
+		static const std::size_t HASH_TOP_POWER = 37;
+
 		mutable std::size_t m_hash;
+		mutable bool m_hasHash;
 		bool m_hasCost;
 		double m_cost;
 		int m_containersCost[BUCKET_SIZE]; // -1 when doesn't exit
@@ -48,6 +52,8 @@ class ContainerLayout : public ILayout
 		inline int getContainerOnTopIndex(int i) const;
 		inline int getContainerOnBottomIndex(char c) const;
 		inline int getContainerOnBottomIndex(int i) const;
+		inline static std::size_t fastPow(std::size_t base, std::size_t exponent);
+		inline static void updateHash(ContainerLayout& layout, long long oldValue, long long newValue, std::size_t constant, std::size_t power);
 
 		bool shouldHaveCost(const std::string& str) const;
 		void populateFromString(const std::string& str);

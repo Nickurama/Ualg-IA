@@ -1,5 +1,6 @@
 #include "doctest.hpp"
 #include "ContainerLayout.hpp"
+#include <iostream>
 #include <string>
 #include <sstream>
 
@@ -286,14 +287,14 @@ TEST_CASE("Should have hash properties")
 	bool simmetry3 = b3 == b5 && b5 == b3;
 	bool simmetry4 = b3 == b6 && b6 == b3;
 	bool simmetry5 = b5 == b7 && b7 == b5;
-	size_t hash0 = b0.hash();
-	size_t hash1 = b1.hash();
-	size_t hash2 = b2.hash();
-	size_t hash3 = b3.hash();
-	size_t hash4 = b4.hash();
-	size_t hash5 = b5.hash();
-	size_t hash6 = b6.hash();
-	size_t hash7 = b7.hash();
+	std::size_t hash0 = b0.hash();
+	std::size_t hash1 = b1.hash();
+	std::size_t hash2 = b2.hash();
+	std::size_t hash3 = b3.hash();
+	std::size_t hash4 = b4.hash();
+	std::size_t hash5 = b5.hash();
+	std::size_t hash6 = b6.hash();
+	std::size_t hash7 = b7.hash();
 
 	// Arrange
 	CHECK(simmetry0);
@@ -400,4 +401,59 @@ TEST_CASE("Should get 8 children")
 	CHECK(test_find(children, expectedChild5));
 	CHECK(test_find(children, expectedChild6));
 	CHECK(test_find(children, expectedChild7));
+}
+
+int test_find_index(const std::vector<std::unique_ptr<ILayout>>& vect, const ILayout& expected)
+{
+	for (int i = 0; i < (int)vect.size(); i++)
+		if (*vect[i] == expected)
+			return i;
+	return -1;
+}
+
+TEST_CASE("Children should get valid hash")
+{
+	// Arrange
+	ContainerLayout cs("B1A1 E14F9927 C7");
+
+	ContainerLayout expectedChild0("A1 B1 E14F9927 C7");
+	ContainerLayout expectedChild1("B1 E14F9927A1 C7");
+	ContainerLayout expectedChild2("B1 E14F9927 C7A1");
+
+	ContainerLayout expectedChild3("F9927 B1A1 E14 C7");
+	ContainerLayout expectedChild4("B1A1F9927 E14 C7");
+	ContainerLayout expectedChild5("B1A1 E14 C7F9927");
+
+	ContainerLayout expectedChild6("B1A1C7 E14F9927");
+	ContainerLayout expectedChild7("B1A1 E14F9927C7");
+
+	std::vector<std::unique_ptr<ILayout>> children = cs.children();
+	std::size_t expectedHash0 = expectedChild0.hash();
+	std::size_t expectedHash1 = expectedChild1.hash();
+	std::size_t expectedHash2 = expectedChild2.hash();
+	std::size_t expectedHash3 = expectedChild3.hash();
+	std::size_t expectedHash4 = expectedChild4.hash();
+	std::size_t expectedHash5 = expectedChild5.hash();
+	std::size_t expectedHash6 = expectedChild6.hash();
+	std::size_t expectedHash7 = expectedChild7.hash();
+
+	// Act
+	std::size_t hash0 = children[test_find_index(children, expectedChild0)]->hash();
+	std::size_t hash1 = children[test_find_index(children, expectedChild1)]->hash();
+	std::size_t hash2 = children[test_find_index(children, expectedChild2)]->hash();
+	std::size_t hash3 = children[test_find_index(children, expectedChild3)]->hash();
+	std::size_t hash4 = children[test_find_index(children, expectedChild4)]->hash();
+	std::size_t hash5 = children[test_find_index(children, expectedChild5)]->hash();
+	std::size_t hash6 = children[test_find_index(children, expectedChild6)]->hash();
+	std::size_t hash7 = children[test_find_index(children, expectedChild7)]->hash();
+
+	// Arrange
+	CHECK(expectedHash0 == hash0);
+	CHECK(expectedHash1 == hash1);
+	CHECK(expectedHash2 == hash2);
+	CHECK(expectedHash3 == hash3);
+	CHECK(expectedHash4 == hash4);
+	CHECK(expectedHash5 == hash5);
+	CHECK(expectedHash6 == hash6);
+	CHECK(expectedHash7 == hash7);
 }

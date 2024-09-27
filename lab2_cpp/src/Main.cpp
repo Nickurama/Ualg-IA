@@ -16,7 +16,6 @@ int main()
 	getline(std::cin, startStr);
 	getline(std::cin, goalStr);
 	ContainerLayout start(startStr), goal(goalStr);
-	std::cout << "equals: " << (start == goal) << std::endl;
 
 	auto time_start = std::chrono::high_resolution_clock::now();
 	std::pair<BestFirst::bf_iter, BestFirst::bf_iter> itPair = bf.solve(start, goal);
@@ -25,7 +24,6 @@ int main()
 	auto stop_ns = std::chrono::time_point_cast<std::chrono::nanoseconds>(time_stop);
 	auto total_ns = stop_ns - start_ns;
 	double total_ms = (double)total_ns.count() / 1000000;
-	std::cout << total_ms << "ms" << std::endl;
 	BestFirst::bf_iter startIt = itPair.first;
 	BestFirst::bf_iter endIt = itPair.second;
 
@@ -40,5 +38,6 @@ int main()
 	const BestFirst::State *lastState = *(--endIt);
 	std::cout << static_cast<int>(std::round(lastState->getCost())) << std::endl;
 
+	std::cout << total_ms << "ms" << std::endl;
 	return 0;
 }

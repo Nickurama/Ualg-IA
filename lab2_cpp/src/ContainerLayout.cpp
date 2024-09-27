@@ -4,8 +4,8 @@
 #include <cstring>
 
 ContainerLayout::ContainerLayout(const std::string& str)
-	: m_hasHash(false),
-	m_hash(-1),
+	: m_hash(-1),
+	m_hasHash(false),
 	m_hasCost(shouldHaveCost(str)),
 	m_cost(0.0),
 	m_topmostContainersIndex()
@@ -22,8 +22,8 @@ ContainerLayout::ContainerLayout(const std::string& str)
 }
 
 ContainerLayout::ContainerLayout(const ContainerLayout& other)
-	: m_hasHash(other.m_hasHash),
-	m_hash(other.m_hash),
+	: m_hash(other.hash()),
+	m_hasHash(other.m_hasHash),
 	m_hasCost(other.m_hasCost),
 	m_cost(other.m_cost),
 	m_topmostContainersIndex()
@@ -291,21 +291,47 @@ std::unique_ptr<ContainerLayout> ContainerLayout::moveContainer(int from, int to
 		// children(), because if the current container is on the ground, it means
 		// it can only be placed TO the top of a container (thus not -1)
 		assert(to >= 0);
+
+		updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
 		moved->m_containerOnBottomIndex[from] = to;
+
+		updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
 		moved->m_containerOnTopIndex[to] = from;
 	}
 	else
 	{
 		int belowFrom = getContainerOnBottomIndex(from);
+
+		updateHash(*moved, moved->m_containerOnTopIndex[belowFrom], -1, HASH_TOP_POWER, belowFrom + 1);
 		moved->m_containerOnTopIndex[belowFrom] = -1;
 		moved->m_topmostContainersIndex.push_back(belowFrom);
 
+		updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
 		moved->m_containerOnBottomIndex[from] = to; // -1 if ground
 		if (to >= 0) // place on top of container
+		{
+			updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
 			moved->m_containerOnTopIndex[to] = from;
+		}
 	}
-	moved->m_hasHash = false;
 	return moved;
+}
+
+inline void ContainerLayout::updateHash(ContainerLayout& layout, long long oldValue, long long newValue, std::size_t constant, std::size_t power)
+{
+	layout.m_hash += (newValue - oldValue) * fastPow(constant, power);
+}
+
+inline std::size_t ContainerLayout::fastPow(std::size_t base, std::size_t exponent)
+{
+	std::size_t temp;
+	if (exponent == 0)
+		return 1;
+	temp = fastPow(base, exponent / 2);
+	if (exponent % 2 == 0)
+		return temp * temp;
+	else
+		return base * temp * temp;
 }
 
 bool ContainerLayout::isGoal(const ILayout& that) const
@@ -327,24 +353,20 @@ std::unique_ptr<ILayout> ContainerLayout::copy() const
 
 std::size_t ContainerLayout::hash() const
 {
-	static const std::size_t containsPowerBase = 11;
-	static const std::size_t bottomPowerBase = 23;
-	static const std::size_t topPowerBase = 37;
-
 	if (m_hasHash)
 		return m_hash;
 
 	m_hasHash = true;
 	m_hash = 0;
 
-	std::size_t containsPower = 1;
+	std::size_t containsPower = 1; // 11^1
 	std::size_t bottomPower = 1;
 	std::size_t topPower = 1;
 	for (int i = 0; i < BUCKET_SIZE; i++)
 	{
-		containsPower *= containsPowerBase;
-		bottomPower *= bottomPowerBase;
-		topPower *= topPowerBase;
+		containsPower *= HASH_CONTAINS_POWER;
+		bottomPower *= HASH_BOTTOM_POWER;
+		topPower *= HASH_TOP_POWER;
 		if (contains(i))
 		{
 			m_hash += containsPower; // boolean value
