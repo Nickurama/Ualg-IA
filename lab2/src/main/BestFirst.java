@@ -28,7 +28,8 @@ class BestFirst
 
 		public double getCost() { return cost; }
 
-		public int hashCode() { return toString().hashCode(); }
+		// public int hashCode() { return toString().hashCode(); }
+		public int hashCode() { return layout.hashCode(); }
 
 		public boolean equals (Object other)
 		{

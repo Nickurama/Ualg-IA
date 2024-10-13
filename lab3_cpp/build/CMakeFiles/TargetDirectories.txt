@@ -1,0 +1,4 @@
+/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles/ia.dir
+/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles/tests.dir
+/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles/edit_cache.dir
+/home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles/rebuild_cache.dir
