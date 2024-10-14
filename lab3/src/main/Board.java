@@ -23,6 +23,7 @@ class Board implements ILayout
 				board[i][j] = Character.getNumericValue(str.charAt(si++));
 	}
 
+
 	public Board(Board other)
 	{
 		board = new int[dim][dim];
@@ -48,6 +49,7 @@ class Board implements ILayout
 		return builder.toString();
 	}
 
+	@Override
 	public boolean equals(Object other)
 	{
 		if (other == this) return true;
@@ -62,6 +64,7 @@ class Board implements ILayout
 		return true;
 	}
 
+	@Override
 	public int hashCode() // assumes that the size is 3!!!!
 	{
 		// int[] rowQuotients = {7, 11, 13};
@@ -74,6 +77,9 @@ class Board implements ILayout
 		// return hash;
 		return this.toString().hashCode();
 	}
+
+	@Override
+	public double heuristic(ILayout goal) { throw new UnsupportedOperationException(); }
 
 	@Override
 	public List<ILayout> children()

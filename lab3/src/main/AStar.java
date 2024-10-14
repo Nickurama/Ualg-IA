@@ -1,23 +1,24 @@
 import java.util.*;
 
-class BestFirst
+class AStar
 {
 	protected Queue<State> open;
 	private Map<ILayout, State> openMap;
 	private Map<ILayout, State> closed;
 	private State current;
-	private ILayout objective;
 
 	static class State
 	{
 		private ILayout layout;
 		private State father;
 		private double cost;
+		private double fitness;
 
-		public State(ILayout layout, State father)
+		public State(ILayout layout, State father, double fitness)
 		{
 			this.layout = layout;
 			this.father = father;
+			this.fitness = fitness;
 
 			this.cost = 0.0;
 			if (father != null)
@@ -26,7 +27,6 @@ class BestFirst
 
 		public String toString() { return layout.toString(); }
 
-		public double getCost() { return cost; }
 
 		// public int hashCode() { return toString().hashCode(); }
 		public int hashCode() { return layout.hashCode(); }
@@ -40,6 +40,10 @@ class BestFirst
 			State that = (State) other;
 			return this.layout.equals(that.layout);
 		}
+
+		public double getCost() { return cost; }
+		public double getFitness() { return fitness; }
+		public void updateFitness(double newFitness) { fitness = newFitness; }
 
 		public ILayout layout() { return layout; }
 	}
@@ -76,7 +80,6 @@ class BestFirst
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		StateSpaceStats.logGenerate(); // initial counts as generated
-		objective = goal;
 		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.getCost() - s2.getCost()));
 		closed = new HashMap<ILayout, State>();
 		openMap = new HashMap<ILayout, State>();

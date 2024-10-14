@@ -16,4 +16,6 @@ interface ILayout
 	 * @return the cost from the receiver to a successor
 	*/
 	double getCost();
+
+	double heuristic(ILayout goal);
 }

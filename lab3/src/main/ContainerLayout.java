@@ -376,4 +376,10 @@ class ContainerLayout implements ILayout
 			throw new IllegalStateException("This layout doesn't support cost.");
 		return this.cost;
 	}
+
+	@Override
+	public double heuristic(ILayout goal)
+	{ 
+		throw new UnsupportedOperationException();
+	}
 }
