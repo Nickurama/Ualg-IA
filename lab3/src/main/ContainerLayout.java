@@ -167,6 +167,8 @@ class ContainerLayout implements ILayout
 	private boolean contains(char c) { return contains(getKey(c)); }
 	private boolean contains(int i)
 	{
+		if (i < 0)
+			return false;
 		return containersCost[i] >= 0;
 	}
 
@@ -378,8 +380,135 @@ class ContainerLayout implements ILayout
 	}
 
 	@Override
-	public double heuristic(ILayout goal)
+	public double heuristic(ILayout goalLayout)
 	{ 
-		throw new UnsupportedOperationException();
+		return h1(goalLayout);
+	}
+
+	// BestFirst
+	private int h0(ILayout goalLayout)
+	{
+		if (this.getClass() != goalLayout.getClass())
+			throw new Error("Should never check the heuristic for a different class Goal!");
+		ContainerLayout goal = (ContainerLayout) goalLayout;
+
+		return 0;
+	}
+
+	private int h1(ILayout goalLayout)
+	{
+		if (this.getClass() != goalLayout.getClass())
+			throw new Error("Should never check the heuristic for a different class Goal!");
+		ContainerLayout goal = (ContainerLayout) goalLayout;
+
+		int h = 0;
+		ArrayList<Integer> thisBottoms = new ArrayList<>(BUCKET_SIZE);
+		ArrayList<Integer> goalBottoms = new ArrayList<>(BUCKET_SIZE);
+
+		for (int i = 0; i < BUCKET_SIZE; i++)
+		{
+			if (this.isOnBottom(i))
+				thisBottoms.add(i);
+
+			if (goal.isOnBottom(i))
+				goalBottoms.add(i);
+		}
+
+		for (Integer thisBottom : thisBottoms)
+		{
+			if (goalBottoms.contains(thisBottom))
+			{
+				Integer currThis = thisBottom;
+				Integer currGoal = thisBottom;
+				boolean currHasRunOut = false;
+				while (currThis == currGoal)
+				{
+					if (this.hasContainerOnTop(currThis))
+						currThis = this.getContainerOnTopIndex(currThis);
+					else
+					{
+						currHasRunOut = true;
+						break;
+					}
+
+					if (goal.hasContainerOnTop(currGoal))
+						currGoal = goal.getContainerOnTopIndex(currGoal);
+					else
+						break;
+				}
+				if (!currHasRunOut)
+					h += getStackLengthFrom(currThis);
+			}
+			else
+				h += getStackLengthFrom(thisBottom);
+		}
+
+		return h;
+	}
+
+	private int h2(ILayout goalLayout)
+	{
+		if (this.getClass() != goalLayout.getClass())
+			throw new Error("Should never check the heuristic for a different class Goal!");
+		ContainerLayout goal = (ContainerLayout) goalLayout;
+
+		int h = 0;
+		ArrayList<Integer> thisBottoms = new ArrayList<>(BUCKET_SIZE);
+		ArrayList<Integer> goalBottoms = new ArrayList<>(BUCKET_SIZE);
+
+		for (int i = 0; i < BUCKET_SIZE; i++)
+		{
+			if (this.isOnBottom(i))
+				thisBottoms.add(i);
+
+			if (goal.isOnBottom(i))
+				goalBottoms.add(i);
+		}
+
+		for (Integer thisBottom : thisBottoms)
+		{
+			if (goalBottoms.contains(thisBottom))
+			{
+				Integer currThis = thisBottom;
+				Integer currGoal = thisBottom;
+				boolean currHasRunOut = false;
+				while (currThis == currGoal)
+				{
+					if (this.hasContainerOnTop(currThis))
+						currThis = this.getContainerOnTopIndex(currThis);
+					else
+					{
+						currHasRunOut = true;
+						break;
+					}
+
+					if (goal.hasContainerOnTop(currGoal))
+						currGoal = goal.getContainerOnTopIndex(currGoal);
+					else
+						break;
+				}
+				if (!currHasRunOut)
+					h += getStackLengthFrom(currThis);
+			}
+			else
+				h += getStackLengthFrom(thisBottom);
+		}
+
+		return h;
+	}
+
+	private int getStackLengthFrom(int i)
+	{
+		if (!contains(i))
+			return 0;
+
+		int result = 0;
+		while (hasContainerOnTop(i))
+		{
+			i = getContainerOnTopIndex(i);
+			result++;
+		}
+		result++;
+		return result;
 	}
 }

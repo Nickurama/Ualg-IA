@@ -6,29 +6,36 @@ class AStar
 	private Map<ILayout, State> openMap;
 	private Map<ILayout, State> closed;
 	private State current;
+	private ILayout goal;
 
 	static class State
 	{
 		private ILayout layout;
 		private State father;
-		private double cost;
+		private double g;
+		private double h;
 		private double fitness;
 
-		public State(ILayout layout, State father, double fitness)
+		public State(ILayout layout, State father, ILayout goal)
 		{
 			this.layout = layout;
 			this.father = father;
-			this.fitness = fitness;
 
-			this.cost = 0.0;
+			this.g = 0.0;
+			this.h = layout.heuristic(goal);
 			if (father != null)
-				this.cost = father.cost + layout.getCost();
+				this.g = father.g + layout.getCost();
+			this.fitness = this.g + this.h;
+
+			// System.out.println(this);
+			// System.out.println("g: " + g);
+			// System.out.println("h: " + h);
+			// System.out.println("f: " + fitness);
+			// System.out.println("===========================");
 		}
 
 		public String toString() { return layout.toString(); }
 
-
-		// public int hashCode() { return toString().hashCode(); }
 		public int hashCode() { return layout.hashCode(); }
 
 		public boolean equals (Object other)
@@ -41,9 +48,16 @@ class AStar
 			return this.layout.equals(that.layout);
 		}
 
-		public double getCost() { return cost; }
-		public double getFitness() { return fitness; }
-		public void updateFitness(double newFitness) { fitness = newFitness; }
+		public double g() { return g; }
+		public double h() { return h; }
+		public double fitness() { return fitness; }
+		
+		public void update(State s)
+		{
+			this.g = s.g;
+			this.h = s.h;
+			this.fitness = s.fitness;
+		}
 
 		public ILayout layout() { return layout; }
 	}
@@ -57,7 +71,7 @@ class AStar
 		{
 			if (state.father == null || !child.equals(state.father.layout))
 			{
-				State nextState = new State(child, state);
+				State nextState = new State(child, state, goal);
 				sucessors.add(nextState);
 			}
 		}
@@ -80,10 +94,11 @@ class AStar
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		StateSpaceStats.logGenerate(); // initial counts as generated
-		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.getCost() - s2.getCost()));
+		this.goal = goal;
+		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.fitness - s2.fitness));
 		closed = new HashMap<ILayout, State>();
 		openMap = new HashMap<ILayout, State>();
-		openAdd(new State(start, null));
+		openAdd(new State(start, null, goal));
 		List<State> sucessors;
 
 		while (!open.isEmpty())
@@ -97,8 +112,19 @@ class AStar
 			sucessors = sucessors(current);
 			StateSpaceStats.logGenerate(sucessors.size());
 			for (State sucessor : sucessors)
-				if (!closed.containsKey(sucessor.layout) && !openMap.containsKey(sucessor.layout))
+			{
+				State openState = openMap.get(sucessor.layout);
+				State closedState = closed.get(sucessor.layout);
+
+				if (closedState == null && openState == null)
 					openAdd(sucessor);
+
+				if (openState != null && sucessor.fitness < openState.fitness)
+					openState.update(sucessor);
+
+				if (closedState != null && sucessor.fitness < closedState.fitness)
+					closedState.update(sucessor);
+			}
 		}
 		return null;
 	}
