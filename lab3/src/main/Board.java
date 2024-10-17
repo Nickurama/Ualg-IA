@@ -159,6 +159,13 @@ class Board implements ILayout
 		return result;
 	}
 
+	/**
+	 * Makes a copy of the board with a piece moved to the right
+	 * @param row the row of the piece to move
+	 * @param column the column of the piece to move
+	 * @return the board with the moved piece
+	 * @throws IllegalArgumentException
+	 */
 	private Board moveRight(int row, int column) throws IllegalArgumentException
 	{
 		if (column >= dim - 1)

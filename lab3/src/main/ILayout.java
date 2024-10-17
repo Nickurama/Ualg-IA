@@ -17,5 +17,8 @@ interface ILayout
 	*/
 	double getCost();
 
+	/**
+	  * @return the estimated cost to goal (heuristic)
+  	*/
 	double heuristic(ILayout goal);
 }
