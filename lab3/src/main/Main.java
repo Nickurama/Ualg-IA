@@ -65,6 +65,6 @@ public class Main
 			}
 		}
 
-		StateSpaceStats.print();
+		// StateSpaceStats.print();
 	}
 }

@@ -5,12 +5,17 @@ class ContainerLayout implements ILayout
 	private static final int BUCKET_SIZE = 52; // 2 * 26
 	private static final int MID_INDEX = 26;
 
+	static final long CONTAINS_POWER_BASE = 11;
+	static final long BOTTOM_POWER_BASE = 23;
+	static final long TOP_POWER_BASE = 37;
+
 	private boolean hasCost;
 	private double cost;
 	private int[] containersCost; // -1 when doesn't exist
 	private int[] containerOnTopIndex; // -1 when container is on top
 	private int[] containerOnBottomIndex; // -1 when container is on bottom
 	private List<Integer> topmostContainersIndex;
+	private List<Integer> bottommostContainersIndex;
 
 	public ContainerLayout(String str) throws IllegalArgumentException
 	{
@@ -29,7 +34,8 @@ class ContainerLayout implements ILayout
 		for (int i = 0; i < BUCKET_SIZE; i++)
 			containerOnBottomIndex[i] = -1;
 
-		this.topmostContainersIndex = new LinkedList<Integer>(); // lazy removal, may not actually be a top
+		this.topmostContainersIndex = new ArrayList<Integer>(); // lazy removal, may not actually be a top
+		this.bottommostContainersIndex = new ArrayList<Integer>(); // lazy removal, may not actually be a bottom
 		this.hasCost = shouldHaveCost(str);
 
 		populateFromString(str);
@@ -46,10 +52,15 @@ class ContainerLayout implements ILayout
 		this.containerOnBottomIndex = new int[BUCKET_SIZE];
 		System.arraycopy(other.containerOnBottomIndex, 0, this.containerOnBottomIndex, 0, BUCKET_SIZE);
 
-		this.topmostContainersIndex = new LinkedList<Integer>();
+		this.topmostContainersIndex = new ArrayList<Integer>();
 		for (int topmost : other.topmostContainersIndex)
 			if (other.isOnTop(topmost))
 				this.topmostContainersIndex.add(topmost);
+		this.bottommostContainersIndex = new ArrayList<Integer>();
+		for (int bottommost : other.bottommostContainersIndex)
+			if (other.isOnBottom(bottommost))
+				this.bottommostContainersIndex.add(bottommost);
+
 		this.hasCost = other.hasCost;
 	}
 
@@ -129,11 +140,13 @@ class ContainerLayout implements ILayout
 
 		if (previous >= 0)
 			containerOnBottomIndex[key] = previous;
+		else
+			this.bottommostContainersIndex.add(key);
 
 		int nextPrevious = -1;
 		if (next < 0)
 		{
-			this.topmostContainersIndex.add((int)key);
+			this.topmostContainersIndex.add(key);
 		}
 		else
 		{
@@ -158,6 +171,8 @@ class ContainerLayout implements ILayout
 				this.topmostContainersIndex.add(key);
 			if (i - 1 >= 0)
 				this.containerOnBottomIndex[key] = getKey(str.charAt(i - 1));
+			else
+				this.bottommostContainersIndex.add(key);
 			if (this.contains(key))
 				throw new IllegalArgumentException("Duplicate container.");
 			this.containersCost[key] = 0;
@@ -280,9 +295,6 @@ class ContainerLayout implements ILayout
 		return false;
 	}
 
-	static final long containsPowerBase = 11;
-	static final long bottomPowerBase = 23;
-	static final long topPowerBase = 37;
 	@Override
 	public int hashCode()
 	{
@@ -293,14 +305,14 @@ class ContainerLayout implements ILayout
 		long topPower = 1;
 		for (int i = 0; i < BUCKET_SIZE; i++)
 		{
-			containsPower *= containsPowerBase;
-			bottomPower *= bottomPowerBase;
-			topPower *= topPowerBase;
+			containsPower *= CONTAINS_POWER_BASE;
+			bottomPower *= BOTTOM_POWER_BASE;
+			topPower *= TOP_POWER_BASE;
 			if (this.contains(i))
 			{
-				hash += containsPower;
-				hash += containerOnBottomIndex[i] * bottomPower;
-				hash += containerOnTopIndex[i] * topPower;
+				hash += (int)containsPower;
+				hash += containerOnBottomIndex[i] * (int)bottomPower;
+				hash += containerOnTopIndex[i] * (int)topPower;
 			}
 		}
 		return hash;
@@ -316,14 +328,14 @@ class ContainerLayout implements ILayout
 
 		for (int topmost : topmostContainersIndex)
 		{
-			if (!isOnTop(topmost))
+			if (!isOnTop(topmost)) // might not be on top because lazy removal
 				continue;
 
 			if (!isOnBottom(topmost))
 				children.add(moveContainerGround(topmost));
 			for (int innerTopmost : topmostContainersIndex)
 			{
-				if (!isOnTop(innerTopmost))
+				if (!isOnTop(innerTopmost)) // might not be on top because lazy removal
 					continue;
 				if (topmost == innerTopmost)
 					continue;
@@ -360,6 +372,8 @@ class ContainerLayout implements ILayout
 			moved.containerOnBottomIndex[from] = to; // -1 if ground
 			if (to >= 0) // place on top of container
 				moved.containerOnTopIndex[to] = from;
+			else
+				moved.bottommostContainersIndex.add(from);
 
 		}
 		return moved;
@@ -382,7 +396,7 @@ class ContainerLayout implements ILayout
 	@Override
 	public double heuristic(ILayout goalLayout)
 	{ 
-		return h1(goalLayout);
+		return h2(goalLayout);
 	}
 
 	// BestFirst
@@ -395,6 +409,7 @@ class ContainerLayout implements ILayout
 		return 0;
 	}
 
+	// Simple difference heuristic
 	private int h1(ILayout goalLayout)
 	{
 		if (this.getClass() != goalLayout.getClass())
@@ -402,21 +417,11 @@ class ContainerLayout implements ILayout
 		ContainerLayout goal = (ContainerLayout) goalLayout;
 
 		int h = 0;
-		ArrayList<Integer> thisBottoms = new ArrayList<>(BUCKET_SIZE);
-		ArrayList<Integer> goalBottoms = new ArrayList<>(BUCKET_SIZE);
-
-		for (int i = 0; i < BUCKET_SIZE; i++)
+		for (Integer thisBottom : bottommostContainersIndex)
 		{
-			if (this.isOnBottom(i))
-				thisBottoms.add(i);
-
-			if (goal.isOnBottom(i))
-				goalBottoms.add(i);
-		}
-
-		for (Integer thisBottom : thisBottoms)
-		{
-			if (goalBottoms.contains(thisBottom))
+			if (!isOnBottom(thisBottom))
+				continue;
+			if (goal.isOnBottom(thisBottom))
 			{
 				Integer currThis = thisBottom;
 				Integer currGoal = thisBottom;
@@ -453,62 +458,84 @@ class ContainerLayout implements ILayout
 		ContainerLayout goal = (ContainerLayout) goalLayout;
 
 		int h = 0;
-		ArrayList<Integer> thisBottoms = new ArrayList<>(BUCKET_SIZE);
-		ArrayList<Integer> goalBottoms = new ArrayList<>(BUCKET_SIZE);
-
-		for (int i = 0; i < BUCKET_SIZE; i++)
+		for (Integer thisBottom : this.bottommostContainersIndex)
 		{
-			if (this.isOnBottom(i))
-				thisBottoms.add(i);
+			if (!isOnBottom(thisBottom))
+				continue;
 
-			if (goal.isOnBottom(i))
-				goalBottoms.add(i);
-		}
-
-		for (Integer thisBottom : thisBottoms)
-		{
-			if (goalBottoms.contains(thisBottom))
-			{
-				Integer currThis = thisBottom;
-				Integer currGoal = thisBottom;
-				boolean currHasRunOut = false;
-				while (currThis == currGoal)
-				{
-					if (this.hasContainerOnTop(currThis))
-						currThis = this.getContainerOnTopIndex(currThis);
-					else
-					{
-						currHasRunOut = true;
-						break;
-					}
-
-					if (goal.hasContainerOnTop(currGoal))
-						currGoal = goal.getContainerOnTopIndex(currGoal);
-					else
-						break;
-				}
-				if (!currHasRunOut)
-					h += getStackLengthFrom(currThis);
-			}
-			else
-				h += getStackLengthFrom(thisBottom);
+			h += hStack(thisBottom, goal);
 		}
 
 		return h;
 	}
 
+	private int hStack(int stackBottom, ContainerLayout goal)
+	{
+		int h = 0;
+		if (goal.isOnBottom(stackBottom))
+		{
+			int currThis = stackBottom;
+			int currGoal = stackBottom;
+			boolean currHasRunOut = false;
+			while (currThis == currGoal)
+			{
+				if (this.hasContainerOnTop(currThis))
+					currThis = this.getContainerOnTopIndex(currThis);
+				else
+				{
+					currHasRunOut = true;
+					break;
+				}
+
+				if (goal.hasContainerOnTop(currGoal))
+					currGoal = goal.getContainerOnTopIndex(currGoal);
+				else
+					break;
+			}
+			if (!currHasRunOut)
+			{
+				h += getStackLengthFrom(currThis);
+
+				// check double moves (on top of bottom ones), could be applied to stacks with no goallike bottom part
+				h += hNonGoalStackLeftovers(currThis, goal);
+			}
+		}
+		else
+			h += getStackLengthFrom(stackBottom);
+		return h;
+	}
+
+	private int hNonGoalStackLeftovers(int stackPos, ContainerLayout goal)
+	{
+		int h = 0;
+		while (stackPos >= 0)
+		{
+			int curr = this.getContainerOnTopIndex(stackPos);
+			while (curr >= 0)
+			{
+				int findOnTopGoal = goal.getContainerOnTopIndex(stackPos);
+				while (findOnTopGoal >= 0)
+				{
+					if (curr == findOnTopGoal)
+						h += containersCost[curr];
+					findOnTopGoal = goal.getContainerOnTopIndex(findOnTopGoal);
+				}
+				curr = this.getContainerOnTopIndex(curr);
+			}
+			stackPos = this.getContainerOnTopIndex(stackPos);
+		}
+		return h;
+	}
+
 	private int getStackLengthFrom(int i)
 	{
-		if (!contains(i))
-			return 0;
-
 		int result = 0;
 		while (hasContainerOnTop(i))
 		{
+			result += containersCost[i];
 			i = getContainerOnTopIndex(i);
-			result++;
 		}
-		result++;
+		result += containersCost[i];
 		return result;
 	}
 }

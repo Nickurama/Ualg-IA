@@ -14,7 +14,7 @@ class AStar
 		private State father;
 		private double g;
 		private double h;
-		private double fitness;
+		private double f;
 
 		public State(ILayout layout, State father, ILayout goal)
 		{
@@ -25,13 +25,7 @@ class AStar
 			this.h = layout.heuristic(goal);
 			if (father != null)
 				this.g = father.g + layout.getCost();
-			this.fitness = this.g + this.h;
-
-			// System.out.println(this);
-			// System.out.println("g: " + g);
-			// System.out.println("h: " + h);
-			// System.out.println("f: " + fitness);
-			// System.out.println("===========================");
+			this.f = this.g + this.h;
 		}
 
 		public String toString() { return layout.toString(); }
@@ -50,13 +44,13 @@ class AStar
 
 		public double g() { return g; }
 		public double h() { return h; }
-		public double fitness() { return fitness; }
+		public double f() { return f; }
 		
 		public void update(State s)
 		{
 			this.g = s.g;
 			this.h = s.h;
-			this.fitness = s.fitness;
+			this.f = s.f;
 		}
 
 		public ILayout layout() { return layout; }
@@ -95,7 +89,7 @@ class AStar
 	{
 		StateSpaceStats.logGenerate(); // initial counts as generated
 		this.goal = goal;
-		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.fitness - s2.fitness));
+		open = new PriorityQueue<State>(10, (s1, s2) -> (int) Math.signum(s1.f - s2.f));
 		closed = new HashMap<ILayout, State>();
 		openMap = new HashMap<ILayout, State>();
 		openAdd(new State(start, null, goal));
@@ -119,10 +113,10 @@ class AStar
 				if (closedState == null && openState == null)
 					openAdd(sucessor);
 
-				if (openState != null && sucessor.fitness < openState.fitness)
+				if (openState != null && sucessor.f < openState.f)
 					openState.update(sucessor);
 
-				if (closedState != null && sucessor.fitness < closedState.fitness)
+				if (closedState != null && sucessor.f < closedState.f)
 					closedState.update(sucessor);
 			}
 		}
