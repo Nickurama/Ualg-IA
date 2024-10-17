@@ -1,16 +1,27 @@
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Represents a sliding square puzzle
+ */
 class Board implements ILayout
 {
 	private static final int dim = 3;
 	private int board[][];
 
+	/**
+	 * initializes an empty board
+	 */
 	public Board()
 	{
 		board = new int[dim][dim];
 	}
 
+	/**
+	 * initializes a board from a string
+	 * @param str the string to initialize the board from
+	 * @throws IllegalStateException
+	 */
 	public Board(String str) throws IllegalStateException
 	{
 		if (str.length() != dim * dim)
@@ -24,6 +35,10 @@ class Board implements ILayout
 	}
 
 
+	/**
+	 * copies a board
+	 * @param other the board to copy
+	 */
 	public Board(Board other)
 	{
 		board = new int[dim][dim];
@@ -32,6 +47,7 @@ class Board implements ILayout
 				this.board[i][j] = other.board[i][j];
 	}
 
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
@@ -103,6 +119,12 @@ class Board implements ILayout
 		return children(zeroRow, zeroColumn);
 	}
 
+	/**
+	 * generates children given the row and column of the empty space
+	 * @param row the row of the empty space
+	 * @param column the column of the empty space
+	 * @return the generated children
+	 */
 	private List<ILayout> children(int row, int column)
 	{
 		List<ILayout> children = new LinkedList<ILayout>();
@@ -117,6 +139,13 @@ class Board implements ILayout
 		return children;
 	}
 
+	/**
+	 * Makes a copy of the board with a piece moved up
+	 * @param row the row of the piece to move
+	 * @param column the column of the piece to move
+	 * @return the board with the moved piece
+	 * @throws IllegalArgumentException
+	 */
 	private Board moveUp(int row, int column) throws IllegalArgumentException
 	{
 		if (row <= 0)
@@ -131,6 +160,13 @@ class Board implements ILayout
 		return result;
 	}
 
+	/**
+	 * Makes a copy of the board with a piece moved down
+	 * @param row the row of the piece to move
+	 * @param column the column of the piece to move
+	 * @return the board with the moved piece
+	 * @throws IllegalArgumentException
+	 */
 	private Board moveDown(int row, int column) throws IllegalArgumentException
 	{
 		if (row >= dim - 1)
@@ -145,6 +181,13 @@ class Board implements ILayout
 		return result;
 	}
 
+	/**
+	 * Makes a copy of the board with a piece moved to the left
+	 * @param row the row of the piece to move
+	 * @param column the column of the piece to move
+	 * @return the board with the moved piece
+	 * @throws IllegalArgumentException
+	 */
 	private Board moveLeft(int row, int column) throws IllegalArgumentException
 	{
 		if (column <= 0)

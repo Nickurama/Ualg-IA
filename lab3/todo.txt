@@ -1,4 +1,3 @@
-- make updating hash on java (and the necessary unit tests)
 - make code prettier
 - document code
 

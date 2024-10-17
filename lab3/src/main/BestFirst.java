@@ -1,5 +1,8 @@
 import java.util.*;
 
+/**
+ * Represents an uniform cost search of ILayout states.
+ */
 class BestFirst
 {
 	protected Queue<State> open;
@@ -8,12 +11,20 @@ class BestFirst
 	private State current;
 	private ILayout objective;
 
+	/**
+	 * Represents a state in the uniform cost search
+	 */
 	static class State
 	{
 		private ILayout layout;
 		private State father;
 		private double cost;
 
+		/**
+		 * State constructor
+		 * @param layout the layout of the state
+		 * @param father the father of the state being constructed (can be null)
+		 */
 		public State(ILayout layout, State father)
 		{
 			this.layout = layout;
@@ -24,12 +35,18 @@ class BestFirst
 				this.cost = father.cost + layout.getCost();
 		}
 
+		@Override
 		public String toString() { return layout.toString(); }
 
+		/**
+		 * @return the cost from the start to this node
+		 */
 		public double getCost() { return cost; }
 
+		@Override
 		public int hashCode() { return layout.hashCode(); }
 
+		@Override
 		public boolean equals (Object other)
 		{
 			if (this == other) return true;
@@ -40,9 +57,17 @@ class BestFirst
 			return this.layout.equals(that.layout);
 		}
 
+		/**
+		 * @return the layout associated with this state
+		 */
 		public ILayout layout() { return layout; }
 	}
 
+	/**
+	 * Generates the sucessors of the provided state
+	 * @param state the state to generate the sucessors of
+	 * @return the sucessors of the state
+	 */
 	final private List<State> sucessors(State state)
 	{
 		List<State> sucessors = new ArrayList<>(4);
@@ -59,12 +84,20 @@ class BestFirst
 		return sucessors;
 	}
 
+	/**
+	 * Adds a state to "open"
+	 * @param state the state to add to "open"
+	 */
 	private void openAdd(State state)
 	{
 		open.add(state);
 		openMap.put(state.layout, state);
 	}
 
+	/**
+	 * Pops the next state from "open"
+	 * @return the next state from "open"
+	 */
 	private State openPop()
 	{
 		State result = open.remove();
@@ -72,6 +105,12 @@ class BestFirst
 		return result;
 	}
 
+	/**
+	 * Generates the shortest path from start to goal
+	 * @param start the starting layout
+	 * @param goal the goal layout
+	 * @return the steps from start to goal
+	 */
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		StateSpaceStats.logGenerate(); // initial counts as generated
@@ -99,6 +138,9 @@ class BestFirst
 		return null;
 	}
 
+	/**
+	 * @return the path from start to the current node
+	 */
 	private Iterator<State> getCurrentPathIterator()
 	{
 		List<State> solution = new LinkedList<State>();

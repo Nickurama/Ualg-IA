@@ -1,5 +1,8 @@
 import java.util.*;
 
+/**
+ * Represents the A* heuristic state space search
+ */
 class AStar
 {
 	protected Queue<State> open;
@@ -8,6 +11,9 @@ class AStar
 	private State current;
 	private ILayout goal;
 
+	/**
+	 * Represents a state in heuristic search
+	 */
 	static class State
 	{
 		private ILayout layout;
@@ -16,6 +22,12 @@ class AStar
 		private double h;
 		private double f;
 
+		/**
+		 * State constructor
+		 * @param layout the layout of the state
+		 * @param father the father of the state being constructed (can be null)
+		 * @param goal the goal layout
+		 */
 		public State(ILayout layout, State father, ILayout goal)
 		{
 			this.layout = layout;
@@ -28,10 +40,13 @@ class AStar
 			this.f = this.g + this.h;
 		}
 
+		@Override
 		public String toString() { return layout.toString(); }
 
+		@Override
 		public int hashCode() { return layout.hashCode(); }
 
+		@Override
 		public boolean equals (Object other)
 		{
 			if (this == other) return true;
@@ -42,10 +57,23 @@ class AStar
 			return this.layout.equals(that.layout);
 		}
 
+		/**
+		 * @return g - the estimated cost from start to this state
+		 */
 		public double g() { return g; }
+		/**
+		 * @return h - the estimated cost from this state to the goal
+		 */
 		public double h() { return h; }
+		/**
+		 * @return f - the estimated cost from start to goal
+		 */
 		public double f() { return f; }
 		
+		/**
+		 * updates the current state with new information
+		 * @param s the equivalent state that holds the current information
+		 */
 		public void update(State s)
 		{
 			this.g = s.g;
@@ -53,9 +81,17 @@ class AStar
 			this.f = s.f;
 		}
 
+		/**
+		 * @return the layout associated with this state
+		 */
 		public ILayout layout() { return layout; }
 	}
 
+	/**
+	 * Generates the sucessors of the provided state
+	 * @param state the state to generate the sucessors of
+	 * @return the sucessors of the state
+	 */
 	final private List<State> sucessors(State state)
 	{
 		List<State> sucessors = new ArrayList<>(4);
@@ -72,12 +108,20 @@ class AStar
 		return sucessors;
 	}
 
+	/**
+	 * Adds a state to "open"
+	 * @param state the state to add to "open"
+	 */
 	private void openAdd(State state)
 	{
 		open.add(state);
 		openMap.put(state.layout, state);
 	}
 
+	/**
+	 * Pops the next state from "open"
+	 * @return the next state from "open"
+	 */
 	private State openPop()
 	{
 		State result = open.remove();
@@ -85,6 +129,12 @@ class AStar
 		return result;
 	}
 
+	/**
+	 * Generates the shortest path from start to goal
+	 * @param start the starting layout
+	 * @param goal the goal layout
+	 * @return the steps from start to goal
+	 */
 	final public Iterator<State> solve(ILayout start, ILayout goal)
 	{
 		StateSpaceStats.logGenerate(); // initial counts as generated
@@ -123,6 +173,9 @@ class AStar
 		return null;
 	}
 
+	/**
+	 * @return the path from start to the current node
+	 */
 	private Iterator<State> getCurrentPathIterator()
 	{
 		List<State> solution = new LinkedList<State>();

@@ -1,5 +1,9 @@
 import java.util.*;
 
+/**
+ * A representation of a configuration (layout) of containers
+ * A container can have an associated cost, or not
+ */
 class ContainerLayout implements ILayout
 {
 	private static final int BUCKET_SIZE = 52; // 2 * 26
@@ -17,6 +21,11 @@ class ContainerLayout implements ILayout
 	private List<Integer> topmostContainersIndex;
 	private List<Integer> bottommostContainersIndex;
 
+	/**
+	 * Instantiates a ContainerLayout from a string
+	 * @param str the string to parse into a ContainerLayout
+	 * @throws IllegalArgumentException
+	 */
 	public ContainerLayout(String str) throws IllegalArgumentException
 	{
 		if (str.isEmpty())
@@ -41,6 +50,11 @@ class ContainerLayout implements ILayout
 		populateFromString(str);
 	}
 
+	/**
+	 * Copies a ContainerLayout and assigns a different cost to it
+	 * @param other the container to copy
+	 * @param cost the new cost
+	 */
 	private ContainerLayout(ContainerLayout other, double cost)
 	{
 		this.cost = cost;
@@ -64,6 +78,12 @@ class ContainerLayout implements ILayout
 		this.hasCost = other.hasCost;
 	}
 
+	/**
+	 * Checks if the container layout described in the string
+	 * has costs associated with the containers or not
+	 * @param str the string to check
+	 * @return if the container layout described in the string has costs associated with the containers
+	 */
 	private boolean shouldHaveCost(String str)
 	{
 		if (str.length() == 1)
@@ -73,6 +93,11 @@ class ContainerLayout implements ILayout
 		return false;
 	}
 
+	/**
+	 * Populates the class from a string
+	 * @param str the string to parse to containers
+	 * @throws IllegalArgumentException
+	 */
 	private void populateFromString(String str) throws IllegalArgumentException
 	{
 		String[] tokens = str.split(" ");
@@ -80,6 +105,11 @@ class ContainerLayout implements ILayout
 			populateContainersFromString(token);
 	}
 
+	/**
+	 * Populates a stack from a string
+	 * @param str the string to parse into a stack of containers
+	 * @throws IllegalArgumentException
+	 */
 	private void populateContainersFromString(String str) throws IllegalArgumentException
 	{
 		if (this.hasCost)
@@ -88,6 +118,11 @@ class ContainerLayout implements ILayout
 			populateContainersFromStringWithoutCost(str);
 	}
 
+	/**
+	 * Populates a stack of containers that have costs from a string
+	 * @param str a string with containers with a cost
+	 * @throws IllegalArgumentException
+	 */
 	private void populateContainersFromStringWithCost(String str) throws IllegalArgumentException
 	{
 		addNextContainer(str, 0, -1);
