@@ -149,6 +149,8 @@ class AStar
 		{
 			StateSpaceStats.logExpand();
 			current = openPop();
+			// System.out.println("Expanding node of f: " + current.f() + " (g: " + current.g() + " h: " + current.h() + ")");
+			// System.out.println(current);
 			if (current.layout.equals(goal))
 				return getCurrentPathIterator();
 			closed.put(current.layout, current);
@@ -164,7 +166,12 @@ class AStar
 					openAdd(sucessor);
 
 				if (openState != null && sucessor.f < openState.f)
-					openState.update(sucessor);
+				{
+					open.remove(sucessor);
+					openMap.remove(sucessor.layout);
+					open.add(sucessor);
+					openMap.put(sucessor.layout, sucessor);
+				}
 
 				if (closedState != null && sucessor.f < closedState.f)
 					closedState.update(sucessor);

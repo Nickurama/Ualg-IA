@@ -439,7 +439,6 @@ class ContainerLayout implements ILayout
 	{
 		if (this.getClass() != goalLayout.getClass())
 			throw new Error("Should never check the heuristic for a different class Goal!");
-		ContainerLayout goal = (ContainerLayout) goalLayout;
 
 		return 0;
 	}
@@ -495,7 +494,7 @@ class ContainerLayout implements ILayout
 		int h = 0;
 		for (Integer thisBottom : this.bottommostContainersIndex)
 		{
-			if (!isOnBottom(thisBottom))
+			if (!isOnBottom(thisBottom)) // lazy removal
 				continue;
 
 			h += hStack(thisBottom, goal);
@@ -530,13 +529,14 @@ class ContainerLayout implements ILayout
 			if (!currHasRunOut)
 			{
 				h += getStackLengthFrom(currThis);
-
-				// check double moves (on top of bottom ones), could be applied to stacks with no goallike bottom part
 				h += hNonGoalStackLeftovers(currThis, goal);
 			}
 		}
 		else
+		{
 			h += getStackLengthFrom(stackBottom);
+			h += hNonGoalStackLeftovers(stackBottom, goal);
+		}
 		return h;
 	}
 
@@ -545,18 +545,30 @@ class ContainerLayout implements ILayout
 		int h = 0;
 		while (stackPos >= 0)
 		{
-			int curr = this.getContainerOnTopIndex(stackPos);
+			boolean hasFound = false;
+			int curr = this.getContainerOnBottomIndex(stackPos);
 			while (curr >= 0)
 			{
-				int findOnTopGoal = goal.getContainerOnTopIndex(stackPos);
-				while (findOnTopGoal >= 0)
+				// check if curr is below stackPos in goal
+				int onGoal = goal.getContainerOnBottomIndex(stackPos);
+				while (onGoal >= 0)
 				{
-					if (curr == findOnTopGoal)
-						h += containersCost[curr];
-					findOnTopGoal = goal.getContainerOnTopIndex(findOnTopGoal);
+					if (curr == onGoal)
+					{
+						h += containersCost[stackPos];
+						hasFound = true;
+						break;
+					}
+
+					onGoal = goal.getContainerOnBottomIndex(onGoal);
 				}
-				curr = this.getContainerOnTopIndex(curr);
+
+				if (hasFound)
+					break;
+				
+				curr = this.getContainerOnBottomIndex(curr);
 			}
+
 			stackPos = this.getContainerOnTopIndex(stackPos);
 		}
 		return h;

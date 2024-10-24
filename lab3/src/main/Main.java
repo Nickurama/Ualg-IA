@@ -57,6 +57,9 @@ public class Main
 		while(it.hasNext())
 		{
 			AStar.State i = it.next();
+			// System.out.println("Trying heuristic...");
+			// i.layout().heuristic(new ContainerLayout(goal));
+			// System.out.println("Expanding node of f: " + i.f() + " (g: " + i.g() + " h: " + i.h() + ")");
 			// System.out.println(i);
 			if (!it.hasNext())
 			{
@@ -65,6 +68,6 @@ public class Main
 			}
 		}
 
-		// StateSpaceStats.print();
+		StateSpaceStats.print();
 	}
 }
