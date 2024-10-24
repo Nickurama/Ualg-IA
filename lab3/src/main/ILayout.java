@@ -1,6 +1,6 @@
 import java.util.List;
 
-interface ILayout
+public interface ILayout
 {
 	/**
 	 * @return the children of the receiver.

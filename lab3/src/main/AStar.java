@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * Represents the A* heuristic state space search
  */
-class AStar
+public class AStar
 {
 	protected Queue<State> open;
 	private Map<ILayout, State> openMap;

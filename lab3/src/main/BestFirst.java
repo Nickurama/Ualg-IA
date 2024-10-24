@@ -3,7 +3,7 @@ import java.util.*;
 /**
  * Represents an uniform cost search of ILayout states.
  */
-class BestFirst
+public class BestFirst
 {
 	protected Queue<State> open;
 	private Map<ILayout, State> openMap;

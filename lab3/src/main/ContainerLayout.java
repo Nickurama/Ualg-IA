@@ -4,7 +4,7 @@ import java.util.*;
  * A representation of a configuration (layout) of containers
  * A container can have an associated cost, or not
  */
-class ContainerLayout implements ILayout
+public class ContainerLayout implements ILayout
 {
 	private static final int BUCKET_SIZE = 52; // 2 * 26
 	private static final int MID_INDEX = 26;
@@ -128,8 +128,14 @@ class ContainerLayout implements ILayout
 		addNextContainer(str, 0, -1);
 	}
 
-	// assumes that string has cost
-	// i has to be a valid index at str
+	/**
+	 * Adds containers recursively
+	 * Assumes that the string has cost
+	 * @param str the string with the container to add
+	 * @param index the index of the container in the string to add
+	 * @param previous the container below the one to be interpreted in the string
+	 * @throws IllegalArgumentException
+	 */
 	private void addNextContainer(String str, int index, int previous) throws IllegalArgumentException
 	{
 		if (index >= str.length())
@@ -159,6 +165,12 @@ class ContainerLayout implements ILayout
 		addNextContainer(str, index, nextPrevious);
 	}
 
+	/**
+	 * Checks if the container at index is a valid container
+	 * @param str the string where the container is
+	 * @param index the index of the container to check
+	 * @throws IllegalArgumentException
+	 */
 	private void validateContainer(String str, int index) throws IllegalArgumentException
 	{
 		if (!isAlphabetical(str.charAt(index)))
@@ -168,6 +180,15 @@ class ContainerLayout implements ILayout
 	}
 
 	// returns the next container's "bottom" container
+	/**
+	 * Adds a container.
+	 * @param key the index of the container
+	 * @param cost the cost of the container
+	 * @param next the container above it
+	 * @param previous the container below it
+	 * @return the container that was added
+	 * @throws IllegalArgumentException
+	 */
 	private int addContainer(int key, int cost, int next, int previous) throws IllegalArgumentException
 	{
 		if (this.contains(key))
@@ -192,6 +213,12 @@ class ContainerLayout implements ILayout
 		return nextPrevious;
 	}
 
+	/**
+	 * Populates containers from a string that doesn't have the cost of
+	 * each container
+	 * @param str the string that has the containers
+	 * @throws IllegalArgumentException
+	 */
 	private void populateContainersFromStringWithoutCost(String str) throws IllegalArgumentException
 	{
 		for (int i = 0; i < str.length(); i++)
@@ -214,7 +241,10 @@ class ContainerLayout implements ILayout
 		}
 	}
 
-	private boolean contains(char c) { return contains(getKey(c)); }
+	/**
+	 * @param i the index of the container
+	 * @return if the container exists
+	 */
 	private boolean contains(int i)
 	{
 		if (i < 0)
@@ -222,62 +252,65 @@ class ContainerLayout implements ILayout
 		return containersCost[i] >= 0;
 	}
 
-	private boolean hasContainerOnTop(char c) { return hasContainerOnTop(getKey(c)); }
-	private boolean hasContainerOnTop(int i)
-	{
-		return containerOnTopIndex[i] >= 0;
-	}
+	/**
+	 * @param i the index of the container
+	 * @return if the container has a container on top of it
+	 */
+	private boolean hasContainerOnTop(int i) { return containerOnTopIndex[i] >= 0; }
 
-	private boolean hasContainerOnBottom(char c) { return hasContainerOnBottom(getKey(c)); }
-	private boolean hasContainerOnBottom(int i)
-	{
-		return containerOnBottomIndex[i] >= 0;
-	}
+	/**
+	 * @param i the index of the container
+	 * @return if the container has a container below it
+	 */
+	private boolean hasContainerOnBottom(int i) { return containerOnBottomIndex[i] >= 0; }
 
-	private boolean isOnBottom(char c) { return isOnBottom(getKey(c)); }
-	private boolean isOnBottom(int i)
-	{
-		return !hasContainerOnBottom(i);
-	}
+	/**
+	 * @param i the index of the container
+	 * @return if the container is on the bottom of it's stack
+	 */
+	private boolean isOnBottom(int i) { return !hasContainerOnBottom(i); }
+ 
+	/**
+	 * @param i the index of the container
+	 * @return if the container is on top of it's stack
+	 */
+	private boolean isOnTop(int i) { return !hasContainerOnTop(i); }
 
-	private boolean isOnTop(char c) { return isOnTop(getKey(c)); }
-	private boolean isOnTop(int i)
-	{
-		return !hasContainerOnTop(i);
-	}
+	/**
+	 * @param i the index of the container
+	 * @return the index of the container on top of it or -1 if there isn't one
+	 */
+	private int getContainerOnTopIndex(int i) { return containerOnTopIndex[i]; }
 
-	private int getContainerOnTopIndex(char c) { return getContainerOnTopIndex(getKey(c)); }
-	private int getContainerOnTopIndex(int i)
-	{
-		return containerOnTopIndex[i];
-	}
+	/**
+	 * @param i the index of the container
+	 * @return the index of the container below it or -1 if there isn't one
+	 */
+	private int getContainerOnBottomIndex(int i) { return containerOnBottomIndex[i]; }
 
-	private int getContainerOnBottomIndex(char c) { return getContainerOnBottomIndex(getKey(c)); }
-	private int getContainerOnBottomIndex(int i)
-	{
-		return containerOnBottomIndex[i];
-	}
+	/**
+	 * @param c the character/container to get the index from
+	 * @return the index of the container
+	 */
+	static private int getKey(char c) { return c - 'A' >= MID_INDEX ? c - 'a' + MID_INDEX : c - 'A'; }
 
-	static private int getKey(char c)
-	{
-		return c - 'A' >= MID_INDEX ? c - 'a' + MID_INDEX : c - 'A';
-	}
+	/**
+	 * @param i the index of the contaier
+	 * @return the character of the container
+	 */
+	static private char getCharFromKey(int i) { return i >= MID_INDEX ? (char)(i - MID_INDEX + 'a') : (char)(i + 'A'); }
 
-	static private char getCharFromKey(int i)
-	{
-		return i >= MID_INDEX ? (char)(i - MID_INDEX + 'a') : (char)(i + 'A');
-	}
+	/**
+	 * @return if the character is alphabetical
+	 */
+	static private boolean isAlphabetical(char c) { return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'); }
 
-	static private boolean isAlphabetical(char c)
-	{
-		return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-	}
+	/**
+	 * @return if the character is a number
+	 */
+	static private boolean isNumerical(char c) { return c >= '0' && c <= '9'; }
 
-	static private boolean isNumerical(char c)
-	{
-		return c >= '0' && c <= '9';
-	}
-
+	@Override
 	public String toString()
 	{
 		StringBuilder builder = new StringBuilder();
@@ -317,6 +350,12 @@ class ContainerLayout implements ILayout
 		return true;
 	}
 
+	/**
+	 * Checks if the two container layouts are equal at a given index
+	 * @param that the container to compare to
+	 * @param i the index to compare
+	 * @return if the two container layouts are equal at that index
+	 */
 	private boolean equalsIndex(ContainerLayout that, int i)
 	{
 		if (this.contains(i) && that.contains(i) &&
@@ -382,13 +421,24 @@ class ContainerLayout implements ILayout
 		return children;
 	}
 
+	/**
+	 * Generates a container layout where the given container will be moved to the ground
+	 * @param from the container to move to the ground
+	 * @return a new container layout where the given container was moved to the ground
+	 * @pre the container must not already be on the ground
+	 */
 	private ContainerLayout moveContainerGround(int from)
 	{
 		return moveContainer(from, -1);
 	}
 
-	// from/to must be top, can also be mutually bottom
-	// to can be -1 to place on ground
+	/**
+	 * Generates a container layout where the given container was moved to the top of another container
+	 * @param from the container to move
+	 * @param to the container to move from on top of (can be -1 to move a container to the ground)
+	 * @return a container layout where the given container was moved on top of the other container
+	 * @pre from and to must be at the top of their stacks
+	 */
 	private ContainerLayout moveContainer(int from, int to)
 	{
 		// must be top
@@ -434,7 +484,11 @@ class ContainerLayout implements ILayout
 		return h2(goalLayout);
 	}
 
-	// BestFirst
+	/**
+	 * heuristic that acts as a best-first search, returning always 0
+	 * @param goalLayout the goal layout
+	 * @return 0
+	 */
 	private int h0(ILayout goalLayout)
 	{
 		if (this.getClass() != goalLayout.getClass())
@@ -443,7 +497,11 @@ class ContainerLayout implements ILayout
 		return 0;
 	}
 
-	// Simple difference heuristic
+	/**
+	 * Simple heuristic checking only what containers aren't in their place
+	 * @param goalLayout the goal layout
+	 * @return the sum of the weights of the containers that aren't in their place
+	 */
 	private int h1(ILayout goalLayout)
 	{
 		if (this.getClass() != goalLayout.getClass())
@@ -485,6 +543,11 @@ class ContainerLayout implements ILayout
 		return h;
 	}
 
+	/**
+	 * does what h1 does, and checks for cases where containers must be moved twice
+	 * @param goalLayout the goal layout
+	 * @return the calculated heuristic
+	 */
 	private int h2(ILayout goalLayout)
 	{
 		if (this.getClass() != goalLayout.getClass())
@@ -503,6 +566,12 @@ class ContainerLayout implements ILayout
 		return h;
 	}
 
+	/**
+	 * gets the h2 but for a single stack
+	 * @param stackBottom the bottom of the stack to get the heuristic out of
+	 * @param goal the goal state
+	 * @return h2 for the given stack
+	 */
 	private int hStack(int stackBottom, ContainerLayout goal)
 	{
 		int h = 0;
@@ -540,18 +609,22 @@ class ContainerLayout implements ILayout
 		return h;
 	}
 
+	/**
+	 * gets h2 but from the middle of a stack to the top
+	 * @param stackPos the position in the stack to start applying h2 to
+	 * @param goal the goal layout
+	 * @return h2 from the given container to the top of it's stack
+	 */
 	private int hNonGoalStackLeftovers(int stackPos, ContainerLayout goal)
 	{
 		int h = 0;
-		while (stackPos >= 0)
+		for ( ; stackPos >= 0; stackPos = this.getContainerOnTopIndex(stackPos))
 		{
 			boolean hasFound = false;
-			int curr = this.getContainerOnBottomIndex(stackPos);
-			while (curr >= 0)
+			for (int curr = this.getContainerOnBottomIndex(stackPos); curr >= 0; curr = this.getContainerOnBottomIndex(curr))
 			{
 				// check if curr is below stackPos in goal
-				int onGoal = goal.getContainerOnBottomIndex(stackPos);
-				while (onGoal >= 0)
+				for (int onGoal = goal.getContainerOnBottomIndex(stackPos); onGoal >= 0; onGoal = goal.getContainerOnBottomIndex(onGoal))
 				{
 					if (curr == onGoal)
 					{
@@ -559,21 +632,20 @@ class ContainerLayout implements ILayout
 						hasFound = true;
 						break;
 					}
-
-					onGoal = goal.getContainerOnBottomIndex(onGoal);
 				}
 
 				if (hasFound)
 					break;
-				
-				curr = this.getContainerOnBottomIndex(curr);
 			}
-
-			stackPos = this.getContainerOnTopIndex(stackPos);
 		}
 		return h;
 	}
 
+	/**
+	 * Gets the sum of the weights of all the container above i (inclusive)
+	 * @param i the container to start summing all the weights from
+	 * @return the sum of the weights of all the containers above i (inclusive)
+	 */
 	private int getStackLengthFrom(int i)
 	{
 		int result = 0;

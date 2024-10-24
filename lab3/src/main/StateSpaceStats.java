@@ -1,4 +1,4 @@
-class StateSpaceStats
+public class StateSpaceStats
 {
 	private static long expanded = 0;
 	private static long generated = 0;

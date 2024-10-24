@@ -4,7 +4,7 @@ import java.util.List;
 /**
  * Represents a sliding square puzzle
  */
-class Board implements ILayout
+public class Board implements ILayout
 {
 	private static final int dim = 3;
 	private int board[][];

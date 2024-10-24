@@ -3,6 +3,9 @@ import java.util.Scanner;
 
 public class Main
 {
+	/**
+	 * Main function
+	 */
 	public static void main(String[] args)
 	{
 		Scanner sc = new Scanner(System.in);
@@ -14,6 +17,9 @@ public class Main
 		solveAStar(start, goal);
 	}
 
+	/**
+	 * solves using best-first
+	 */
 	private static void solveBestFirst(String start, String goal)
 	{
 		BestFirst s = new BestFirst();
@@ -41,6 +47,9 @@ public class Main
 		StateSpaceStats.print();
 	}
 
+	/**
+	 * solves using A*
+	 */
 	private static void solveAStar(String start, String goal)
 	{
 		AStar s = new AStar();
@@ -57,10 +66,6 @@ public class Main
 		while(it.hasNext())
 		{
 			AStar.State i = it.next();
-			// System.out.println("Trying heuristic...");
-			// i.layout().heuristic(new ContainerLayout(goal));
-			// System.out.println("Expanding node of f: " + i.f() + " (g: " + i.g() + " h: " + i.h() + ")");
-			// System.out.println(i);
 			if (!it.hasNext())
 			{
 				System.out.println(i);
@@ -68,6 +73,6 @@ public class Main
 			}
 		}
 
-		StateSpaceStats.print();
+		// StateSpaceStats.print();
 	}
 }
