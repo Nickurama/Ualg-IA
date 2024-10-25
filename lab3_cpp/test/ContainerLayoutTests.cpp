@@ -55,6 +55,23 @@ TEST_CASE("Test constructor 3")
 	CHECK(bStr == expected);
 }
 
+TEST_CASE("Should work with lowercase")
+{
+	// Arrange
+	std::string expected = 	"[A]\n"
+							"[a, B]\n"
+							"[c, d]\n";
+
+	// Act
+	ContainerLayout b("a1B7 c3d2 A14");
+	std::stringstream ss;
+	ss << b;
+	std::string bStr = ss.str();
+
+	// Assert
+	CHECK(bStr == expected);
+}
+
 TEST_CASE("Should throw when constructing empty string")
 {
 	// Arrange

@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/luna/Documents/uni_code/IA/lab2_cpp
+CMAKE_SOURCE_DIR = /home/luna/Documents/uni_code/IA/lab3_cpp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/luna/Documents/uni_code/IA/lab2_cpp/build
+CMAKE_BINARY_DIR = /home/luna/Documents/uni_code/IA/lab3_cpp/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles /home/luna/Documents/uni_code/IA/lab2_cpp/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna/Documents/uni_code/IA/lab3_cpp/build/CMakeFiles /home/luna/Documents/uni_code/IA/lab3_cpp/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna/Documents/uni_code/IA/lab2_cpp/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/luna/Documents/uni_code/IA/lab3_cpp/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -141,6 +141,33 @@ tests: cmake_check_build_system
 tests/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/build
 .PHONY : tests/fast
+
+src/AStar.o: src/AStar.cpp.o
+.PHONY : src/AStar.o
+
+# target to build an object file
+src/AStar.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/AStar.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/AStar.cpp.o
+.PHONY : src/AStar.cpp.o
+
+src/AStar.i: src/AStar.cpp.i
+.PHONY : src/AStar.i
+
+# target to preprocess a source file
+src/AStar.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/AStar.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/AStar.cpp.i
+.PHONY : src/AStar.cpp.i
+
+src/AStar.s: src/AStar.cpp.s
+.PHONY : src/AStar.s
+
+# target to generate assembly for a file
+src/AStar.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/AStar.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/src/AStar.cpp.s
+.PHONY : src/AStar.cpp.s
 
 src/BestFirst.o: src/BestFirst.cpp.o
 .PHONY : src/BestFirst.o
@@ -274,6 +301,30 @@ src/Main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ia.dir/build.make CMakeFiles/ia.dir/src/Main.cpp.s
 .PHONY : src/Main.cpp.s
 
+test/AStarTests.o: test/AStarTests.cpp.o
+.PHONY : test/AStarTests.o
+
+# target to build an object file
+test/AStarTests.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/AStarTests.cpp.o
+.PHONY : test/AStarTests.cpp.o
+
+test/AStarTests.i: test/AStarTests.cpp.i
+.PHONY : test/AStarTests.i
+
+# target to preprocess a source file
+test/AStarTests.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/AStarTests.cpp.i
+.PHONY : test/AStarTests.cpp.i
+
+test/AStarTests.s: test/AStarTests.cpp.s
+.PHONY : test/AStarTests.s
+
+# target to generate assembly for a file
+test/AStarTests.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tests.dir/build.make CMakeFiles/tests.dir/test/AStarTests.cpp.s
+.PHONY : test/AStarTests.cpp.s
+
 test/BestFirstTests.o: test/BestFirstTests.cpp.o
 .PHONY : test/BestFirstTests.o
 
@@ -380,6 +431,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... ia"
 	@echo "... tests"
+	@echo "... src/AStar.o"
+	@echo "... src/AStar.i"
+	@echo "... src/AStar.s"
 	@echo "... src/BestFirst.o"
 	@echo "... src/BestFirst.i"
 	@echo "... src/BestFirst.s"
@@ -395,6 +449,9 @@ help:
 	@echo "... src/Main.o"
 	@echo "... src/Main.i"
 	@echo "... src/Main.s"
+	@echo "... test/AStarTests.o"
+	@echo "... test/AStarTests.i"
+	@echo "... test/AStarTests.s"
 	@echo "... test/BestFirstTests.o"
 	@echo "... test/BestFirstTests.i"
 	@echo "... test/BestFirstTests.s"

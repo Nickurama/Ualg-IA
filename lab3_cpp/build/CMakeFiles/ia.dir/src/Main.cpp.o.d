@@ -1,8 +1,8 @@
 CMakeFiles/ia.dir/src/Main.cpp.o: \
- /home/luna/Documents/uni_code/IA/lab2_cpp/src/Main.cpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/src/Main.cpp \
  /usr/include/stdc-predef.h \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/BestFirst.hpp \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/ILayout.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/AStar.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/ILayout.hpp \
  /usr/include/c++/14.2.1/list \
  /usr/include/c++/14.2.1/bits/requires_hosted.h \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -199,8 +199,8 @@ CMakeFiles/ia.dir/src/Main.cpp.o: \
  /usr/include/c++/14.2.1/bits/enable_special_members.h \
  /usr/include/c++/14.2.1/bits/node_handle.h \
  /usr/include/c++/14.2.1/bits/erase_if.h \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/Board.hpp \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/ContainerLayout.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/Board.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/ContainerLayout.hpp \
  /usr/include/c++/14.2.1/cmath /usr/include/math.h \
  /usr/include/bits/math-vector.h /usr/include/bits/libm-simd-decl-stubs.h \
  /usr/include/bits/flt-eval-method.h /usr/include/bits/fp-logb.h \

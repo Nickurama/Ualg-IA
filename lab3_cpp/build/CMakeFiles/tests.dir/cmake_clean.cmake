@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/tests.dir/src/AStar.cpp.o"
+  "CMakeFiles/tests.dir/src/AStar.cpp.o.d"
   "CMakeFiles/tests.dir/src/BestFirst.cpp.o"
   "CMakeFiles/tests.dir/src/BestFirst.cpp.o.d"
   "CMakeFiles/tests.dir/src/Board.cpp.o"
@@ -7,6 +9,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/tests.dir/src/ContainerLayout.cpp.o.d"
   "CMakeFiles/tests.dir/src/ILayout.cpp.o"
   "CMakeFiles/tests.dir/src/ILayout.cpp.o.d"
+  "CMakeFiles/tests.dir/test/AStarTests.cpp.o"
+  "CMakeFiles/tests.dir/test/AStarTests.cpp.o.d"
   "CMakeFiles/tests.dir/test/BestFirstTests.cpp.o"
   "CMakeFiles/tests.dir/test/BestFirstTests.cpp.o.d"
   "CMakeFiles/tests.dir/test/BoardTests.cpp.o"

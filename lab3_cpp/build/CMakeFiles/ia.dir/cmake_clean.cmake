@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/ia.dir/src/AStar.cpp.o"
+  "CMakeFiles/ia.dir/src/AStar.cpp.o.d"
   "CMakeFiles/ia.dir/src/BestFirst.cpp.o"
   "CMakeFiles/ia.dir/src/BestFirst.cpp.o.d"
   "CMakeFiles/ia.dir/src/Board.cpp.o"

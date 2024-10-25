@@ -1,8 +1,8 @@
 CMakeFiles/tests.dir/test/BoardTests.cpp.o: \
- /home/luna/Documents/uni_code/IA/lab2_cpp/test/BoardTests.cpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/test/BoardTests.cpp \
  /usr/include/stdc-predef.h \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/doctest.hpp \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/Board.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/doctest.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/Board.hpp \
  /usr/include/c++/14.2.1/string \
  /usr/include/c++/14.2.1/bits/requires_hosted.h \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -111,7 +111,7 @@ CMakeFiles/tests.dir/test/BoardTests.cpp.o: \
  /usr/include/c++/14.2.1/bits/uses_allocator.h \
  /usr/include/c++/14.2.1/bits/uses_allocator_args.h \
  /usr/include/c++/14.2.1/tuple /usr/include/c++/14.2.1/bits/ranges_util.h \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/ILayout.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/ILayout.hpp \
  /usr/include/c++/14.2.1/list /usr/include/c++/14.2.1/bits/stl_list.h \
  /usr/include/c++/14.2.1/bits/allocated_ptr.h \
  /usr/include/c++/14.2.1/ext/aligned_buffer.h \

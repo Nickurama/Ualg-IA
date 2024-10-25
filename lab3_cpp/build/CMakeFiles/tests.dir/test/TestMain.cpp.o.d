@@ -1,7 +1,7 @@
 CMakeFiles/tests.dir/test/TestMain.cpp.o: \
- /home/luna/Documents/uni_code/IA/lab2_cpp/test/TestMain.cpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/test/TestMain.cpp \
  /usr/include/stdc-predef.h \
- /home/luna/Documents/uni_code/IA/lab2_cpp/include/doctest.hpp \
+ /home/luna/Documents/uni_code/IA/lab3_cpp/include/doctest.hpp \
  /usr/include/c++/14.2.1/ctime \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
  /usr/include/c++/14.2.1/x86_64-pc-linux-gnu/bits/os_defines.h \

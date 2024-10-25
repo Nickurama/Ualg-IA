@@ -284,6 +284,7 @@ std::unique_ptr<ContainerLayout> ContainerLayout::moveContainer(int from, int to
 {
 	// must be top
 	std::unique_ptr<ContainerLayout> moved = std::make_unique<ContainerLayout>(*this);
+	moved->m_hasHash = false;
 	moved->m_cost = m_containersCost[from];
 	if (isOnBottom(from))
 	{
@@ -292,25 +293,25 @@ std::unique_ptr<ContainerLayout> ContainerLayout::moveContainer(int from, int to
 		// it can only be placed TO the top of a container (thus not -1)
 		assert(to >= 0);
 
-		updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
+		// updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
 		moved->m_containerOnBottomIndex[from] = to;
 
-		updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
+		// updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
 		moved->m_containerOnTopIndex[to] = from;
 	}
 	else
 	{
 		int belowFrom = getContainerOnBottomIndex(from);
 
-		updateHash(*moved, moved->m_containerOnTopIndex[belowFrom], -1, HASH_TOP_POWER, belowFrom + 1);
+		// updateHash(*moved, moved->m_containerOnTopIndex[belowFrom], -1, HASH_TOP_POWER, belowFrom + 1);
 		moved->m_containerOnTopIndex[belowFrom] = -1;
 		moved->m_topmostContainersIndex.push_back(belowFrom);
 
-		updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
+		// updateHash(*moved, moved->m_containerOnBottomIndex[from], to, HASH_BOTTOM_POWER, from + 1);
 		moved->m_containerOnBottomIndex[from] = to; // -1 if ground
 		if (to >= 0) // place on top of container
 		{
-			updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
+			// updateHash(*moved, moved->m_containerOnTopIndex[to], from, HASH_TOP_POWER, to + 1);
 			moved->m_containerOnTopIndex[to] = from;
 		}
 	}
@@ -389,6 +390,7 @@ bool ContainerLayout::operator==(const ILayout& rhs) const
 
 	if (!(std::memcmp(m_containerOnBottomIndex, other->m_containerOnBottomIndex, BUCKET_SIZE * sizeof(int)) == 0))
 		return false;
+
 	for (int i = 0; i < BUCKET_SIZE; i++)
 	{
 		if (this->contains(i) && !other->contains(i))
