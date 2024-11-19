@@ -303,4 +303,77 @@ public class MatrixTests
 		assertTrue(threw0);
 		assertTrue(threw1);
 	}
+
+	@Test
+	public void shouldCopy()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		// Act
+		Matrix copy = new Matrix(m0);
+
+		// Assert
+		assertEquals(m0, copy);
+	}
+
+	@Test
+	public void shouldAddRow()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		double[] row = { 1, 3, 5, 9, 4 };
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+			{ 1, 3, 5, 9, 4 },
+		});
+
+		// Act
+		Matrix obtained = m0.addRow(row);
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
+
+	@Test
+	public void shouldAppendAsRows()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		Matrix m1 = new Matrix(new double[][]{
+			{ 8, 2, 0, 0, 5 },
+			{ 1, 9, 9, 3, 2 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+			{ 8, 2, 0, 0, 5 },
+			{ 1, 9, 9, 3, 2 },
+		});
+
+		// Act
+		Matrix obtained = m0.appendAsRows(m1);
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
 }
