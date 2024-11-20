@@ -8,8 +8,7 @@ public interface IPropagable
 	public void connect(IPropagable that, double weight);
 	public void resetCaches(); // propagates forward throughout network; must be called after training for further usage
 	public void propagate(); // propagates forward throughout network
-	// TODO
-	// public void backpropagate(double errorDifference); // errorDifference = (t - y); propagates back throughout network; resets caches automatically except for the ones for training
+	public void backpropagate(Matrix deltas, double learningRate); // errorDifference = (t - y); propagates back throughout network; resets caches automatically except for the ones for training
 	// TODO
 	// public void train(double learningRate, double numTrainingSets); // propagates forward throughout network
 	// TODO

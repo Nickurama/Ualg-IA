@@ -376,4 +376,171 @@ public class MatrixTests
 		// Assert
 		assertEquals(obtained, expected);
 	}
+
+	@Test
+	public void shouldNotSum()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		Matrix m1 = new Matrix(new double[][]{
+			{ 4, 0, 0, 7 },
+			{ 2, 1, 2, 3 },
+			{ 3, 9, 3, 7 },
+		});
+
+		// Act
+		boolean threw = false;
+
+		try {
+			m0.add(m1);
+		}
+		catch (Exception e)
+		{
+			threw = true;
+		}
+
+		// Assert
+		assertTrue(threw);
+	}
+
+	@Test
+	public void shouldNotSubtract()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		Matrix m1 = new Matrix(new double[][]{
+			{ 4, 0, 0, 7, 2 },
+			{ 2, 1, 2, 3, 5 },
+		});
+
+		// Act
+		boolean threw = false;
+
+		try {
+			m0.sub(m1);
+		}
+		catch (Exception e)
+		{
+			threw = true;
+		}
+
+		// Assert
+		assertTrue(threw);
+	}
+
+	@Test
+	public void shouldSum()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		Matrix m1 = new Matrix(new double[][]{
+			{ 4, 0, 0, 7, 2 },
+			{ 2, 1, 2, 3, 5 },
+			{ 3, 9, 3, 7, 6 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 5, 2, 3, 11, 7 },
+			{ 9, 3, 9, 3, 6 },
+			{ 10, 10, 6, 14, 8 },
+		});
+
+		// Act
+		Matrix obtained = m0.add(m1);
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
+
+	@Test
+	public void shouldSubtract()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		Matrix m1 = new Matrix(new double[][]{
+			{ 4, 0, 0, 7, 2 },
+			{ 2, 1, 2, 3, 5 },
+			{ 3, 9, 3, 7, 6 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ -3, 2, 3, -3, 3 },
+			{ 5, 1, 5, -3, -4 },
+			{ 4, -8, 0, 0, -4 },
+		});
+
+		// Act
+		Matrix obtained = m0.sub(m1);
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
+
+	@Test
+	public void shouldNotMakeDiagonal()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+		});
+
+		// Act
+		boolean threw = false;
+
+		try {
+			m0.makeDiagonal();
+		}
+		catch (Exception e)
+		{
+			threw = true;
+		}
+
+		// Assert
+		assertTrue(threw);
+	}
+
+	@Test
+	public void shouldMakeDiagonal()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 1, 0, 0, 0, 0 },
+			{ 0, 2, 0, 0, 0 },
+			{ 0, 0, 3, 0, 0 },
+			{ 0, 0, 0, 4, 0 },
+			{ 0, 0, 0, 0, 5 },
+		});
+
+		// Act
+		Matrix obtained = m0.makeDiagonal();
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
 }

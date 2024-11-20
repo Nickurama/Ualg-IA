@@ -4,38 +4,29 @@ import java.util.function.Function;
 public class Neuron implements IPropagable
 {
 	// network
-	// private ArrayList<Double> weights; // forward
 	private Matrix weights; // first weight is bias
 	private ArrayList<IPropagable> forwardNeurons;
 	private ArrayList<IPropagable> backwardNeurons;
-	// private Double bias;
-	// private boolean hasTrained;
 
 	// propagation
-	// private ArrayList<Double> inputsCache;
 	private static final Function<Double, Double> SIGMOID_FUNC = z -> sigmoid(z);
-	// private Matrix inputsCache; // can be null
-	private double numInputs;
+	private static final Function<Double, Double> D_SIGMOID_FUNC = z -> dSigmoid(z);
+	private int numInputs;
+	private Matrix inputCache; // can be null
 	private Matrix sumCache; // can be null
 	private Matrix outCache; // can be null
 
 	// backpropagation
-	// private ArrayList<Double> dWeightsCache;
-	// private double dSigmoidCache;
-	// private double dBiasCache;
-	// private double errorTermCache;
+	private int backpropInputs;
+	private Matrix deltaCache; // can be null
 
 	public Neuron(double bias)
 	{
-		// this.bias() = bias;
-		// this.weights = new ArrayList<>();
 		this.weights = new Matrix(new double[][]{{ bias }});
 		this.forwardNeurons = new ArrayList<>();
 		this.backwardNeurons = new ArrayList<>();
 
-		// this.dWeightsCache = new ArrayList<>();
-		this.resetValues(true);
-		// this.hasTrained = false;
+		this.resetValues();
 	}
 
 	private static double sigmoid(double z) { return 1.0 / (1.0 + Math.exp(-z)); }
@@ -45,8 +36,6 @@ public class Neuron implements IPropagable
 	@Override
 	public void connect(IPropagable that, double weight)
 	{
-		// this.weights = this.weights.addRow(new double[] { weight });
-		// this.weights.add(weight);
 		this.fwrdConnect(that);
 		that.backConnect(this, weight);
 	}
@@ -66,9 +55,6 @@ public class Neuron implements IPropagable
 
 	private boolean hasAllInputs()
 	{
-		//FIXME
-		// if (this.inputsCache == null)
-		// 	return false;
 		return this.numInputs == backwardNeurons.size();
 	}
 
@@ -79,18 +65,13 @@ public class Neuron implements IPropagable
 		if (!hasAllInputs())
 			return;
 
-		Matrix inputs = gatherInputs();
-		this.sumCache = this.weights.transpose().dot(inputs);
+
+		this.inputCache = gatherInputs();
+		this.sumCache = this.weights.transpose().dot(this.inputCache);
 		this.outCache = sumCache.apply(SIGMOID_FUNC);
 
 		for (IPropagable p : this.forwardNeurons)
 			p.propagate();
-		// for (int i = 0; i < this.forwardNeurons.size(); i++)
-		// {
-		// 	IPropagable curr = forwardNeurons.get(i);
-		// 	// curr.addInput(outCache * weights.get(i, 0));
-		// 	curr.propagate();
-		// }
 	}
 
 	private Matrix gatherInputs()
@@ -102,84 +83,60 @@ public class Neuron implements IPropagable
 		return inputs;
 	}
 
-	// private Matrix summation()
-	// {
-	// 	return this.weights.transpose().dot(this.inputsCache);
-	// 	// double result = this.bias();
-	// 	// for (int i = 0; i < this.inputsCache.size(); i++)
-	// 	// 	result += this.inputsCache.get(i);
-	// 	// return result;
-	// }
-
-	// @Override
-	// public void addInput() // a_n^(0), a_n^(1), ..., a_n^(m);
-	// {
-	// 	// if (this.inputsCache == null)
-	// 	// 	this.inputsCache = new Matrix(1, inputsRow.columns, 1.0);
-	// 	// this.inputsCache = this.inputsCache.appendAsRows(inputsRow);
-	// 	numInputs++;
-	// }
-
 	@Override
 	public Matrix output() // requires propagation
 	{
 		return this.outCache;
 	}
 
-	// TODO
-	// @Override
-	// public void backpropagate(double errorDifference)
-	// {
-	// 	if (!this.forwardNeurons.isEmpty())
-	// 	{
-	// 		this.dWeightsCache.add(0.0);
-	// 		if (!hasAllErrorTerms())
-	// 			return;
-	// 	}
-	//
-	// 	updateErrorTerm();
-	// 	updateWeightDeltas(errorDifference);
-	//
-	// 	for (IPropagable p : backwardNeurons)
-	// 		p.backpropagate(errorDifference);
-	//
-	// 	resetValues(false);
-	// }
+	@Override
+	public void backpropagate(Matrix deltas, double learningRate)
+	{
+		this.backpropInputs++;
+		if (this.deltaCache == null)
+		{
+			this.deltaCache = deltas;
+		}
+		else
+		{
+			this.deltaCache = this.deltaCache.add(deltas);
+		}
 
-	// private boolean hasAllErrorTerms()
-	// {
-	// 	return this.dWeightsCache.size() >= this.forwardNeurons.size();
-	// }
+		if (this.isOutputNeuron()) // deltas should be T on output node
+		{
+			this.deltaCache = deltas.sub(this.outCache); // (T - Y)
+		}
+		else if (!hasAllBackpropInputs())
+		{
+			return;
+		}
 
-	// private void updateErrorTerm()
-	// {
-	// 	this.errorTermCache = dSigmoid(sumCache);
-	// 	double sum = 0;
-	// 	for (int i = 0; i < forwardNeurons.size(); i++)
-	// 		sum += weights.get(i, 0) * forwardNeurons.get(i).errorTerm();
-	// 	if (forwardNeurons.size() > 0)
-	// 		this.errorTermCache *= sum;
-	// }
+		// calculate delta
+		Matrix dSigmoid = this.sumCache.apply(D_SIGMOID_FUNC);
+		Matrix dSigmoidDiag = dSigmoid.makeDiagonal();
+		this.deltaCache = dSigmoidDiag.dot(this.deltaCache.transpose()).transpose();
 
-	// must be ran after having errorTermCache
-	// private void updateWeightDeltas(double errorDifference)
-	// {
-	// 	// calculate bias delta
-	// 	this.dBiasCache += errorDifference * this.errorTerthis.weights.transpose().dot(inputs)m();
-	// 	// calculate weights delta
-	// 	for (int i = 0; i < weights.rows(); i++)
-	// 	{
-	// 		double delta = errorDifference * dSigmoid(this.sumCache) * this.forwardNeurons.get(i).errorTerm();
-	// 		this.dWeightsCache.set(i, this.dWeightsCache.get(i) + delta);
-	// 	}
-	// }
+		// backpropagate corresponding w * delta
+		for (int i = 0; i < this.backwardNeurons.size(); i++)
+			this.backwardNeurons.get(i).backpropagate(this.deltaCache.multiply(this.weights.get(i + 1, 0)), learningRate);
 
-	// @Override
-	// public double errorTerm()
-	// {
-	// 	// FIXME remove
-	// 	return this.errorTermCache;
-	// }
+		// calculate weight delta
+		Matrix weightDeltas = this.inputCache.dot(this.deltaCache.transpose());
+		weightDeltas = weightDeltas.multiply(learningRate * (2.0 / this.inputCache.columns()));
+
+		// update weights
+		this.weights = this.weights.add(weightDeltas);
+	}
+
+	private boolean isOutputNeuron()
+	{
+		return this.forwardNeurons.isEmpty();
+	}
+
+	private boolean hasAllBackpropInputs()
+	{
+		return this.backpropInputs == this.forwardNeurons.size();
+	}
 
 	@Override
 	public void resetCaches()
@@ -187,60 +144,25 @@ public class Neuron implements IPropagable
 		if (this.isClear())
 			return;
 
-		resetValues(true);
+		resetValues();
 		for (IPropagable p : forwardNeurons)
 			p.resetCaches();
 	}
 
 	private boolean isClear()
 	{
-		// FIXME
-		return false;
-		// return this.inputsCache == null;
+		return numInputs + backpropInputs == 0;
 	}
 
-	private void resetValues(boolean clearWeightsDeltas)
+	private void resetValues()
 	{
-		// FIXME
-		if (clearWeightsDeltas)
-		{
-			// this.dWeightsCache.clear();
-			// this.dBiasCache = 0;
-		}
-		// this.inputsCache.clear();
-		// this.inputsCache = null;
+		this.backpropInputs = 0;
 		this.numInputs = 0;
 		this.sumCache = null;
 		this.outCache = null;
-		// this.errorTermCache = 0;
-		// this.dSigmoidCache = -1;
-		// this.hasTrained = false;
+		this.deltaCache = null;
+		this.inputCache = null;
 	}
-
-	// @Override
-	// public void train(double learningRate, double numTrainingSets)
-	// {
-	// 	this.train(learningRate * (2 / numTrainingSets)); // 2 can be replaced with 1
-	// }
-	//
-	// @Override
-	// public void train(double quotient)
-	// {
-	// 	if (this.hasTrained)
-	// 		return;
-	// 	this.hasTrained = true;
-	//
-	// 	this.weights.set(0, 0, this.bias() + quotient * this.dBiasCache);
-	// 	// this.bias = this.bias() + quotient * this.dBiasCache;
-	// 	for (int i = 0; i < this.weights.rows(); i++)
-	// 	{
-	// 		double delta = quotient * this.dWeightsCache.get(i);
-	// 		this.weights.set(i, 0, this.weights.get(i, 0) + delta);
-	// 	}
-	//
-	// 	for (IPropagable p : forwardNeurons)
-	// 		p.train(quotient);
-	// }
 
 	@Override
 	public Matrix weights()
@@ -252,8 +174,5 @@ public class Neuron implements IPropagable
 	public double bias()
 	{
 		return this.weights.get(0, 0);
-		// return this.bias();
 	}
-
-	// public double evaluateOutput() { return this.output() >= 0.5 ? 1 : 0; }
 }

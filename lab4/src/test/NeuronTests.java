@@ -9,8 +9,8 @@ class NeuronTests
 	public void shouldMakeLogicAnd()
 	{
 		// Arrange
-		InputNode x1 = new InputNode(new double[]{ 0, 1, 0, 1 });
-		InputNode x2 = new InputNode(new double[]{ 0, 0, 1, 1 });
+		InputNode x1 = new InputNode(new Matrix(new double[][]{{ 0, 1, 0, 1 }}));
+		InputNode x2 = new InputNode(new Matrix(new double[][]{{ 0, 0, 1, 1 }}));
 		Neuron n1 = new Neuron(-1.5);
 		
 		x1.connect(n1, 1.0);
@@ -40,8 +40,8 @@ class NeuronTests
 	public void shouldMakeLogicXor()
 	{
 		// Arrange
-		InputNode x1 = new InputNode(new double[]{ 0, 1, 0, 1 });
-		InputNode x2 = new InputNode(new double[]{ 0, 0, 1, 1 });
+		InputNode x1 = new InputNode(new Matrix(new double[][]{{ 0, 1, 0, 1 }}));
+		InputNode x2 = new InputNode(new Matrix(new double[][]{{ 0, 0, 1, 1 }}));
 		Neuron n1 = new Neuron(300); // w0
 		Neuron n2 = new Neuron(-900); // w3
 

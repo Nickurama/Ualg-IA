@@ -119,6 +119,30 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	public Matrix sub(Matrix that)
+	{
+		if (this.rows != that.rows || this.columns != that.columns)
+			throw new IllegalArgumentException("Illegal matrix subtraction");
+
+		Matrix result = new Matrix(rows, columns);
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < columns; j++)
+				result.matrix[i][j] = this.matrix[i][j] - that.matrix[i][j];
+		return result;
+	}
+
+	public Matrix add(Matrix that)
+	{
+		if (this.rows != that.rows || this.columns != that.columns)
+			throw new IllegalArgumentException("Illegal matrix sum");
+
+		Matrix result = new Matrix(rows, columns);
+		for (int i = 0; i < rows; i++)
+			for (int j = 0; j < columns; j++)
+				result.matrix[i][j] = this.matrix[i][j] + that.matrix[i][j];
+		return result;
+	}
+
 	public Matrix dot(Matrix that)
 	{
 		if (this.columns != that.rows)
@@ -135,6 +159,17 @@ public class Matrix //<T extends Number>
 				result.matrix[row][col] = curr;
 			}
 		}
+		return result;
+	}
+
+	public Matrix makeDiagonal()
+	{
+		if (this.rows != 1)
+			throw new IllegalArgumentException("Matrix must be a single row to transform into a diagonal matrix");
+
+		Matrix result = new Matrix(columns, columns, 0);
+		for (int i = 0; i < columns; i++)
+			result.matrix[i][i] = this.matrix[0][i];
 		return result;
 	}
 
@@ -187,15 +222,6 @@ public class Matrix //<T extends Number>
 	{
 		return this.matrix[row][column];
 	}
-
-	// FIXME REMOVE
-	public void set(int row, int column, double value)
-	{
-	// FIXME REMOVE
-		this.matrix[row][column] = value;
-	// FIXME REMOVE
-	}
-	// FIXME REMOVE
 
 	public int rows()
 	{
