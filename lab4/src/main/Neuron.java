@@ -19,7 +19,7 @@ public class Neuron implements IPropagable
 	// backpropagation
 	private int backpropInputs;
 	private Matrix deltaCache; // can be null
-	private Matrix targetOutputCache; // can be null
+	// private Matrix targetOutputCache; // can be null
 
 	public Neuron(double bias)
 	{
@@ -105,7 +105,7 @@ public class Neuron implements IPropagable
 
 		if (this.isOutputNeuron()) // deltas should be T on output node
 		{
-			this.targetOutputCache = new Matrix(deltas);
+			// this.targetOutputCache = new Matrix(deltas);
 			this.deltaCache = deltas.sub(this.outCache); // (T - Y)
 		}
 		else if (!hasAllBackpropInputs())
@@ -164,16 +164,26 @@ public class Neuron implements IPropagable
 		this.outCache = null;
 		this.deltaCache = null;
 		this.inputCache = null;
-		this.targetOutputCache = null;
+		// this.targetOutputCache = null;
 	}
 
-	public double getError()
+	// public double getError()
+	// {
+	// 	if (!isOutputNeuron())
+	// 		throw new IllegalCallerException("Only output neurons can calculate error!");
+	//
+	// 	Matrix err = this.targetOutputCache.sub(this.outCache);
+	// 	err = err.dot(err.transpose()).multiply(1.0 / this.targetOutputCache.columns());
+	// 	return err.parse();
+	// }
+
+	public double getError(Matrix targetOutput)
 	{
 		if (!isOutputNeuron())
 			throw new IllegalCallerException("Only output neurons can calculate error!");
 
-		Matrix err = this.targetOutputCache.sub(this.outCache);
-		err = err.dot(err.transpose()).multiply(1.0 / this.targetOutputCache.columns());
+		Matrix err = targetOutput.sub(this.outCache);
+		err = err.dot(err.transpose()).multiply(1.0 / targetOutput.columns());
 		return err.parse();
 	}
 
