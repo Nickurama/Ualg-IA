@@ -1,5 +1,8 @@
 import java.util.ArrayList;
 
+/**
+ * This class represents an input node in a neural network.
+ */
 public class InputNode implements IPropagable
 {
 	private static final String IDENTIFIER = "x";
@@ -8,6 +11,10 @@ public class InputNode implements IPropagable
 	private ArrayList<IPropagable> forwardNeurons;
 	private Matrix input;
 
+	/**
+	 * instantiates an input node
+	 * @param in a matrix with a single row, with all the training inputs for the node
+	 */
 	public InputNode(Matrix in)
 	{
 		this.forwardNeurons = new ArrayList<>();
@@ -15,6 +22,11 @@ public class InputNode implements IPropagable
 		setDefaultName();
 	}
 
+	/**
+	 * instantiates an input node
+	 * @param in a matrix with a single row, with all the training inputs for the node
+	 * @param nodeName a string representation of the node
+	 */
 	public InputNode(Matrix in, String nodeName)
 	{
 		this(in);
@@ -88,6 +100,10 @@ public class InputNode implements IPropagable
 		throw new IllegalAccessError("InputNodes have no bias");
 	}
 
+	/**
+	 * changes the input matrix of this node.
+	 * @param in the new input matrix.
+	 */
 	public void set(Matrix in)
 	{
 		if (in.rows() > 1)
@@ -97,17 +113,22 @@ public class InputNode implements IPropagable
 		resetCaches();
 	}
 
+	/**
+	 * generates a default name for the node
+	 */
 	private void setDefaultName()
 	{
 		this.name = IDENTIFIER + count;
 		count++;
 	}
 
+	@Override
 	public String name()
 	{
 		return this.name;
 	}
 
+	@Override
 	public ArrayList<String> getWeightInfo(ArrayList<String> previousInfo)
 	{
 		for (IPropagable p : forwardNeurons)

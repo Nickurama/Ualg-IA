@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
 
+/**
+ * Represents a neuron in a neural network.
+ */
 public class Neuron implements IPropagable
 {
 	// random number generator
@@ -31,6 +34,11 @@ public class Neuron implements IPropagable
 	private int backpropInputs;
 	private Matrix deltaCache; // can be null
 
+	/**
+	 * Instantiates a neuron.
+	 * @param bias the bias of the neuron
+	 * @param neuronName a string representation for the neuron
+	 */
 	public Neuron(double bias, String neuronName)
 	{
 		this.weights = new Matrix(new double[][]{{ bias }});
@@ -41,26 +49,45 @@ public class Neuron implements IPropagable
 		this.name = neuronName;
 	}
 
+	/**
+	 * Instantiates a neuron.
+	 * @param bias the bias of the neuron
+	 */
 	public Neuron(double bias)
 	{
 		this(bias, generateDefaultName());
 	}
 
+	/**
+	 * Instantiates a neuron with a random bias.
+	 * @param neuronName a string representation for the neuron
+	 */
 	public Neuron(String neuronName)
 	{
 		this(getRandomWeight(), neuronName);
 	}
 
+	/**
+	 * Instantiates a neuron with a random bias.
+	 */
 	public Neuron()
 	{
 		this(getRandomWeight(), generateDefaultName());
 	}
 
+	/**
+	 * Sets the seed to use for weight generation.
+	 * @param seed the new seed
+	 */
 	public static void setSeed(long seed)
 	{
 		Neuron.seed = seed;
 	}
 
+	/**
+	 * The seed the neurons are using.
+	 * @return the seed the neurons are using
+	 */
 	public static long seed()
 	{
 		if (rng == null)
@@ -68,6 +95,9 @@ public class Neuron implements IPropagable
 		return Neuron.seed;
 	}
 
+	/**
+	 * @return a random weight between -1 and 1.
+	 */
 	public static double getRandomWeight()
 	{
 		if (rng == null)
@@ -75,6 +105,9 @@ public class Neuron implements IPropagable
 		return rng.nextBoolean() ? rng.nextDouble() : - 1.0 * rng.nextDouble();
 	}
 
+	/**
+	 * instantiates the random number generator.
+	 */
 	private static void generateRandom()
 	{
 		rng = new Random();
@@ -83,8 +116,18 @@ public class Neuron implements IPropagable
 		rng.setSeed(seed);
 	}
 
+	/**
+	 * sigmoid function
+	 * @param z sigmoid parameter
+	 * @return sigmoid
+	 */
 	private static double sigmoid(double z) { return 1.0 / (1.0 + Math.exp(-z)); }
 
+	/**
+	 * sigmoid derivative function
+	 * @param z sigmoid derivative parameter
+	 * @return sigmoid derivative
+	 */
 	private static double dSigmoid(double z) { return sigmoid(z) * (1.0 - sigmoid(z)); }
 
 	@Override
@@ -114,6 +157,9 @@ public class Neuron implements IPropagable
 		this.forwardNeurons.add(that);
 	}
 
+	/**
+	 * @return true if the neuron has all the necessary inputs to propagate itself
+	 */
 	private boolean hasAllInputs()
 	{
 		return this.numInputs == backwardNeurons.size();
@@ -134,6 +180,11 @@ public class Neuron implements IPropagable
 			p.propagate();
 	}
 
+	/**
+	 * Gathers all the inputs.
+	 * @pre should have all inputs
+	 * @return a matrix with all the inputs
+	 */
 	private Matrix gatherInputs()
 	{
 		int numTrainingCases = this.backwardNeurons.get(0).output().columns();
@@ -191,11 +242,17 @@ public class Neuron implements IPropagable
 		resetValues();
 	}
 
+	/**
+	 * @return true if the neuron is an output neuron.
+	 */
 	private boolean isOutputNeuron()
 	{
 		return this.forwardNeurons.isEmpty();
 	}
 
+	/**
+	 * @return true if the neuron has all backpropagation inputs needed to backpropagate
+	 */
 	private boolean hasAllBackpropInputs()
 	{
 		return this.backpropInputs == this.forwardNeurons.size();
@@ -212,11 +269,17 @@ public class Neuron implements IPropagable
 			p.resetCaches();
 	}
 
+	/**
+	 * @return true if the neuron has already been cleared.
+	 */
 	private boolean isClear()
 	{
 		return numInputs + backpropInputs == 0;
 	}
 
+	/**
+	 * resets the variables to their default state.
+	 */
 	private void resetValues()
 	{
 		this.hasGivenInfo = false;
@@ -228,6 +291,12 @@ public class Neuron implements IPropagable
 		this.inputCache = null;
 	}
 
+	/**
+	 * The error function (MSE)
+	 * @pre should be an output neuron
+	 * @param targetOutput the target values for this output node.
+	 * @return the error function (MSE)
+	 */
 	public double getError(Matrix targetOutput)
 	{
 		if (!isOutputNeuron())
@@ -250,16 +319,21 @@ public class Neuron implements IPropagable
 		return this.weights.get(0, 0);
 	}
 
+	/**
+	 * @return a default name for the neuron
+	 */
 	private static String generateDefaultName()
 	{
 		return IDENTIFIER + count++;
 	}
 
+	@Override
 	public String name()
 	{
 		return this.name;
 	}
 
+	@Override
 	public ArrayList<String> getWeightInfo(ArrayList<String> previousInfo)
 	{
 		if (this.hasGivenInfo)

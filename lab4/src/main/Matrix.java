@@ -1,11 +1,19 @@
 import java.util.function.Function;
 
+/**
+ * Represents a matrix.
+ */
 public class Matrix //<T extends Number>
 {
 	private double matrix[][];
 	private int columns;
 	private int rows;
 
+	/**
+	 * instantiates an empty matrix with the desired rows and columns.
+	 * @param rows the number of rows
+	 * @param columns the number of columns
+	 */
 	public Matrix(int rows, int columns)
 	{
 		this.matrix = new double[rows][columns];
@@ -13,6 +21,12 @@ public class Matrix //<T extends Number>
 		this.columns = columns;
 	}
 
+	/**
+	 * instantiates a matrix with the desired number.
+	 * @param rows the number of rows
+	 * @param columns the number of columns
+	 * @param fill the number to fill the matrix with
+	 */
 	public Matrix(int rows, int columns, double fill)
 	{
 		this(rows, columns);
@@ -21,6 +35,10 @@ public class Matrix //<T extends Number>
 				this.matrix[i][j] = fill;
 	}
 
+	/**
+	 * instantiates a matrix from a two-dimentional array.
+	 * @param matrix the array to initialize the matrix from
+	 */
 	public Matrix(double matrix[][])
 	{
 		this.rows = matrix.length;
@@ -39,12 +57,23 @@ public class Matrix //<T extends Number>
 		this.matrix = matrix;
 	}
 
+	/**
+	 * Matrix copy constructor
+	 * @param copy the matrix to copy
+	 */
 	public Matrix(Matrix copy)
 	{
 		this(copy.rows, copy.columns);
 		copy(copy.matrix, this.matrix, rows, columns);
 	}
 
+	/**
+	 * copies a section of a two dimentional array into another, starting at the origin
+	 * @param from the array to copy from
+	 * @param to the array to paste to
+	 * @param rows the number of rows to copy
+	 * @param columns the number of columns to copy
+	 */
 	private static void copy(double[][] from, double[][] to, int rows, int columns)
 	{
 		if (columns == 0)
@@ -53,6 +82,15 @@ public class Matrix //<T extends Number>
 			System.arraycopy(from[i], 0, to[i], 0, columns);
 	}
 
+	/**
+	 * copies a section of a two dimentional array into another
+	 * @param from the array to copy from
+	 * @param to the array to copy to
+	 * @param startRowTo the row to start pasting to
+	 * @param startColumnTo the column to start pasting to
+	 * @param rows the number of rows to copy
+	 * @param columns the number of columns to copy
+	 */
 	private static void copy(double[][] from, double[][] to, int startRowTo, int startColumnTo, int rows, int columns)
 	{
 		if (columns == 0)
@@ -79,6 +117,9 @@ public class Matrix //<T extends Number>
 		return true;
 	}
 
+	/**
+	 * @return the transpose of the matrix
+	 */
 	public Matrix transpose()
 	{
 		Matrix transposed = new Matrix(columns, rows);
@@ -110,6 +151,11 @@ public class Matrix //<T extends Number>
 		return sb.toString();
 	}
 
+	/**
+	 * multiplies the matrix by a scalar.
+	 * @param scalar the scalar to multiply the matrix by
+	 * @return the matrix multiplied by the scalar.
+	 */
 	public Matrix multiply(double scalar)
 	{
 		Matrix result = new Matrix(rows, columns);
@@ -119,6 +165,11 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * subtract two matrices.
+	 * @param that the matrix to subtract the current one
+	 * @return a matrix resulting in the subtraction of the current by the other 
+	 */
 	public Matrix sub(Matrix that)
 	{
 		if (this.rows != that.rows || this.columns != that.columns)
@@ -131,6 +182,11 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * add two matrices.
+	 * @param that the matrix to add to the current one
+	 * @return a matrix resulting in the sum of the current by the other
+	 */
 	public Matrix add(Matrix that)
 	{
 		if (this.rows != that.rows || this.columns != that.columns)
@@ -143,6 +199,11 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * the dot product between two matrices.
+	 * @param that the matrix to apply the dot product by
+	 * @return the dot product between the current one and the other
+	 */
 	public Matrix dot(Matrix that)
 	{
 		if (this.columns != that.rows)
@@ -162,6 +223,12 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * Makes a matrix where all the values are 0, except for the diagonal,
+	 * which holds the values of the current row matrix.
+	 * @pre the matrix is a single row
+	 * @return a diagonal version of the current row matrix
+	 */
 	public Matrix makeDiagonal()
 	{
 		if (this.rows != 1)
@@ -173,6 +240,12 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * appends a row to the current matrix.
+	 * @pre the new row has to have the same column size as the matrix
+	 * @param newRow the new row to append
+	 * @return a matrix resulting of the current one with the row appended to it
+	 */
 	public Matrix addRow(double[] newRow)
 	{
 		if (newRow.length != this.columns && this.columns != 0)
@@ -190,6 +263,12 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * appends the current matrix to another, as rows (below).
+	 * @pre the matrices need to have the same ammount of columns
+	 * @param that the matrix to append below the current one
+	 * @return a matrix resulting in the the current matrix appended with the other below it
+	 */
 	public Matrix appendAsRows(Matrix that)
 	{
 		if (this.columns != that.columns)
@@ -202,6 +281,11 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * Applies a function to the matrix
+	 * @param func the function to apply
+	 * @return a matrix resulting in the current one, with the function applied to it
+	 */
 	public Matrix apply(Function<Double, Double> func)
 	{
 		Matrix result = new Matrix(this);
@@ -211,6 +295,11 @@ public class Matrix //<T extends Number>
 		return result;
 	}
 
+	/**
+	 * parses a matrix of a single number to a double
+	 * @pre the matrix is a single number
+	 * @return the double version of the matrix
+	 */
 	public double parse()
 	{
 		if (this.rows != 1 || this.columns != 1)
@@ -218,21 +307,38 @@ public class Matrix //<T extends Number>
 		return this.matrix[0][0];
 	}
 
+	/**
+	 * returns the specified number on the matrix
+	 * @param row the row of the number
+	 * @param column the column of the number
+	 * @return the number on the given row and column
+	 */
 	public double get(int row, int column)
 	{
 		return this.matrix[row][column];
 	}
 
+	/**
+	 * returns a row of the matrix
+	 * @param row the zero-indexed row of the matrix
+	 * @return a matrix with a single row, compromised of the selected row
+	 */
 	public Matrix getRow(int row)
 	{
 		return new Matrix(new double[][] { this.matrix[row] });
 	}
 
+	/**
+	 * @return the number of rows
+	 */
 	public int rows()
 	{
 		return this.rows;
 	}
 
+	/**
+	 * @return the number of columns
+	 */
 	public int columns()
 	{
 		return this.columns;

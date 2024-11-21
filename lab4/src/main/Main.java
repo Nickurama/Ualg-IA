@@ -1,19 +1,16 @@
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 
 public class Main
 {
-	private static Random rng;
-
 	public static void main(String[] args)
 	{
 		// trainingNetworkXOR();
-		trainingNetworkXORMultipleOutputs();
+		trainingNetwork_BinarySum_MultipleOutputs();
 		// premadeNetworks();
 	}
 
-	private static void trainingNetworkXORMultipleOutputs()
+	private static void trainingNetwork_BinarySum_MultipleOutputs()
 	{
 		Neuron.setSeed(-682544829822166666l);
 
@@ -94,8 +91,8 @@ public class Main
 
 		InputNode x1 = new InputNode(trainingSet.getRow(0));
 		InputNode x2 = new InputNode(trainingSet.getRow(1));
-		Neuron n1 = new Neuron(0.1);
-		Neuron n2 = new Neuron(0.1);
+		Neuron n1 = new Neuron();
+		Neuron n2 = new Neuron();
 
 		ArrayList<InputNode> inputNodes = new ArrayList<>();
 		inputNodes.add(x1);
@@ -106,11 +103,11 @@ public class Main
 		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
 
 		// setup connections
-		x1.connect(n1, 0.1);
-		x1.connect(n2, 0.1);
-		x2.connect(n1, 0.1);
-		x2.connect(n2, 0.1);
-		n1.connect(n2, 0.1);
+		x1.connect(n1);
+		x1.connect(n2);
+		x2.connect(n1);
+		x2.connect(n2);
+		n1.connect(n2);
 
 		network.setPrettyPrint(true);
 		network.setPrintWhileTraining(false);
