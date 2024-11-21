@@ -543,4 +543,27 @@ public class MatrixTests
 		// Assert
 		assertEquals(obtained, expected);
 	}
+
+	@Test
+	public void shouldTakeRow()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 2, 3, 4, 5 },
+			{ 7, 2, 7, 0, 1 },
+			{ 7, 1, 3, 7, 2 },
+			{ 8, 2, 0, 0, 5 },
+			{ 1, 9, 9, 3, 2 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 8, 2, 0, 0, 5 },
+		});
+
+		// Act
+		Matrix obtained = m0.getRow(3);
+
+		// Assert
+		assertEquals(obtained, expected);
+	}
 }

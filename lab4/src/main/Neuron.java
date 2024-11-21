@@ -1,8 +1,19 @@
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.function.Function;
 
 public class Neuron implements IPropagable
 {
+	// random number generator
+	private static Random rng;
+	private static long seed = 0;
+
+	// naming
+	private static final String IDENTIFIER = "n";
+	private static int count = 1;
+	private String name;
+	private boolean hasGivenInfo;
+
 	// network
 	private Matrix weights; // first weight is bias
 	private ArrayList<IPropagable> forwardNeurons;
@@ -19,15 +30,57 @@ public class Neuron implements IPropagable
 	// backpropagation
 	private int backpropInputs;
 	private Matrix deltaCache; // can be null
-	// private Matrix targetOutputCache; // can be null
 
-	public Neuron(double bias)
+	public Neuron(double bias, String neuronName)
 	{
 		this.weights = new Matrix(new double[][]{{ bias }});
 		this.forwardNeurons = new ArrayList<>();
 		this.backwardNeurons = new ArrayList<>();
 
 		this.resetValues();
+		this.name = neuronName;
+	}
+
+	public Neuron(double bias)
+	{
+		this(bias, generateDefaultName());
+	}
+
+	public Neuron(String neuronName)
+	{
+		this(getRandomWeight(), neuronName);
+	}
+
+	public Neuron()
+	{
+		this(getRandomWeight(), generateDefaultName());
+	}
+
+	public static void setSeed(long seed)
+	{
+		Neuron.seed = seed;
+	}
+
+	public static long seed()
+	{
+		if (rng == null)
+			generateRandom();
+		return Neuron.seed;
+	}
+
+	public static double getRandomWeight()
+	{
+		if (rng == null)
+			generateRandom();
+		return rng.nextBoolean() ? rng.nextDouble() : - 1.0 * rng.nextDouble();
+	}
+
+	private static void generateRandom()
+	{
+		rng = new Random();
+		if (seed == 0)
+			seed = rng.nextLong();
+		rng.setSeed(seed);
 	}
 
 	private static double sigmoid(double z) { return 1.0 / (1.0 + Math.exp(-z)); }
@@ -39,6 +92,13 @@ public class Neuron implements IPropagable
 	{
 		this.fwrdConnect(that);
 		that.backConnect(this, weight);
+	}
+
+	@Override
+	public void connect(IPropagable that)
+	{
+		this.fwrdConnect(that);
+		that.backConnect(this, getRandomWeight());
 	}
 
 	@Override
@@ -66,7 +126,6 @@ public class Neuron implements IPropagable
 		if (!hasAllInputs())
 			return;
 
-
 		this.inputCache = gatherInputs();
 		this.sumCache = this.weights.transpose().dot(this.inputCache);
 		this.outCache = sumCache.apply(SIGMOID_FUNC);
@@ -91,7 +150,7 @@ public class Neuron implements IPropagable
 	}
 
 	@Override
-	public void backpropagate(Matrix deltas, double learningRate)
+	public void backpropagate(Matrix deltas, double learningRate, int numOutputs)
 	{
 		this.backpropInputs++;
 		if (this.deltaCache == null)
@@ -105,7 +164,6 @@ public class Neuron implements IPropagable
 
 		if (this.isOutputNeuron()) // deltas should be T on output node
 		{
-			// this.targetOutputCache = new Matrix(deltas);
 			this.deltaCache = deltas.sub(this.outCache); // (T - Y)
 		}
 		else if (!hasAllBackpropInputs())
@@ -120,14 +178,17 @@ public class Neuron implements IPropagable
 
 		// backpropagate corresponding w * delta
 		for (int i = 0; i < this.backwardNeurons.size(); i++)
-			this.backwardNeurons.get(i).backpropagate(this.deltaCache.multiply(this.weights.get(i + 1, 0)), learningRate);
+			this.backwardNeurons.get(i).backpropagate(this.deltaCache.multiply(this.weights.get(i + 1, 0)), learningRate, numOutputs);
 
 		// calculate weight delta
 		Matrix weightDeltas = this.inputCache.dot(this.deltaCache.transpose());
-		weightDeltas = weightDeltas.multiply(learningRate * (2.0 / this.inputCache.columns()));
+		weightDeltas = weightDeltas.multiply(learningRate * (2.0 / (this.inputCache.columns() * numOutputs)));
 
 		// update weights
 		this.weights = this.weights.add(weightDeltas);
+
+		// reset caches for this node only
+		resetValues();
 	}
 
 	private boolean isOutputNeuron()
@@ -158,24 +219,14 @@ public class Neuron implements IPropagable
 
 	private void resetValues()
 	{
+		this.hasGivenInfo = false;
 		this.backpropInputs = 0;
 		this.numInputs = 0;
 		this.sumCache = null;
 		this.outCache = null;
 		this.deltaCache = null;
 		this.inputCache = null;
-		// this.targetOutputCache = null;
 	}
-
-	// public double getError()
-	// {
-	// 	if (!isOutputNeuron())
-	// 		throw new IllegalCallerException("Only output neurons can calculate error!");
-	//
-	// 	Matrix err = this.targetOutputCache.sub(this.outCache);
-	// 	err = err.dot(err.transpose()).multiply(1.0 / this.targetOutputCache.columns());
-	// 	return err.parse();
-	// }
 
 	public double getError(Matrix targetOutput)
 	{
@@ -197,5 +248,32 @@ public class Neuron implements IPropagable
 	public double bias()
 	{
 		return this.weights.get(0, 0);
+	}
+
+	private static String generateDefaultName()
+	{
+		return IDENTIFIER + count++;
+	}
+
+	public String name()
+	{
+		return this.name;
+	}
+
+	public ArrayList<String> getWeightInfo(ArrayList<String> previousInfo)
+	{
+		if (this.hasGivenInfo)
+			return previousInfo;
+		this.hasGivenInfo = true;
+
+		for (int i = 0; i < this.backwardNeurons.size(); i++)
+		{
+			String newInfo = this.backwardNeurons.get(i).name() + " -> " + this.name() + " : " + this.weights.get(i + 1, 0);
+			previousInfo.add(newInfo);
+		}
+
+		for (IPropagable p : forwardNeurons)
+			previousInfo = p.getWeightInfo(previousInfo);
+		return previousInfo;
 	}
 }

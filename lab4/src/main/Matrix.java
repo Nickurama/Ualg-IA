@@ -223,6 +223,11 @@ public class Matrix //<T extends Number>
 		return this.matrix[row][column];
 	}
 
+	public Matrix getRow(int row)
+	{
+		return new Matrix(new double[][] { this.matrix[row] });
+	}
+
 	public int rows()
 	{
 		return this.rows;
