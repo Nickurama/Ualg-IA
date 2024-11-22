@@ -336,7 +336,7 @@ public class Neuron implements IPropagable
 	@Override
 	public ArrayList<String> getWeightInfo(ArrayList<String> previousInfo)
 	{
-		if (this.hasGivenInfo)
+		if (this.hasGivenInfo) // requires cache reset to give info again
 			return previousInfo;
 		this.hasGivenInfo = true;
 

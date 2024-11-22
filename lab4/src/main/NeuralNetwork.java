@@ -13,6 +13,7 @@ public class NeuralNetwork
 	Matrix targetOutput;
 	ArrayList<Matrix> targetOutputRowsCache;
 
+	ArrayList<String> nodeInfoCache;
 	boolean prettyPrinting;
 	boolean printWhileTraining;
 	boolean printWeights;
@@ -34,6 +35,7 @@ public class NeuralNetwork
 		this.trainingSet = trainingSet;
 		this.targetOutput = targetOutput;
 		cacheTargetOutputRows(targetOutput);
+		// nodeInfoCache = new ArrayList<String>();
 		this.shouldPrint = true;
 		this.prettyPrinting = false;
 		this.printWhileTraining = false;
@@ -61,6 +63,8 @@ public class NeuralNetwork
 		printStats(iterations, learningRate);
 
 		propagate();
+		if (this.printWhileTraining)
+			printState();
 		for (int i = 0; i < iterations; i++)
 		{
 			backpropagate(learningRate);
@@ -85,6 +89,8 @@ public class NeuralNetwork
 
 		propagate();
 		int iterations = 0;
+		if (this.printWhileTraining)
+			printState();
 		while (getError() > maxError)
 		{
 			iterations++;
@@ -258,8 +264,22 @@ public class NeuralNetwork
 
 		info.sort((s0, s1) -> s0.compareTo(s1));
 
+		if (info.isEmpty())
+			info = this.nodeInfoCache;
+		else
+			this.nodeInfoCache = info;
+
 		for (String s : info)
 			System.out.println(s);
+	}
+
+	/**
+	 * resets all caches
+	 */
+	private void resetCache()
+	{
+		for (IPropagable p : inputNodes)
+			p.resetCaches();
 	}
 
 	/**

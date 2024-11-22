@@ -6,7 +6,8 @@ public class Main
 	public static void main(String[] args)
 	{
 		// trainingNetworkXOR();
-		trainingNetwork_BinarySum_MultipleOutputs();
+		trainingNetworkXORRand();
+		// trainingNetwork_BinarySum_MultipleOutputs();
 		// premadeNetworks();
 	}
 
@@ -73,11 +74,13 @@ public class Main
 		network.iterativePropagation();
 	}
 
-	private static void trainingNetworkXOR()
+	private static void trainingNetworkXORRand()
 	{
-		Neuron.setSeed(7723607231041998711L);
+		// Neuron.setSeed(7723607231041998711L);
+		// Neuron.setSeed(-2967061369577244698L);
+		// Neuron.setSeed(5356092256304775059); // the 37.0 learning rate ankle breaker
 
-		int iterations = 130;
+		// int iterations = 2;
 		double maxError = 0.00001;
 		double learningRate = 37.0;
 
@@ -115,6 +118,55 @@ public class Main
 
 		// network.train(iterations, learningRate);
 		network.train(maxError, learningRate);
+
+		// System.out.println(Neuron.seed());
+
+		// network.iterativePropagation();
+	}
+
+	private static void trainingNetworkXOR()
+	{
+		Neuron.setSeed(7723607231041998711L);
+
+		int iterations = 2;
+		double maxError = 0.00001;
+		// double learningRate = 37.0;
+		double learningRate = 1.0;
+
+		Matrix trainingSet = new Matrix(new double[][] {
+			{ 0, 1, 0, 1 },
+			{ 0, 0, 1, 1 },
+		});
+		Matrix targetOutput = new Matrix(new double[][] {
+			{ 0, 1, 1, 0 },
+		});
+
+		InputNode x1 = new InputNode(trainingSet.getRow(0));
+		InputNode x2 = new InputNode(trainingSet.getRow(1));
+		Neuron n1 = new Neuron(0.1);
+		Neuron n2 = new Neuron(0.1);
+
+		ArrayList<InputNode> inputNodes = new ArrayList<>();
+		inputNodes.add(x1);
+		inputNodes.add(x2);
+		ArrayList<Neuron> outputNeurons = new ArrayList<>();
+		outputNeurons.add(n2);
+
+		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
+
+		// setup connections
+		x1.connect(n1, 0.1);
+		x1.connect(n2, 0.1);
+		x2.connect(n1, 0.1);
+		x2.connect(n2, 0.1);
+		n1.connect(n2, 0.1);
+
+		network.setPrettyPrint(true);
+		network.setPrintWhileTraining(true);
+		network.setPrintWeights(true);
+
+		network.train(iterations, learningRate);
+		// network.train(maxError, learningRate);
 
 		network.iterativePropagation();
 	}
