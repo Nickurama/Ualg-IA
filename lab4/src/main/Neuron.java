@@ -345,6 +345,7 @@ public class Neuron implements IPropagable
 			String newInfo = this.backwardNeurons.get(i).name() + " -> " + this.name() + " : " + this.weights.get(i + 1, 0);
 			previousInfo.add(newInfo);
 		}
+		previousInfo.add(this.name() + " : " + this.weights.get(0, 0));
 
 		for (IPropagable p : forwardNeurons)
 			previousInfo = p.getWeightInfo(previousInfo);

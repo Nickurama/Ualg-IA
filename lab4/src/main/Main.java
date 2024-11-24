@@ -5,14 +5,15 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		playground();
-		// trainingNetworkXOR();
-		// trainingNetworkXORRand();
-		// trainingNetwork_BinarySum_MultipleOutputs();
-		// premadeNetworks();
+		// twoBitAdderNetwork();
+		trainingNetworkXOR();
+		// runAND();
+		// runXOR();
+
+		// learningRateSamples();
 	}
 
-	private static void playground()
+	private static void twoBitAdderNetwork()
 	{
 		Neuron.setSeed(-682544829822166666l);
 
@@ -73,7 +74,7 @@ public class Main
 
 		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
 
-		// input layer
+		// input layer -> layer 1
 		x1.connect(n1);
 		x1.connect(n2);
 		x1.connect(n3);
@@ -91,7 +92,7 @@ public class Main
 		x4.connect(n3);
 		x4.connect(n4);
 
-		// hidden layer 1
+		// hidden layer 1 -> hidden layer 2
 		n1.connect(n5);
 		n1.connect(n6);
 		n1.connect(n7);
@@ -109,7 +110,7 @@ public class Main
 		n4.connect(n7);
 		n4.connect(n8);
 
-		// hidden layer 2
+		// hidden layer 2 -> hidden layer 3
 		n5.connect(n9);
 		n5.connect(n10);
 		n5.connect(n11);
@@ -127,7 +128,7 @@ public class Main
 		n8.connect(n11);
 		n8.connect(n12);
 
-		// hidden layer 3
+		// hidden layer 3 -> output layer
 		n9.connect(n13);
 		n9.connect(n14);
 		n9.connect(n15);
@@ -141,6 +142,7 @@ public class Main
 		n12.connect(n14);
 		n12.connect(n15);
 
+		network.setExportingLoss(false);
 		network.setPrettyPrint(true);
 		network.setPrintWhileTraining(false);
 		network.setPrintWeights(true);
@@ -151,78 +153,14 @@ public class Main
 		network.iterativePropagation();
 	}
 
-	private static void trainingNetwork_BinarySum_MultipleOutputs()
+	private static NeuralNetwork trainingNetworkXOR() { return trainingNetworkXOR(0); }
+	private static NeuralNetwork trainingNetworkXOR(double learningRate)
 	{
-		Neuron.setSeed(-682544829822166666l);
+		Neuron.setSeed(3207636386306947792L);
 
-		int iterations = 1000;
-		double maxError = 0.00001;
-		double learningRate = 8.0;
-
-		Matrix trainingSet = new Matrix(new double[][] {
-			{ 0, 1, 0, 1 },
-			{ 0, 0, 1, 1 },
-		});
-		Matrix targetOutput = new Matrix(new double[][] {
-			{ 0, 1, 1, 0 },
-			{ 0, 0, 0, 1 },
-		});
-
-		InputNode x1 = new InputNode(trainingSet.getRow(0));
-		InputNode x2 = new InputNode(trainingSet.getRow(1));
-		Neuron n1 = new Neuron();
-		Neuron n2 = new Neuron();
-		Neuron n3 = new Neuron();
-		Neuron n4 = new Neuron();
-		Neuron n5 = new Neuron();
-		Neuron n6 = new Neuron();
-
-		ArrayList<InputNode> inputNodes = new ArrayList<>();
-		inputNodes.add(x1);
-		inputNodes.add(x2);
-		ArrayList<Neuron> outputNeurons = new ArrayList<>();
-		outputNeurons.add(n5);
-		outputNeurons.add(n6);
-
-		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
-
-		// input layer
-		x1.connect(n1);
-		x1.connect(n2);
-		x2.connect(n1);
-		x2.connect(n2);
-
-		// hidden layer 1
-		n1.connect(n3);
-		n1.connect(n4);
-		n2.connect(n3);
-		n2.connect(n4);
-
-		// hidden layer 2
-		n3.connect(n5);
-		n3.connect(n6);
-		n4.connect(n5);
-		n4.connect(n6);
-
-		network.setPrettyPrint(true);
-		network.setPrintWhileTraining(false);
-		network.setPrintWeights(true);
-
-		// network.train(iterations, learningRate);
-		network.train(maxError, learningRate);
-
-		network.iterativePropagation();
-	}
-
-	private static void trainingNetworkXORRand()
-	{
-		// Neuron.setSeed(7723607231041998711L);
-		// Neuron.setSeed(-2967061369577244698L);
-		// Neuron.setSeed(5356092256304775059); // the 37.0 learning rate ankle breaker
-
-		// int iterations = 2;
-		double maxError = 0.00001;
-		double learningRate = 37.0;
+		int iterations = 9800;
+		double maxError = 0.001;
+		learningRate = 1.0;
 
 		Matrix trainingSet = new Matrix(new double[][] {
 			{ 0, 1, 0, 1 },
@@ -252,39 +190,50 @@ public class Main
 		x2.connect(n2);
 		n1.connect(n2);
 
+		network.setExportingLoss(true);
+		network.setPrinting(true);
 		network.setPrettyPrint(true);
 		network.setPrintWhileTraining(false);
 		network.setPrintWeights(true);
 
-		// network.train(iterations, learningRate);
-		network.train(maxError, learningRate);
+		network.train(iterations, learningRate);
+		// network.train(maxError, learningRate);
 
-		// System.out.println(Neuron.seed());
+		network.iterativePropagation();
 
-		// network.iterativePropagation();
+		return network;
 	}
 
-	private static void trainingNetworkXOR()
+	private static void learningRateSamples()
 	{
-		Neuron.setSeed(7723607231041998711L);
+		// for (int j = 20; j < 40; j++)
+		// {
+			int samples = 1000;
+			long sum = 0;
+			for (int i = 0; i < samples; i++)
+				sum += trainingNetworkXOR(1.0).iterationsDone();
+				// sum += trainingNetworkXOR(j).iterationsDone();
+			sum /= samples;
+			System.out.println(sum);
+			// System.out.println(j + ": " + sum);
+		// }
+	}
 
-		int iterations = 2;
-		double maxError = 0.00001;
-		// double learningRate = 37.0;
-		double learningRate = 1.0;
-
+	private static void runXOR()
+	{
 		Matrix trainingSet = new Matrix(new double[][] {
-			{ 0, 1, 0, 1 },
 			{ 0, 0, 1, 1 },
+			{ 0, 1, 0, 1 },
 		});
 		Matrix targetOutput = new Matrix(new double[][] {
 			{ 0, 1, 1, 0 },
 		});
-
+		// setup neurons
 		InputNode x1 = new InputNode(trainingSet.getRow(0));
 		InputNode x2 = new InputNode(trainingSet.getRow(1));
-		Neuron n1 = new Neuron(0.1);
-		Neuron n2 = new Neuron(0.1);
+
+		Neuron n1 = new Neuron(300.0); // w0
+		Neuron n2 = new Neuron(-500.0); // w3
 
 		ArrayList<InputNode> inputNodes = new ArrayList<>();
 		inputNodes.add(x1);
@@ -294,76 +243,54 @@ public class Main
 
 		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
 
-		// setup connections
-		x1.connect(n1, 0.1);
-		x1.connect(n2, 0.1);
-		x2.connect(n1, 0.1);
-		x2.connect(n2, 0.1);
-		n1.connect(n2, 0.1);
+		x1.connect(n1, -200.0); // w1
+		x1.connect(n2, 200.0); // w4
+		x2.connect(n1, -200.0); // w2
+		x2.connect(n2, 200.0); // w6
+		n1.connect(n2, 400.0); // w5
 
 		network.setPrettyPrint(true);
-		network.setPrintWhileTraining(true);
-		network.setPrintWeights(true);
 
-		network.train(iterations, learningRate);
-		// network.train(maxError, learningRate);
+		network.propagate();
+
+		network.printWeights();
+		network.printOutputs();
 
 		network.iterativePropagation();
 	}
 
-	private static void premadeNetworks()
+	private static void runAND()
 	{
-		Scanner sc = new Scanner(System.in);
-		while (sc.hasNext())
-		{
-			// runAND(sc);
-			runXOR(sc);
-		}
-		sc.close();
-	}
+		Matrix trainingSet = new Matrix(new double[][] {
+			{ 0, 0, 1, 1 },
+			{ 0, 1, 0, 1 },
+		});
+		Matrix targetOutput = new Matrix(new double[][] {
+			{ 0, 0, 0, 1 },
+		});
 
-	private static void runXOR(Scanner sc)
-	{
-		// setup neurons
-		InputNode x1 = new InputNode(new Matrix(new double[][] {{ sc.nextDouble() }}));
-		InputNode x2 = new InputNode(new Matrix(new double[][] {{ sc.nextDouble() }}));
-
-		Neuron n1 = new Neuron(300.0); // w0
-		Neuron n2 = new Neuron(-900.0); // w3
-
-		// setup connections
-		x1.connect(n1, -200.0); // w1
-		x1.connect(n2, 400.0); // w4
-		x2.connect(n1, -200.0); // w2
-		x2.connect(n2, 400.0); // w6
-		n1.connect(n2, 700.0); // w5
-
-		// propagate
-		x1.propagate(); // input node
-		x2.propagate(); // input node
-
-		// get result
-		System.out.println((n2.output()));
-	}
-
-	private static void runAND(Scanner sc)
-	{
-		// setup neurons
-		InputNode x1 = new InputNode(new Matrix(new double[][] {{ sc.nextDouble() }}));
-		InputNode x2 = new InputNode(new Matrix(new double[][] {{ sc.nextDouble() }}));
-
+		InputNode x1 = new InputNode(trainingSet.getRow(0));
+		InputNode x2 = new InputNode(trainingSet.getRow(1));
 		Neuron n1 = new Neuron(-1.5);
 
-		// setup connections
-		x1.connect(n1, 1.0);
-		x2.connect(n1, 1.0);
+		ArrayList<InputNode> inputNodes = new ArrayList<>();
+		inputNodes.add(x1);
+		inputNodes.add(x2);
+		ArrayList<Neuron> outputNeurons = new ArrayList<>();
+		outputNeurons.add(n1);
 
-		// propagate
-		x1.propagate(); // input node
-		x2.propagate(); // input node
+		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
 
-		// get result
-		System.out.println((n1.output()));
+		x1.connect(n1, 1);
+		x2.connect(n1, 1);
+
+		network.setPrettyPrint(true);
+
+		network.propagate();
+
+		network.printWeights();
+		network.printOutputs();
+
+		network.iterativePropagation();
 	}
-
 }

@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -7,17 +9,23 @@ import java.util.Scanner;
  */
 public class NeuralNetwork
 {
-	ArrayList<InputNode> inputNodes;
-	ArrayList<Neuron> outputNeurons;
-	Matrix trainingSet;
-	Matrix targetOutput;
-	ArrayList<Matrix> targetOutputRowsCache;
+	private static final String OUT_FILE = "lossData.csv";
 
-	ArrayList<String> nodeInfoCache;
-	boolean prettyPrinting;
-	boolean printWhileTraining;
-	boolean printWeights;
-	boolean shouldPrint;
+	private ArrayList<InputNode> inputNodes;
+	private ArrayList<Neuron> outputNeurons;
+	private Matrix trainingSet;
+	private Matrix targetOutput;
+	private ArrayList<Matrix> targetOutputRowsCache;
+
+	private ArrayList<String> nodeInfoCache;
+	private boolean prettyPrinting;
+	private boolean printWhileTraining;
+	private boolean printWeights;
+	private boolean shouldPrint;
+	private int iterationsDone;
+
+	private FileWriter fWriter;
+	private boolean shouldExport;
 
 	/**
 	 * instantiates a neural network.
@@ -40,6 +48,8 @@ public class NeuralNetwork
 		this.prettyPrinting = false;
 		this.printWhileTraining = false;
 		this.printWeights = false;
+		this.shouldExport = false;
+		this.iterationsDone = 0;
 	}
 
 	/**
@@ -60,22 +70,30 @@ public class NeuralNetwork
 	 */
 	public void train(int iterations, double learningRate)
 	{
+		if (this.shouldExport)
+			initFileWriter();
 		printStats(iterations, learningRate);
 
 		propagate();
+		if (this.shouldExport)
+			exportLoss();
 		if (this.printWhileTraining)
 			printState();
-		for (int i = 0; i < iterations; i++)
+		for (this.iterationsDone = 0; iterationsDone < iterations; iterationsDone++)
 		{
 			backpropagate(learningRate);
 			propagate();
 
+			if (this.shouldExport)
+				exportLoss();
 			if (this.printWhileTraining)
 				printState();
 		}
 
 		if (!this.printWhileTraining)
 			printState();
+		if (this.shouldExport)
+			closeFileWriter();
 	}
 
 	/**
@@ -85,26 +103,78 @@ public class NeuralNetwork
 	 */
 	public void train(double maxError, double learningRate)
 	{
+		if (this.shouldExport)
+			initFileWriter();
 		printStats(maxError, learningRate);
 
 		propagate();
-		int iterations = 0;
+		this.iterationsDone = 0;
+		if (this.shouldExport)
+			exportLoss();
 		if (this.printWhileTraining)
 			printState();
 		while (getError() > maxError)
 		{
-			iterations++;
+			this.iterationsDone++;
 			backpropagate(learningRate);
 			propagate();
 
+			if (this.shouldExport)
+				exportLoss();
 			if (this.printWhileTraining)
 				printState();
 		}
 
 		if (this.shouldPrint)
-			System.out.println("iterations: " + iterations);
+			System.out.println("iterations: " + this.iterationsDone);
 		if (!this.printWhileTraining)
 			printState();
+		if (this.shouldExport)
+			closeFileWriter();
+	}
+
+	/**
+	 * initializes the class file writer.
+	 */
+	private void initFileWriter()
+	{
+		try
+		{
+			this.fWriter = new FileWriter(OUT_FILE);
+		}
+		catch (IOException e)
+		{
+			throw new IllegalStateException("Could not initialize file writer." + e.getMessage());
+		}
+	}
+
+	private void closeFileWriter()
+	{
+		try
+		{
+			this.fWriter.flush();
+			this.fWriter.close();
+		}
+		catch (IOException e)
+		{
+			throw new IllegalStateException("Could not close file writer." + e.getMessage());
+		}
+	}
+
+	/**
+	 * writes the current loss function output to a file
+	 * @pre file writer has been initialized
+	 */
+	private void exportLoss()
+	{
+		try
+		{
+			this.fWriter.write(Double.toString(this.iterationsDone) + ';' + getError() + '\n');
+		}
+		catch (IOException e)
+		{
+			throw new IllegalStateException("Could not write to file." + e.getMessage());
+		}
 	}
 
 	/**
@@ -151,7 +221,7 @@ public class NeuralNetwork
 	/**
 	 * performs the propagation of the network.
 	 */
-	private void propagate()
+	public void propagate()
 	{
 		for (IPropagable x : inputNodes)
 			x.propagate();
@@ -161,7 +231,7 @@ public class NeuralNetwork
 	 * performs a backwards pass (backpropagation) of the network
 	 * @param learningRate the rate of learning
 	 */
-	private void backpropagate(double learningRate)
+	public void backpropagate(double learningRate)
 	{
 		Iterator<Matrix> currTarget = targetOutputRowsCache.iterator();
 		for (IPropagable n : outputNeurons)
@@ -356,5 +426,23 @@ public class NeuralNetwork
 	public void setPrinting(boolean shouldPrint)
 	{
 		this.shouldPrint = shouldPrint;
+	}
+
+	/**
+	 * sets exporting the loss function to a file
+	 * during training on or off.
+	 * @param value
+	 */
+	public void setExportingLoss(boolean value)
+	{
+		this.shouldExport = value;
+	}
+
+	/**
+	 * @return the number of iterations done through training
+	 */
+	public int iterationsDone()
+	{
+		return this.iterationsDone;
 	}
 }
