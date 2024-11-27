@@ -22,6 +22,7 @@ public class NeuralNetwork
 	private boolean prettyPrinting;
 	private boolean printWhileTraining;
 	private boolean printWeights;
+	private boolean shouldPrintOutputs;
 	private boolean shouldPrint;
 	private int iterationsDone;
 
@@ -46,6 +47,7 @@ public class NeuralNetwork
 		cacheTargetOutputRows(targetOutput);
 		// nodeInfoCache = new ArrayList<String>();
 		this.shouldPrint = true;
+		this.shouldPrintOutputs = true;
 		this.prettyPrinting = false;
 		this.printWhileTraining = false;
 		this.printWeights = false;
@@ -79,10 +81,8 @@ public class NeuralNetwork
 		}
 
 		for (Neuron out : outputLayer)
-		{
 			for (IPropagable previous : previousLayer)
 				previous.connect(out);
-		}
 
 		return network;
 	}
@@ -221,7 +221,8 @@ public class NeuralNetwork
 			return;
 		if (this.printWeights)
 			printWeights();
-		printOutputs();
+		if (this.shouldPrintOutputs)
+			printOutputs();
 		System.out.println("error: " + getError());
 	}
 
@@ -471,6 +472,16 @@ public class NeuralNetwork
 	public void setExportingLoss(boolean value)
 	{
 		this.shouldExport = value;
+	}
+
+	/**
+	 * sets printing the input-output pairs from
+	 * training to terminal on or off.
+	 * @param value
+	 */
+	public void setPrintOutputs(boolean value)
+	{
+		this.shouldPrintOutputs = value;
 	}
 
 	/**

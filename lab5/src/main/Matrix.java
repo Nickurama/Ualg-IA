@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.function.Function;
 
 /**
@@ -65,6 +70,39 @@ public class Matrix //<T extends Number>
 	{
 		this(copy.rows, copy.columns);
 		copy(copy.matrix, this.matrix, rows, columns);
+	}
+
+	/**
+	 * Instantiates a matrix from a file where each line is a row
+	 * @param file the file path
+	 * @param separator the separator for each column
+	 * @return the matrix created from the file data
+	 */
+	public static Matrix parseFromFile(String file, String separator)
+	{
+		Matrix result = new Matrix(new double[][]{{}});
+		try
+		{
+			File f = new File(file);
+			BufferedReader reader = new BufferedReader(new FileReader(f));
+
+			String line;
+			while ((line = reader.readLine()) != null)
+			{
+				String[] tokens = line.split(separator);
+				double[] row = new double[tokens.length];
+				for (int i = 0; i < tokens.length; i++)
+					row[i] = Double.parseDouble(tokens[i]);
+				result = result.addRow(row);
+			}
+
+			reader.close();
+		}
+		catch (IOException e)
+		{
+			throw new IllegalStateException("Error initializing matrix from file:\n" + e.getMessage());
+		}
+		return result;
 	}
 
 	/**
