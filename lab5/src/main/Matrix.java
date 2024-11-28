@@ -346,6 +346,42 @@ public class Matrix //<T extends Number>
 	}
 
 	/**
+	 * gets the a submatrix from a matrix (0-indexed)
+	 * @param startRow the starting row (inclusive)
+	 * @param endRow the ending row (inclusive)
+	 * @param startColumn the starting column (inclusive)
+	 * @param endColumn the ending column (inclusive)
+	 * @return the submatrix in the bounds set
+	 */
+	public Matrix subMatrix(int startRow, int endRow, int startColumn, int endColumn)
+	{
+		double[][] result = new double[endRow - startRow + 1][endColumn - startColumn + 1];
+		for (int i = startRow; i < endRow + 1; i++)
+			System.arraycopy(this.matrix[i], startColumn, result[i - startRow], 0, endColumn - startColumn + 1);
+		return new Matrix(result);
+	}
+
+	/**
+	 * split a matrix into two by their rows.
+	 * index 0 - from 0% to percentage.
+	 * index 1 - from percentage to 100%.
+	 * @param percentage the percentage at which to split the matrices row-wise
+	 * @return an array with both of the resulting matrices
+	 */
+	public Matrix[] splitByRows(double percentage)
+	{
+		if (percentage < 0 || percentage > 1.0)
+			throw new IllegalArgumentException("Percentage must be between 0 and 1.");
+		Matrix[] result = new Matrix[2];
+
+		int rows0 = (int)(Math.round((double)this.rows() * percentage));
+		result[0] = this.subMatrix(0, rows0 - 1, 0, this.columns() - 1);
+		result[1] = this.subMatrix(rows0, this.rows() - 1, 0, this.columns() - 1);
+
+		return result;
+	}
+
+	/**
 	 * returns the specified number on the matrix
 	 * @param row the row of the number
 	 * @param column the column of the number

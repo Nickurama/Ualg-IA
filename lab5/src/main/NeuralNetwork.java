@@ -10,22 +10,38 @@ import java.util.Scanner;
  */
 public class NeuralNetwork
 {
-	private static final String OUT_FILE = "lossData.csv";
+	// constants
+	private static final String OUT_FILE = "errorData.csv";
 
+	// member variables
 	private ArrayList<InputNode> inputNodes;
 	private ArrayList<Neuron> outputNeurons;
 	private Matrix trainingSet;
 	private Matrix targetOutput;
 	private ArrayList<Matrix> targetOutputRowsCache;
 
+	// caches and states
 	private ArrayList<String> nodeInfoCache;
+	private int iterationsDone;
+	private boolean areNeuronsPropagated;
+
+	// early stopping and testing
+	private Matrix testingSet; // can be null
+	private Matrix testingTargetOutputs; // can be null
+	private boolean earlyStopping;
+	private double minimumTestingError;
+	private boolean cachedTestErrorBeforeBackpropagation;
+	private double cachedTestError;
+
+	// flags
 	private boolean prettyPrinting;
-	private boolean printWhileTraining;
-	private boolean printWeights;
+	private boolean shouldPrintWhileTraining;
+	private boolean shouldPrintWeights;
 	private boolean shouldPrintOutputs;
 	private boolean shouldPrint;
-	private int iterationsDone;
+	private boolean shouldPrintTestingError;
 
+	// exporting
 	private FileWriter fWriter;
 	private boolean shouldExport;
 
@@ -45,12 +61,17 @@ public class NeuralNetwork
 		this.trainingSet = trainingSet;
 		this.targetOutput = targetOutput;
 		cacheTargetOutputRows(targetOutput);
+		this.areNeuronsPropagated = false;
+		this.earlyStopping = false;
+		this.cachedTestErrorBeforeBackpropagation = false;
+		this.minimumTestingError = 1.0;
+		this.cachedTestError = 0.0;
 		// nodeInfoCache = new ArrayList<String>();
 		this.shouldPrint = true;
 		this.shouldPrintOutputs = true;
 		this.prettyPrinting = false;
-		this.printWhileTraining = false;
-		this.printWeights = false;
+		this.shouldPrintWhileTraining = false;
+		this.shouldPrintWeights = false;
 		this.shouldExport = false;
 		this.iterationsDone = 0;
 	}
@@ -99,36 +120,48 @@ public class NeuralNetwork
 	}
 
 	/**
+	 * trains the neural network untill the error is below the specified one
+	 * or untill the number of iterations are reached.
+	 * @param maxError the maximum error the network should have (can be null)
+	 * @param iterations the number of times to perform backpropagation (can be null)
+	 * @param learningRate the learning rate
+	 */
+	public void train(Integer iterations, Double maxError, double learningRate)
+	{
+		if (this.shouldExport)
+			initFileWriter();
+
+		printStats(iterations, maxError, learningRate);
+		tryExportError();
+		tryPrintState();
+
+		if (iterations == null)
+			iterations = Integer.MAX_VALUE;
+		if (maxError == null)
+			maxError = -1.0;
+
+		for (this.iterationsDone = 0; getError() > maxError && this.iterationsDone < iterations; this.iterationsDone++)
+		{
+			if (detectEarlyStop())
+				break;
+			trainOneEpoch(learningRate);
+		}
+
+		if (!this.shouldPrintWhileTraining)
+			printState();
+
+		if (this.shouldExport)
+			closeFileWriter();
+	}
+
+	/**
 	 * trains the neural network for a certain ammount of iterations.
 	 * @param iterations the number of times to perform backpropagation
 	 * @param learningRate the learning rate
 	 */
 	public void train(int iterations, double learningRate)
 	{
-		if (this.shouldExport)
-			initFileWriter();
-		printStats(iterations, learningRate);
-
-		propagate();
-		if (this.shouldExport)
-			exportLoss();
-		if (this.printWhileTraining)
-			printState();
-		for (this.iterationsDone = 0; iterationsDone < iterations; iterationsDone++)
-		{
-			backpropagate(learningRate);
-			propagate();
-
-			if (this.shouldExport)
-				exportLoss();
-			if (this.printWhileTraining)
-				printState();
-		}
-
-		if (!this.printWhileTraining)
-			printState();
-		if (this.shouldExport)
-			closeFileWriter();
+		train(iterations, null, learningRate);
 	}
 
 	/**
@@ -138,34 +171,62 @@ public class NeuralNetwork
 	 */
 	public void train(double maxError, double learningRate)
 	{
-		if (this.shouldExport)
-			initFileWriter();
-		printStats(maxError, learningRate);
+		train(null, maxError, learningRate);
+	}
 
+	/**
+	 * @return if early stopping should be performed
+	 */
+	private boolean detectEarlyStop()
+	{
+		if (!this.earlyStopping)
+			return false;
+		double currTestingError = getTestingError();
+		if (currTestingError > this.minimumTestingError)
+			return true;
+		this.minimumTestingError = currTestingError;
+		return false;
+	}
+
+	/**
+	 * trains for a single epoch
+	 * @param learningRate
+	 */
+	private void trainOneEpoch(double learningRate)
+	{
+		if (!this.areNeuronsPropagated)
+			propagateWithStats();
+		backpropagate(learningRate);
+		propagateWithStats();
+	}
+
+	/**
+	 * propagates, while doing stat logic
+	 */
+	private void propagateWithStats()
+	{
 		propagate();
-		this.iterationsDone = 0;
-		if (this.shouldExport)
-			exportLoss();
-		if (this.printWhileTraining)
-			printState();
-		while (getError() > maxError)
-		{
-			this.iterationsDone++;
-			backpropagate(learningRate);
-			propagate();
 
-			if (this.shouldExport)
-				exportLoss();
-			if (this.printWhileTraining)
-				printState();
-		}
+		tryExportError();
+		tryPrintState();
+	}
 
-		if (this.shouldPrint)
-			System.out.println("iterations: " + this.iterationsDone);
-		if (!this.printWhileTraining)
+	/**
+	 * prints state if the flag is set
+	 */
+	private void tryPrintState()
+	{
+		if (this.shouldPrintWhileTraining)
 			printState();
+	}
+
+	/**
+	 * exports error if the flag is set
+	 */
+	private void tryExportError()
+	{
 		if (this.shouldExport)
-			closeFileWriter();
+			exportError();
 	}
 
 	/**
@@ -200,7 +261,7 @@ public class NeuralNetwork
 	 * writes the current loss function output to a file
 	 * @pre file writer has been initialized
 	 */
-	private void exportLoss()
+	private void exportError()
 	{
 		try
 		{
@@ -219,48 +280,65 @@ public class NeuralNetwork
 	{
 		if (!this.shouldPrint)
 			return;
-		if (this.printWeights)
+		System.out.println("iter: " + this.iterationsDone);
+		if (this.shouldPrintWeights)
 			printWeights();
 		if (this.shouldPrintOutputs)
 			printOutputs();
+		if (this.shouldPrintTestingError)
+			System.out.println("testing error: " + getTestingError());
 		System.out.println("error: " + getError());
 	}
 
 	/**
 	 * prints statistics with number of iterations.
-	 * @param iterations the iterations to perform
+	 * @param iterations the iterations to perform (can be null)
+	 * @param maxError the maximum error (can be null)
 	 * @param learningRate the learning rate
 	 */
-	private void printStats(int iterations, double learningRate)
+	private void printStats(Integer iterations, Double maxError, double learningRate)
 	{
 		if (!this.shouldPrint)
 			return;
 		System.out.println("seed: " + Neuron.seed());
-		System.out.println("iter: " + iterations);
-		System.out.println("rate: " + learningRate);
-	}
-
-	/**
-	 * prints  statistics with the maximum error.
-	 * @param maxError the maximum error
-	 * @param learningRate the learning rate
-	 */
-	private void printStats(double maxError, double learningRate)
-	{
-		if (!this.shouldPrint)
-			return;
-		System.out.println("seed: " + Neuron.seed());
-		System.out.println("merr: " + maxError);
+		if (maxError != null)
+			System.out.println("merr: " + maxError);
+		if (iterations != null)
+			System.out.println("total iter: " + iterations);
 		System.out.println("rate: " + learningRate);
 	}
 
 	/**
 	 * performs the propagation of the network.
+	 * if the output is cached, doesn't propagate.
 	 */
 	public void propagate()
 	{
+		if (this.areNeuronsPropagated)
+			return;
+		forcePropagation();
+	}
+
+	/**
+	 * propagates no matter what.
+	 */
+	public void forcePropagation()
+	{
+		this.areNeuronsPropagated = true;
 		for (IPropagable x : inputNodes)
 			x.propagate();
+	}
+
+	public Matrix evaluate(Matrix input)
+	{
+		setInputNodes(input);
+		forcePropagation();
+
+		Matrix result = output();
+
+		setInputNodes(this.trainingSet); // is in correct order
+		forcePropagation();
+		return result;
 	}
 
 	/**
@@ -269,6 +347,8 @@ public class NeuralNetwork
 	 */
 	public void backpropagate(double learningRate)
 	{
+		this.areNeuronsPropagated = false;
+		this.cachedTestErrorBeforeBackpropagation = false;
 		Iterator<Matrix> currTarget = targetOutputRowsCache.iterator();
 		for (IPropagable n : outputNeurons)
 			n.backpropagate(currTarget.next(), learningRate, outputNeurons.size());
@@ -328,11 +408,15 @@ public class NeuralNetwork
 	 */
 	public Matrix output()
 	{
-		double[][] out = new double[this.outputNeurons.size()][this.trainingSet.columns()];
-		for (int i = 0; i < this.trainingSet.columns(); i++)
-			for (int j = 0; j < this.outputNeurons.size(); j++)
-				out[j][i] = this.outputNeurons.get(j).output().get(0, i);
-		return new Matrix(out);
+		// double[][] out = new double[this.outputNeurons.size()][this.trainingSet.columns()];
+		Matrix result = this.outputNeurons.get(0).output();
+		for (int i = 1; i < this.outputNeurons.size(); i++)
+			result.appendAsRows(this.outputNeurons.get(i).output());
+		// for (int i = 0; i < this.trainingSet.columns(); i++)
+		// 	for (int j = 0; j < this.outputNeurons.size(); j++)
+		// 		out[j][i] = this.outputNeurons.get(j).output().get(0, i);
+		// return new Matrix(out);
+		return result;
 	}
 
 	/**
@@ -350,12 +434,52 @@ public class NeuralNetwork
 	 */
 	public double getError()
 	{
+		propagate();
 		double error = 0;
 		Iterator<Matrix> currTarget = targetOutputRowsCache.iterator();
 		for (Neuron out : outputNeurons)
 			error += out.getError(currTarget.next());
 		error /= outputNeurons.size();
 		return error;
+	}
+
+	/**
+	 * gets the error for a specific input-output set
+	 * @param inputs the inputs to check for error
+	 * @param targetOutputs the target output of the given inputs
+	 * @return the MSE
+	 */
+	public double getError(Matrix inputs, Matrix targetOutputs)
+	{
+		setInputNodes(inputs);
+		forcePropagation();
+
+		double error = 0;
+		for (int i = 0; i < this.outputNeurons.size(); i++)
+			error += this.outputNeurons.get(i).getError(targetOutputs.getRow(i));
+		error /= this.outputNeurons.size();
+
+		setInputNodes(this.trainingSet); // is in correct order
+		forcePropagation();
+		return error;
+	}
+
+	private void setInputNodes(Matrix inputs)
+	{
+		for (int i = 0; i < this.inputNodes.size(); i++)
+			this.inputNodes.get(i).set(inputs.getRow(i));
+	}
+
+	public double getTestingError()
+	{
+		if (this.testingSet == null || this.testingTargetOutputs == null)
+			throw new IllegalArgumentException("Testing data not set!");
+
+		if (!this.cachedTestErrorBeforeBackpropagation)
+			this.cachedTestError = getError(this.testingSet, this.testingTargetOutputs);
+
+		this.cachedTestErrorBeforeBackpropagation = true;
+		return this.cachedTestError;
 	}
 
 	/**
@@ -399,7 +523,7 @@ public class NeuralNetwork
 		{
 			for (InputNode x : this.inputNodes)
 				x.set(new Matrix(new double[][] {{ sc.nextDouble() }}));
-			propagate();
+			forcePropagation();
 
 			// get result
 			for (Neuron n : this.outputNeurons)
@@ -441,18 +565,18 @@ public class NeuralNetwork
 	 * sets printing of the state while training on or off.
 	 * @param shouldPrintWhileTraining
 	 */
-	public void setPrintWhileTraining(boolean shouldPrintWhileTraining)
+	public void setShouldPrintWhileTraining(boolean shouldPrintWhileTraining)
 	{
-		this.printWhileTraining = shouldPrintWhileTraining;
+		this.shouldPrintWhileTraining = shouldPrintWhileTraining;
 	}
 
 	/**
 	 * sets printing of the weights on or off during training.
 	 * @param shouldPrintWeights
 	 */
-	public void setPrintWeights(boolean shouldPrintWeights)
+	public void setShouldPrintWeights(boolean shouldPrintWeights)
 	{
-		this.printWeights = shouldPrintWeights;
+		this.shouldPrintWeights = shouldPrintWeights;
 	}
 
 	/**
@@ -482,6 +606,36 @@ public class NeuralNetwork
 	public void setPrintOutputs(boolean value)
 	{
 		this.shouldPrintOutputs = value;
+	}
+
+	/**
+	 * sets the testing samples.
+	 * @param testingInputs the inputs to use for testing
+	 * @param testingTargetOutputs the outputs to use for testing
+	 */
+	public void setTestingSet(Matrix testingInputs, Matrix testingTargetOutputs)
+	{
+		this.testingSet = testingInputs;
+		this.testingTargetOutputs = testingTargetOutputs;
+	}
+
+	/**
+	 * sets printing the error of the test set to
+	 * on or off.
+	 * @param value
+	 */
+	public void setPrintingTestingError(boolean value)
+	{
+		this.shouldPrintTestingError = value;
+	}
+
+	/**
+	 * sets early stopping on or off.
+	 * @param value
+	 */
+	public void setEarlyStopping(boolean value)
+	{
+		this.earlyStopping = value;
 	}
 
 	/**

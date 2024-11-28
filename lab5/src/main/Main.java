@@ -5,6 +5,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
+		// testXOR();
 		playground();
 
 		// twoBitAdderNetwork();
@@ -15,51 +16,187 @@ public class Main
 		// learningRateSamples();
 	}
 
-	private static void playground()
+	private static NeuralNetwork testXOR() { return testXOR(0); }
+	private static NeuralNetwork testXOR(double learningRate)
 	{
-		Neuron.setSeed(7643187110837245245L);
+		Neuron.setSeed(3207636386306947792L);
 
-		int iterations = 1000000000;
-		double maxError = 0.00001;
-		double learningRate = 0.1;
+		int iterations = 9800;
+		double maxError = 0.001;
+		learningRate = 1.0;
 
-		String separator = ",";
-		String trainingSetFile = "dataset/dataset.csv";
-		String targetOutputFile = "dataset/labels.csv";
-		Matrix trainingSet = Matrix.parseFromFile(trainingSetFile, separator).transpose();
-		Matrix targetOutput = Matrix.parseFromFile(targetOutputFile, separator).transpose();
-		// Matrix trainingSet = new Matrix(new double[][] {
-		// 	{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 },
-		// 	{ 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1 },
-		//
-		// 	{ 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1 },
-		// 	{ 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 },
-		// });
+		Matrix trainingSet = new Matrix(new double[][] {
+			{ 0, 1, 0, 1 },
+			{ 0, 0, 1, 1 },
+		});
+		Matrix targetOutput = new Matrix(new double[][] {
+			{ 0, 1, 1, 0 },
+		});
 
-		// Matrix targetOutput = new Matrix(new double[][] {
-		// 	{ 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0 },
-		// 	{ 0, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1 },
-		// 	{ 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1 },
-		// });
+		Matrix testingSet = new Matrix(new double[][] {
+			{ 0.25 },
+			{ 0.25 },
+		});
 
-		ArrayList<Integer> layerSizes = new ArrayList<>();
-		layerSizes.add(10);
-		layerSizes.add(10);
+		Matrix testingTargetOutput = new Matrix(new double[][] {
+			{ 0.5 },
+		});
 
-		// NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 3, trainingSet, targetOutput, layerSizes);
-		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, targetOutput, layerSizes);
+		InputNode x1 = new InputNode(trainingSet.getRow(0));
+		InputNode x2 = new InputNode(trainingSet.getRow(1));
+		Neuron n1 = new Neuron();
+		Neuron n2 = new Neuron();
 
-		network.setExportingLoss(false);
+		ArrayList<InputNode> inputNodes = new ArrayList<>();
+		inputNodes.add(x1);
+		inputNodes.add(x2);
+		ArrayList<Neuron> outputNeurons = new ArrayList<>();
+		outputNeurons.add(n2);
+
+		NeuralNetwork network = new NeuralNetwork(inputNodes, outputNeurons, trainingSet, targetOutput);
+
+		// setup connections
+		x1.connect(n1);
+		x1.connect(n2);
+		x2.connect(n1);
+		x2.connect(n2);
+		n1.connect(n2);
+
+		network.setTestingSet(testingSet, testingTargetOutput);
+		network.setPrintingTestingError(true);
+
+		network.setExportingLoss(true);
+		network.setPrinting(true);
 		network.setPrettyPrint(true);
-		network.setPrintOutputs(false);
-		network.setPrintWhileTraining(true);
-		network.setPrintWeights(false);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(true);
 
 		network.train(iterations, learningRate);
 		// network.train(maxError, learningRate);
 
+		network.iterativePropagation();
+
+		return network;
+	}
+
+	private static void playground()
+	{
+		// Neuron.setSeed(7643187110837245245L);
+
+		int iterations = 1000000000;
+		double maxError = 0.00001;
+		double learningRate = 0.20;
+		double trainingToTestingRatio = 0.20;
+
+		String separator = ",";
+		String inSetFile = "dataset/dataset.csv";
+		String targetOutFile = "dataset/labels.csv";
+		// Matrix trainingSet = Matrix.parseFromFile(inSetFile, separator).transpose();
+		// Matrix trainingTargetOutput = Matrix.parseFromFile(targetOutFile, separator).transpose();
+		Matrix[] targetOutputSets = Matrix.parseFromFile(targetOutFile, separator).splitByRows(trainingToTestingRatio); // should be transposed!
+		Matrix[] inputSets = Matrix.parseFromFile(inSetFile, separator).splitByRows(trainingToTestingRatio); // should be transposed!
+
+
+		Matrix trying = new Matrix(new double[][] {{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}});
+		trying = trying.transpose();
+
+		Matrix trying2 = new Matrix(new double[][] {{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}});
+		trying2 = trying2.transpose();
+
+
+		// Matrix inputSets = Matrix.parseFromFile(inSetFile, separator); // should be transposed!
+		// ArrayList<Matrix> inputSetsArr = new ArrayList<Matrix>();
+		// for (int i = 0; i < inputSets.rows(); i++)
+		// Matrix targetOutputSets = Matrix.parseFromFile(targetOutFile, separator); // should be transposed!
+		// ArrayList<Matrix> targetOutputSetsArr = new ArrayList<Matrix>();
+
+
+
+
+		Matrix trainingSet = inputSets[1].transpose();
+		Matrix trainingTargetOutput = targetOutputSets[1].transpose();
+		Matrix testingSet = inputSets[0].transpose();
+		Matrix testingTargetOutput = targetOutputSets[0].transpose();
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+		layerSizes.add(5);
+		layerSizes.add(5);
+
+		// NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 3, trainingSet, targetOutput, layerSizes);
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
+		network.setTestingSet(testingSet, testingTargetOutput);
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+		System.out.println(network.getTestingError());
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(true);
+		network.setShouldPrintWeights(false);
+
+		Scanner sc = new Scanner(System.in);
+		int i = 1;
+		while(i == 1)
+		{
+			network.train(iterations, learningRate);
+
+			System.out.println("EVALUATION (1): " + network.evaluate(trying));
+			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
+			sc.next();
+		}
+		sc.close();
+
+		// network.train(maxError, learningRate);
+
 		// network.iterativePropagation();
 	}
+
 
 	private static void twoBitAdderNetwork()
 	{
@@ -192,8 +329,8 @@ public class Main
 
 		network.setExportingLoss(false);
 		network.setPrettyPrint(true);
-		network.setPrintWhileTraining(false);
-		network.setPrintWeights(true);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(true);
 
 		network.train(iterations, learningRate);
 		// network.train(maxError, learningRate);
@@ -241,8 +378,8 @@ public class Main
 		network.setExportingLoss(true);
 		network.setPrinting(true);
 		network.setPrettyPrint(true);
-		network.setPrintWhileTraining(false);
-		network.setPrintWeights(true);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(true);
 
 		network.train(iterations, learningRate);
 		// network.train(maxError, learningRate);

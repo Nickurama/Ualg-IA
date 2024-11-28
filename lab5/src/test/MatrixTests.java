@@ -566,4 +566,71 @@ public class MatrixTests
 		// Assert
 		assertEquals(obtained, expected);
 	}
+
+	@Test
+	public void shouldGetSubmatrix()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			//       0  1  2  3  4  5
+			/* 0 */{ 1, 2, 3, 4, 5, 2 },
+			/* 1 */{ 7, 2, 7, 0, 1, 9 },
+			/* 2 */{ 7, 1, 3, 7, 2, 2 },
+			/* 3 */{ 8, 2, 0, 0, 5, 3 },
+			/* 4 */{ 1, 9, 9, 3, 2, 5 },
+		});
+
+		Matrix expected = new Matrix(new double[][]{
+			{ 2, 7, 0, 1 },
+			{ 1, 3, 7, 2 },
+			{ 2, 0, 0, 5 },
+		});
+
+		// Act
+		Matrix obtained = m0.subMatrix(1, 3, 1, 4);
+
+		// Assert
+		assertEquals(expected, obtained);
+	}
+
+	@Test
+	public void shouldSplitMatrix()
+	{
+		// Arrange
+		Matrix m0 = new Matrix(new double[][]{
+			{ 1, 0, 0, 0, 0 },
+			{ 0, 2, 0, 0, 0 },
+			{ 0, 0, 3, 0, 0 },
+			{ 0, 0, 0, 4, 0 },
+			{ 0, 0, 0, 0, 5 },
+			{ 0, 0, 0, 0, 6 },
+			{ 0, 0, 0, 7, 0 },
+			{ 0, 0, 8, 0, 0 },
+			{ 0, 9, 0, 0, 0 },
+			{ 10, 0, 0, 0, 0 },
+		});
+
+		Matrix expected0 = new Matrix(new double[][]{
+			{ 1, 0, 0, 0, 0 },
+			{ 0, 2, 0, 0, 0 },
+			{ 0, 0, 3, 0, 0 },
+			{ 0, 0, 0, 4, 0 },
+			{ 0, 0, 0, 0, 5 },
+			{ 0, 0, 0, 0, 6 },
+			{ 0, 0, 0, 7, 0 },
+			{ 0, 0, 8, 0, 0 },
+		});
+
+		Matrix expected1 = new Matrix(new double[][]{
+			{ 0, 9, 0, 0, 0 },
+			{ 10, 0, 0, 0, 0 },
+		});
+
+		// Act
+		Matrix[] obtained = m0.splitByRows(0.8);
+
+		// Assert
+		assertEquals(expected0, obtained[0]);
+		assertEquals(expected1, obtained[1]);
+	}
 }
