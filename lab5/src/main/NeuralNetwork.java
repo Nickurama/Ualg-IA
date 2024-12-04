@@ -95,7 +95,7 @@ public class NeuralNetwork
 		int numOutputBackwardConn = layerSizes.isEmpty() ? numInputs : layerSizes.getLast();
 		double outputWeightRange = 1.0 / (double)numOutputBackwardConn;
 		for (int i = 0; i < numOutputs; i++)
-			outputLayer.add(new Neuron(RandomNumberGenerator.getRandomBounded(outputWeightRange)));
+			outputLayer.add(new Neuron());
 		NeuralNetwork network = new NeuralNetwork(inputLayer, outputLayer, trainingSet, targetOutput);
 
 		ArrayList<IPropagable> previousLayer = new ArrayList<IPropagable>(inputLayer);
@@ -105,10 +105,10 @@ public class NeuralNetwork
 			double weightRange = 1.0 / (double)previousLayer.size();
 			for (int i = 0; i < layerSize; i++)
 			{
-				Neuron n = new Neuron(RandomNumberGenerator.getRandomBounded(weightRange));
+				Neuron n = new Neuron();
 				currLayer.add(n);
 				for (IPropagable previous : previousLayer)
-					previous.connect(n, RandomNumberGenerator.getRandomBounded(weightRange));
+					previous.connect(n);
 			}
 			previousLayer = currLayer;
 			currLayer = new ArrayList<>();
@@ -116,7 +116,7 @@ public class NeuralNetwork
 
 		for (Neuron out : outputLayer)
 			for (IPropagable previous : previousLayer)
-				previous.connect(out, RandomNumberGenerator.getRandomBounded(outputWeightRange));
+				previous.connect(out);
 
 		return network;
 	}

@@ -21,23 +21,33 @@ public class Main
 
 	private static void playground() throws IOException
 	{
-		DataPreprocessor.normalize("../dataset/dataset.csv", "../dataset/normalized_dataset.csv", ",");
-		// RandomNumberGenerator.setSeed(8533424756459807616L); // learning rate = 0.1, trainingRatio = 0.7, 100 iterations
-
-		int iterations = 100;
-		double maxError = 0.00001;
-		double learningRate = 0.90;
-		double trainingToTestingRatio = 0.90;
-
 		String separator = ",";
-		String inSetFile = "../dataset/dataset.csv";
-		// String inSetFile = "../dataset/normalized_dataset.csv";
-		String targetOutFile = "../dataset/labels.csv";
-		// Matrix trainingSet = Matrix.parseFromFile(inSetFile, separator).transpose();
-		// Matrix trainingTargetOutput = Matrix.parseFromFile(targetOutFile, separator).transpose();
-		Matrix[] targetOutputSets = Matrix.parseFromFile(targetOutFile, separator).splitByRows(trainingToTestingRatio); // needs to be transposed!
-		Matrix[] inputSets = Matrix.parseFromFile(inSetFile, separator).splitByRows(trainingToTestingRatio); // needs to be transposed!
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// RandomNumberGenerator.setSeed(7296176720875951778L); // learning rate = 0.7, trainingRatio = 0.8
+		// RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
+		// tuning parameters
+		int iterations = 100;
+		double learningRate = 0.70;
+		double trainingToTestingRatio = 0.66;
+
+		// Read from file
+		// String inSetFile = "dataset/dataset.csv";
+		String inSetFile = "dataset/normalized_dataset.csv";
+		String targetOutFile = "dataset/labels.csv";
+		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
+		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
+
+		// split by training to test ratio
+		Matrix[] targetOutputSets = new Matrix(outputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix[] inputSets = new Matrix(inputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
+
+		
+
+
+		// my inputs
+		Matrix tryingFile0 = new Matrix(DataPreprocessor.readMatrix("dataset/my_inputs.csv", ",")).transpose();
 
 		Matrix trying = new Matrix(new double[][] {{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -111,18 +121,10 @@ public class Main
 		}});
 		trying3 = trying3.transpose();
 
-
-		// Matrix inputSets = Matrix.parseFromFile(inSetFile, separator); // should be transposed!
-		// ArrayList<Matrix> inputSetsArr = new ArrayList<Matrix>();
-		// for (int i = 0; i < inputSets.rows(); i++)
-		// Matrix targetOutputSets = Matrix.parseFromFile(targetOutFile, separator); // should be transposed!
-		// ArrayList<Matrix> targetOutputSetsArr = new ArrayList<Matrix>();
-
-
-
-
 		Matrix trainingSet = inputSets[0].transpose();
 		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
+		// Matrix trainingSet = inputSets[0].appendAsRows(tryingFile0.transpose().getRow(1)).transpose();
+		// Matrix trainingTargetOutput = targetOutputSets[0].appendAsRows(new Matrix(new double[][]{{1}})).transpose();
 		Matrix testingSet = inputSets[1].transpose();
 		Matrix testingTargetOutput = targetOutputSets[1].transpose();
 
@@ -130,38 +132,37 @@ public class Main
 		System.out.println("testing size: " + testingSet.columns());
 
 		ArrayList<Integer> layerSizes = new ArrayList<>();
-		// layerSizes.add(2);
-		// layerSizes.add(1);
+		// layerSizes.add(5);
+		// layerSizes.add(5);
 
-		// NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 3, trainingSet, targetOutput, layerSizes);
 		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
 		network.setTestingSet(testingSet, testingTargetOutput);
 		network.setEarlyStopping(true);
 		network.setPrintingTestingError(true);
-		System.out.println(network.getTestingError());
 
 		network.setExportingLoss(false);
 		network.setPrettyPrint(true);
 		network.setPrintOutputs(false);
-		network.setShouldPrintWhileTraining(true);
+		network.setShouldPrintWhileTraining(false);
 		network.setShouldPrintWeights(false);
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		int i = 1;
-		while(i == 1)
+		int i = 100;
+		System.out.println("EVALUATION (1): " + network.evaluate(trying));
+		System.out.println("EVALUATION (0): " + network.evaluate(trying2));
+		System.out.println("EVALUATION (1): " + network.evaluate(trying3));
+		System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
+		while(i-- > 0)
 		{
 			network.train(iterations, learningRate);
 
 			System.out.println("EVALUATION (1): " + network.evaluate(trying));
 			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
 			System.out.println("EVALUATION (1): " + network.evaluate(trying3));
-			try { reader.readLine(); } catch(Exception e) {};
+			System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
+			// reader.readLine();
 		}
-		try { reader.close(); } catch(Exception e) {};
-
-		// network.train(maxError, learningRate);
-
-		// network.iterativePropagation();
+		reader.close();
 	}
 
 

@@ -28,8 +28,9 @@ public class RandomNumberGenerator
 	 */
 	public static void setSeed(long seed)
 	{
+		RandomNumberGenerator.get();
 		RandomNumberGenerator.seed = seed;
-		RandomNumberGenerator.get().setSeed(seed);
+		rng.setSeed(seed);
 	}
 
 	/**
