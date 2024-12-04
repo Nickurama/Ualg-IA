@@ -1,11 +1,12 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		// testXOR();
 		playground();
@@ -18,10 +19,157 @@ public class Main
 		// learningRateSamples();
 	}
 
+	private static void playground() throws IOException
+	{
+		DataPreprocessor.normalize("../dataset/dataset.csv", "../dataset/normalized_dataset.csv", ",");
+		// RandomNumberGenerator.setSeed(8533424756459807616L); // learning rate = 0.1, trainingRatio = 0.7, 100 iterations
+
+		int iterations = 100;
+		double maxError = 0.00001;
+		double learningRate = 0.90;
+		double trainingToTestingRatio = 0.90;
+
+		String separator = ",";
+		String inSetFile = "../dataset/dataset.csv";
+		// String inSetFile = "../dataset/normalized_dataset.csv";
+		String targetOutFile = "../dataset/labels.csv";
+		// Matrix trainingSet = Matrix.parseFromFile(inSetFile, separator).transpose();
+		// Matrix trainingTargetOutput = Matrix.parseFromFile(targetOutFile, separator).transpose();
+		Matrix[] targetOutputSets = Matrix.parseFromFile(targetOutFile, separator).splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix[] inputSets = Matrix.parseFromFile(inSetFile, separator).splitByRows(trainingToTestingRatio); // needs to be transposed!
+
+
+		Matrix trying = new Matrix(new double[][] {{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}});
+		trying = trying.transpose();
+
+		Matrix trying2 = new Matrix(new double[][] {{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}});
+		trying2 = trying2.transpose();
+
+		Matrix trying3 = new Matrix(new double[][] {{
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		}});
+		trying3 = trying3.transpose();
+
+
+		// Matrix inputSets = Matrix.parseFromFile(inSetFile, separator); // should be transposed!
+		// ArrayList<Matrix> inputSetsArr = new ArrayList<Matrix>();
+		// for (int i = 0; i < inputSets.rows(); i++)
+		// Matrix targetOutputSets = Matrix.parseFromFile(targetOutFile, separator); // should be transposed!
+		// ArrayList<Matrix> targetOutputSetsArr = new ArrayList<Matrix>();
+
+
+
+
+		Matrix trainingSet = inputSets[0].transpose();
+		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
+		Matrix testingSet = inputSets[1].transpose();
+		Matrix testingTargetOutput = targetOutputSets[1].transpose();
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+		// layerSizes.add(2);
+		// layerSizes.add(1);
+
+		// NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 3, trainingSet, targetOutput, layerSizes);
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
+		network.setTestingSet(testingSet, testingTargetOutput);
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+		System.out.println(network.getTestingError());
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(true);
+		network.setShouldPrintWeights(false);
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		int i = 1;
+		while(i == 1)
+		{
+			network.train(iterations, learningRate);
+
+			System.out.println("EVALUATION (1): " + network.evaluate(trying));
+			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
+			System.out.println("EVALUATION (1): " + network.evaluate(trying3));
+			try { reader.readLine(); } catch(Exception e) {};
+		}
+		try { reader.close(); } catch(Exception e) {};
+
+		// network.train(maxError, learningRate);
+
+		// network.iterativePropagation();
+	}
+
+
+
 	private static NeuralNetwork testXOR() { return testXOR(0); }
 	private static NeuralNetwork testXOR(double learningRate)
 	{
-		Neuron.setSeed(3207636386306947792L);
+		RandomNumberGenerator.setSeed(3207636386306947792L);
 
 		int iterations = 9800;
 		double maxError = 0.001;
@@ -81,153 +229,9 @@ public class Main
 		return network;
 	}
 
-	private static void playground()
-	{
-		Neuron.setSeed(8533424756459807616L); // learning rate = 0.1, trainingRatio = 0.7, 100 iterations
-
-		int iterations = 100;
-		double maxError = 0.00001;
-		double learningRate = 0.10;
-		double trainingToTestingRatio = 0.90;
-
-		String separator = ",";
-		String inSetFile = "dataset/dataset.csv";
-		String targetOutFile = "dataset/labels.csv";
-		// Matrix trainingSet = Matrix.parseFromFile(inSetFile, separator).transpose();
-		// Matrix trainingTargetOutput = Matrix.parseFromFile(targetOutFile, separator).transpose();
-		Matrix[] targetOutputSets = Matrix.parseFromFile(targetOutFile, separator).splitByRows(trainingToTestingRatio); // should be transposed!
-		Matrix[] inputSets = Matrix.parseFromFile(inSetFile, separator).splitByRows(trainingToTestingRatio); // should be transposed!
-
-
-		Matrix trying = new Matrix(new double[][] {{
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		}});
-		trying = trying.transpose();
-
-		Matrix trying2 = new Matrix(new double[][] {{
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		}});
-		trying2 = trying2.transpose();
-
-		Matrix trying3 = new Matrix(new double[][] {{
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		}});
-		trying3 = trying3.transpose();
-
-
-		// Matrix inputSets = Matrix.parseFromFile(inSetFile, separator); // should be transposed!
-		// ArrayList<Matrix> inputSetsArr = new ArrayList<Matrix>();
-		// for (int i = 0; i < inputSets.rows(); i++)
-		// Matrix targetOutputSets = Matrix.parseFromFile(targetOutFile, separator); // should be transposed!
-		// ArrayList<Matrix> targetOutputSetsArr = new ArrayList<Matrix>();
-
-
-
-
-		Matrix trainingSet = inputSets[0].transpose();
-		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
-		Matrix testingSet = inputSets[1].transpose();
-		Matrix testingTargetOutput = targetOutputSets[1].transpose();
-
-		System.out.println("training size: " + trainingSet.columns());
-		System.out.println("testing size: " + testingSet.columns());
-
-		ArrayList<Integer> layerSizes = new ArrayList<>();
-		// layerSizes.add(2);
-		// layerSizes.add(1);
-
-		// NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 3, trainingSet, targetOutput, layerSizes);
-		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
-		network.setTestingSet(testingSet, testingTargetOutput);
-		network.setEarlyStopping(true);
-		network.setPrintingTestingError(true);
-		System.out.println(network.getTestingError());
-
-		network.setExportingLoss(false);
-		network.setPrettyPrint(true);
-		network.setPrintOutputs(false);
-		network.setShouldPrintWhileTraining(true);
-		network.setShouldPrintWeights(false);
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		int i = 1;
-		while(i == 1)
-		{
-			network.train(iterations, learningRate);
-
-			System.out.println("EVALUATION (1): " + network.evaluate(trying));
-			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
-			System.out.println("EVALUATION (1): " + network.evaluate(trying3));
-			try { reader.readLine(); } catch(Exception e) {};
-		}
-		try { reader.close(); } catch(Exception e) {};
-
-		// network.train(maxError, learningRate);
-
-		// network.iterativePropagation();
-	}
-
-
 	private static void twoBitAdderNetwork()
 	{
-		Neuron.setSeed(-682544829822166666l);
+		RandomNumberGenerator.setSeed(-682544829822166666l);
 
 		int iterations = 100000;
 		double maxError = 0.00001;
@@ -368,7 +372,7 @@ public class Main
 	private static NeuralNetwork trainingNetworkXOR() { return trainingNetworkXOR(0); }
 	private static NeuralNetwork trainingNetworkXOR(double learningRate)
 	{
-		Neuron.setSeed(3207636386306947792L);
+		RandomNumberGenerator.setSeed(3207636386306947792L);
 
 		int iterations = 9800;
 		double maxError = 0.001;

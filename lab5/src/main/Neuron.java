@@ -7,10 +7,6 @@ import java.util.function.Function;
  */
 public class Neuron implements IPropagable
 {
-	// random number generator
-	private static Random rng;
-	private static long seed = 0;
-
 	// naming
 	private static final String IDENTIFIER = "n";
 	private static int count = 1;
@@ -76,44 +72,11 @@ public class Neuron implements IPropagable
 	}
 
 	/**
-	 * Sets the seed to use for weight generation.
-	 * @param seed the new seed
-	 */
-	public static void setSeed(long seed)
-	{
-		Neuron.seed = seed;
-	}
-
-	/**
-	 * The seed the neurons are using.
-	 * @return the seed the neurons are using
-	 */
-	public static long seed()
-	{
-		if (rng == null)
-			generateRandom();
-		return Neuron.seed;
-	}
-
-	/**
 	 * @return a random weight between -1 and 1.
 	 */
 	public static double getRandomWeight()
 	{
-		if (rng == null)
-			generateRandom();
-		return rng.nextBoolean() ? rng.nextDouble() : - 1.0 * rng.nextDouble();
-	}
-
-	/**
-	 * instantiates the random number generator.
-	 */
-	private static void generateRandom()
-	{
-		rng = new Random();
-		if (seed == 0)
-			seed = rng.nextLong();
-		rng.setSeed(seed);
+		return RandomNumberGenerator.getRandomBounded(1);
 	}
 
 	/**

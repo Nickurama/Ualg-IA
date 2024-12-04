@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.function.Function;
 
 /**
@@ -78,30 +80,23 @@ public class Matrix //<T extends Number>
 	 * @param separator the separator for each column
 	 * @return the matrix created from the file data
 	 */
-	public static Matrix parseFromFile(String file, String separator)
+	public static Matrix parseFromFile(String file, String separator) throws IOException
 	{
 		Matrix result = new Matrix(new double[][]{{}});
-		try
-		{
-			File f = new File(file);
-			BufferedReader reader = new BufferedReader(new FileReader(f));
+		File f = new File(file);
+		BufferedReader reader = new BufferedReader(new FileReader(f));
 
-			String line;
-			while ((line = reader.readLine()) != null)
-			{
-				String[] tokens = line.split(separator);
-				double[] row = new double[tokens.length];
-				for (int i = 0; i < tokens.length; i++)
-					row[i] = Double.parseDouble(tokens[i]);
-				result = result.addRow(row);
-			}
-
-			reader.close();
-		}
-		catch (IOException e)
+		String line;
+		while ((line = reader.readLine()) != null)
 		{
-			throw new IllegalStateException("Error initializing matrix from file:\n" + e.getMessage());
+			String[] tokens = line.split(separator);
+			double[] row = new double[tokens.length];
+			for (int i = 0; i < tokens.length; i++)
+				row[i] = Double.parseDouble(tokens[i]);
+			result = result.addRow(row);
 		}
+
+		reader.close();
 		return result;
 	}
 

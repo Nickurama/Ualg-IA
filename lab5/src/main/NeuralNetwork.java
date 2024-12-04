@@ -76,26 +76,39 @@ public class NeuralNetwork
 		this.iterationsDone = 0;
 	}
 
+	/**
+	 * builds a layered network automatically
+	 * @param numInputs number of inputs
+	 * @param numOutputs number of outputs
+	 * @param trainingSet the training set
+	 * @param targetOutput the target output of the training set
+	 * @param layerSizes how many neurons each layer will have
+	 * @return the built layered network
+	 */
 	public static NeuralNetwork layeredBuilder(int numInputs, int numOutputs, Matrix trainingSet, Matrix targetOutput, ArrayList<Integer> layerSizes)
 	{
 		ArrayList<InputNode> inputLayer = new ArrayList<>();
 		for (int i = 0; i < numInputs; i++)
 			inputLayer.add(new InputNode(trainingSet.getRow(i)));
 		ArrayList<Neuron> outputLayer = new ArrayList<>();
+
+		int numOutputBackwardConn = layerSizes.isEmpty() ? numInputs : layerSizes.getLast();
+		double outputWeightRange = 1.0 / (double)numOutputBackwardConn;
 		for (int i = 0; i < numOutputs; i++)
-			outputLayer.add(new Neuron());
+			outputLayer.add(new Neuron(RandomNumberGenerator.getRandomBounded(outputWeightRange)));
 		NeuralNetwork network = new NeuralNetwork(inputLayer, outputLayer, trainingSet, targetOutput);
 
 		ArrayList<IPropagable> previousLayer = new ArrayList<IPropagable>(inputLayer);
 		ArrayList<IPropagable> currLayer = new ArrayList<>();
 		for (int layerSize : layerSizes)
 		{
+			double weightRange = 1.0 / (double)previousLayer.size();
 			for (int i = 0; i < layerSize; i++)
 			{
-				Neuron n = new Neuron();
+				Neuron n = new Neuron(RandomNumberGenerator.getRandomBounded(weightRange));
 				currLayer.add(n);
 				for (IPropagable previous : previousLayer)
-					previous.connect(n);
+					previous.connect(n, RandomNumberGenerator.getRandomBounded(weightRange));
 			}
 			previousLayer = currLayer;
 			currLayer = new ArrayList<>();
@@ -103,7 +116,7 @@ public class NeuralNetwork
 
 		for (Neuron out : outputLayer)
 			for (IPropagable previous : previousLayer)
-				previous.connect(out);
+				previous.connect(out, RandomNumberGenerator.getRandomBounded(outputWeightRange));
 
 		return network;
 	}
@@ -300,7 +313,7 @@ public class NeuralNetwork
 	{
 		if (!this.shouldPrint)
 			return;
-		System.out.println("seed: " + Neuron.seed());
+		System.out.println("seed: " + RandomNumberGenerator.seed());
 		if (maxError != null)
 			System.out.println("merr: " + maxError);
 		if (iterations != null)
