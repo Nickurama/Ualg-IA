@@ -29,6 +29,7 @@ public class NeuralNetwork implements Serializable
 	private Matrix trainingSet;
 	private Matrix targetOutput;
 	private ArrayList<Matrix> targetOutputRowsCache;
+	private ArrayList<Matrix> targetTestOutputRowsCache;
 
 	// caches and states
 	private ArrayList<String> nodeInfoCache;
@@ -102,8 +103,8 @@ public class NeuralNetwork implements Serializable
 			inputLayer.add(new InputNode(trainingSet.getRow(i)));
 		ArrayList<Neuron> outputLayer = new ArrayList<>();
 
-		int numOutputBackwardConn = layerSizes.isEmpty() ? numInputs : layerSizes.getLast();
-		double outputWeightRange = 1.0 / (double)numOutputBackwardConn;
+		// int numOutputBackwardConn = layerSizes.isEmpty() ? numInputs : layerSizes.getLast();
+		// double outputWeightRange = 1.0 / (double)numOutputBackwardConn;
 		for (int i = 0; i < numOutputs; i++)
 			outputLayer.add(new Neuron());
 		NeuralNetwork network = new NeuralNetwork(inputLayer, outputLayer, trainingSet, targetOutput);
@@ -112,7 +113,7 @@ public class NeuralNetwork implements Serializable
 		ArrayList<IPropagable> currLayer = new ArrayList<>();
 		for (int layerSize : layerSizes)
 		{
-			double weightRange = 1.0 / (double)previousLayer.size();
+			// double weightRange = 1.0 / (double)previousLayer.size();
 			for (int i = 0; i < layerSize; i++)
 			{
 				Neuron n = new Neuron();
@@ -385,15 +386,24 @@ public class NeuralNetwork implements Serializable
 			x.propagate();
 	}
 
+	public void ghostpropagate()
+	{
+		for (IPropagable x : inputNodes)
+			x.ghostpropagate();
+	}
+
 	public Matrix evaluate(Matrix input)
 	{
-		setInputNodes(input);
-		forcePropagation();
+		// setInputNodes(input);
+		// forcePropagation();
+		setGhostInputs(input);
+		ghostpropagate();
 
-		Matrix result = output();
+		Matrix result = ghostOutput();
 
-		setInputNodes(this.trainingSet); // is in correct order
-		forcePropagation();
+		setGhostInputs(this.trainingSet);
+		// setInputNodes(this.trainingSet); // is in correct order
+		// forcePropagation();
 		return result;
 	}
 
@@ -460,13 +470,24 @@ public class NeuralNetwork implements Serializable
 	}
 
 	/**
-	 * @return a matrix the outputs of the network, with each row in respect to an output and each columns in respect to each training input
+	 * @return a matrix with the outputs of the network, with each row in respect to an output and each columns in respect to each training input
 	 */
 	public Matrix output()
 	{
 		Matrix result = this.outputNeurons.get(0).output();
 		for (int i = 1; i < this.outputNeurons.size(); i++)
 			result.appendAsRows(this.outputNeurons.get(i).output());
+		return result;
+	}
+
+	/**
+	 * @return a matrix with the outputs of the networ, with each row in respect to a ghost output, and each column in respect to each input
+	 */
+	public Matrix ghostOutput()
+	{
+		Matrix result = this.outputNeurons.get(0).ghostOutput();
+		for (int i = 1; i < this.outputNeurons.size(); i++)
+			result.appendAsRows(this.outputNeurons.get(i).ghostOutput());
 		return result;
 	}
 
@@ -485,11 +506,13 @@ public class NeuralNetwork implements Serializable
 	 */
 	public double getError()
 	{
+		final boolean isGhost = false;
+
 		propagate();
 		double error = 0;
 		Iterator<Matrix> currTarget = targetOutputRowsCache.iterator();
 		for (Neuron out : outputNeurons)
-			error += out.getError(currTarget.next());
+			error += out.getError(currTarget.next(), isGhost);
 		error /= outputNeurons.size();
 		return error;
 	}
@@ -502,16 +525,21 @@ public class NeuralNetwork implements Serializable
 	 */
 	public double getError(Matrix inputs, Matrix targetOutputs)
 	{
-		setInputNodes(inputs);
-		forcePropagation();
+		final boolean isGhost = true;
+
+		setGhostInputs(inputs);
+		ghostpropagate();
+		// setInputNodes(inputs);
+		// forcePropagation();
 
 		double error = 0;
 		for (int i = 0; i < this.outputNeurons.size(); i++)
-			error += this.outputNeurons.get(i).getError(targetOutputs.getRow(i));
+			error += this.outputNeurons.get(i).getError(targetOutputs.getRow(i), isGhost);
 		error /= this.outputNeurons.size();
 
-		setInputNodes(this.trainingSet); // is in correct order
-		forcePropagation();
+		// setInputNodes(this.trainingSet); // is in correct order
+		// forcePropagation();
+		setGhostInputs(this.testingSet);
 		return error;
 	}
 
@@ -520,11 +548,19 @@ public class NeuralNetwork implements Serializable
 	 */
 	public double getTestingError()
 	{
+		final boolean isGhost = true;
 		if (this.testingSet == null || this.testingTargetOutputs == null)
 			throw new IllegalAccessError("Testing data not set!");
+		if (this.cachedTestErrorBeforeBackpropagation)
+			return this.cachedTestError;
 
-		if (!this.cachedTestErrorBeforeBackpropagation)
-			this.cachedTestError = getError(this.testingSet, this.testingTargetOutputs);
+		setGhostInputs(this.testingSet);
+		ghostpropagate();
+		this.cachedTestError = 0;
+		Iterator<Matrix> currTarget = targetTestOutputRowsCache.iterator();
+		for (Neuron out : outputNeurons)
+			this.cachedTestError += out.getError(currTarget.next(), isGhost);
+		this.cachedTestError /= outputNeurons.size();
 
 		this.cachedTestErrorBeforeBackpropagation = true;
 		return this.cachedTestError;
@@ -535,28 +571,28 @@ public class NeuralNetwork implements Serializable
 	 * @pre has 1 output
 	 * @return the accuracy of the testing set
 	 */
-	public double getAccuracy()
-	{
-		if (this.outputNeurons.size() > 1)
-			throw new IllegalAccessError("Cannot get accuracy for non-binary networks (should have only 1 output neuron).");
-		if (this.testingSet == null || this.testingTargetOutputs == null)
-			throw new IllegalAccessError("Testing data not set!");
-	}
-
-	public double getPrecision()
-	{
-
-	}
-
-	public double getRecall()
-	{
-
-	}
-
-	public double getKappa()
-	{
-
-	}
+	// public double getAccuracy()
+	// {
+	// 	if (this.outputNeurons.size() > 1)
+	// 		throw new IllegalAccessError("Cannot get accuracy for non-binary networks (should have only 1 output neuron).");
+	// 	if (this.testingSet == null || this.testingTargetOutputs == null)
+	// 		throw new IllegalAccessError("Testing data not set!");
+	// }
+	//
+	// public double getPrecision()
+	// {
+	//
+	// }
+	//
+	// public double getRecall()
+	// {
+	//
+	// }
+	//
+	// public double getKappa()
+	// {
+	//
+	// }
 
 	/**
 	 * sets the input nodes to the given matrix
@@ -701,8 +737,23 @@ public class NeuralNetwork implements Serializable
 	 */
 	public void setTestingSet(Matrix testingInputs, Matrix testingTargetOutputs)
 	{
+		setGhostInputs(testingInputs);
+
+		this.targetTestOutputRowsCache = new ArrayList<Matrix>();
+		for (int i = 0; i < testingTargetOutputs.rows(); i++)
+			this.targetTestOutputRowsCache.add(testingTargetOutputs.getRow(i));
+
 		this.testingSet = testingInputs;
 		this.testingTargetOutputs = testingTargetOutputs;
+	}
+
+	/**
+	 * @param inputs the inputs for the ghost input nodes
+	 */
+	private void setGhostInputs(Matrix inputs)
+	{
+		for (int i = 0; i < this.inputNodes.size(); i++)
+			this.inputNodes.get(i).setGhost(inputs.getRow(i));
 	}
 
 	/**

@@ -13,6 +13,7 @@ public class InputNode implements IPropagable
 	private String name;
 	private ArrayList<IPropagable> forwardNeurons;
 	private Matrix input;
+	private Matrix ghostInput;
 
 	/**
 	 * instantiates an input node
@@ -45,9 +46,22 @@ public class InputNode implements IPropagable
 	}
 
 	@Override
+	public void ghostpropagate()
+	{
+		for (IPropagable p : forwardNeurons)
+			p.ghostpropagate();
+	}
+
+	@Override
 	public Matrix output()
 	{
 		return this.input;
+	}
+
+	@Override
+	public Matrix ghostOutput()
+	{
+		return this.ghostInput;
 	}
 
 	@Override
@@ -114,6 +128,18 @@ public class InputNode implements IPropagable
 
 		this.input = in;
 		resetCaches();
+	}
+
+	/**
+	 * changes the ghost input matrix of this node.
+	 * @param in the new ghost input matrix.
+	 */
+	public void setGhost(Matrix in)
+	{
+		if (in.rows() > 1)
+			throw new IllegalArgumentException("Input should have only 1 row.");
+
+		this.ghostInput = in;
 	}
 
 	/**

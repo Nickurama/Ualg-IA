@@ -28,6 +28,8 @@ public class Neuron implements IPropagable
 	private Matrix inputCache; // can be null
 	private Matrix sumCache; // can be null
 	private Matrix outCache; // can be null
+	private int numInputsGhost;
+	private Matrix outCacheGhost; // can be null
 
 	// backpropagation
 	private int backpropInputs;
@@ -125,20 +127,25 @@ public class Neuron implements IPropagable
 
 	/**
 	 * @return true if the neuron has all the necessary inputs to propagate itself
+	 * @param isGhostInputs if the neuron is propagating or ghostpropagating
 	 */
-	private boolean hasAllInputs()
+	private boolean hasAllInputs(boolean isGhostInputs)
 	{
+		if (isGhostInputs)
+			return this.numInputsGhost == backwardNeurons.size();
 		return this.numInputs == backwardNeurons.size();
 	}
 
 	@Override
 	public void propagate()
 	{
+		final boolean isGhost = false;
+
 		numInputs++;
-		if (!hasAllInputs())
+		if (!hasAllInputs(isGhost))
 			return;
 
-		this.inputCache = gatherInputs();
+		this.inputCache = gatherInputs(isGhost);
 		this.sumCache = this.weights.transpose().dot(this.inputCache);
 		this.outCache = sumCache.apply(SIGMOID_FUNC);
 
@@ -146,18 +153,49 @@ public class Neuron implements IPropagable
 			p.propagate();
 	}
 
+	@Override
+	public void ghostpropagate()
+	{
+		final boolean isGhost = true;
+
+		numInputsGhost++;
+		if (numInputsGhost > backwardNeurons.size()) // ghostpropagating has been done before
+			numInputsGhost = 1;
+		if (!hasAllInputs(isGhost))
+			return;
+
+		this.outCacheGhost = this.weights.transpose().dot(gatherInputs(isGhost)).apply(SIGMOID_FUNC);
+		
+		for (IPropagable p : this.forwardNeurons)
+			p.ghostpropagate();
+	}
+
+
 	/**
 	 * Gathers all the inputs.
 	 * @pre should have all inputs
+	 * @param isGhostInputs if the neuron is propagating or ghostpropagating
 	 * @return a matrix with all the inputs
 	 */
-	private Matrix gatherInputs()
+	private Matrix gatherInputs(boolean isGhostInputs)
 	{
-		int numTrainingCases = this.backwardNeurons.get(0).output().columns();
+		int numTrainingCases = isGhostInputs ? this.backwardNeurons.get(0).ghostOutput().columns() : this.backwardNeurons.get(0).output().columns();
 		Matrix inputs = new Matrix(1, numTrainingCases, 1);
-		for (IPropagable a : backwardNeurons)
-			inputs = inputs.appendAsRows(a.output());
+
+		if (isGhostInputs)
+			for (IPropagable a : backwardNeurons)
+				inputs = inputs.appendAsRows(a.ghostOutput());
+		else
+			for (IPropagable a : backwardNeurons)
+				inputs = inputs.appendAsRows(a.output());
+
 		return inputs;
+	}
+
+	@Override
+	public Matrix ghostOutput() // requires propagation
+	{
+		return this.outCacheGhost;
 	}
 
 	@Override
@@ -251,6 +289,8 @@ public class Neuron implements IPropagable
 		this.hasGivenInfo = false;
 		this.backpropInputs = 0;
 		this.numInputs = 0;
+		this.numInputsGhost = 0;
+		this.outCacheGhost = null;
 		this.sumCache = null;
 		this.outCache = null;
 		this.deltaCache = null;
@@ -258,17 +298,35 @@ public class Neuron implements IPropagable
 	}
 
 	/**
-	 * The error function (MSE)
+	 * the error function (MSE) of the current neuron.
 	 * @pre should be an output neuron
 	 * @param targetOutput the target values for this output node.
+	 * @param isGhost if the error is to be calculated to the ghost output or the normal one.
 	 * @return the error function (MSE)
 	 */
-	public double getError(Matrix targetOutput)
+	public double getError(Matrix targetOutput, boolean isGhost)
 	{
 		if (!isOutputNeuron())
 			throw new IllegalCallerException("Only output neurons can calculate error!");
 
-		Matrix err = targetOutput.sub(this.outCache);
+
+		if (isGhost)
+			return calcError(this.outCacheGhost, targetOutput);
+		return calcError(this.outCache, targetOutput);
+		// Matrix err = targetOutput.sub(this.outCache);
+		// err = err.dot(err.transpose()).multiply(1.0 / targetOutput.columns());
+		// return err.parse();
+	}
+
+	/**
+	 * the error function (MSE).
+	 * @param output the output of a neuron
+	 * @param targetOutput the target output of that neuron
+	 * @return the mean square error
+	 */
+	private static double calcError(Matrix output, Matrix targetOutput)
+	{
+		Matrix err = targetOutput.sub(output);
 		err = err.dot(err.transpose()).multiply(1.0 / targetOutput.columns());
 		return err.parse();
 	}

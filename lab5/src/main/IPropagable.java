@@ -15,6 +15,11 @@ public interface IPropagable extends Serializable
 	public Matrix output();
 
 	/**
+	 * @return the ghost output of the current node
+	 */
+	public Matrix ghostOutput();
+
+	/**
 	 * connects two nodes with a given weight.
 	 * (directional)
 	 * @param that the node to connect to
@@ -35,12 +40,20 @@ public interface IPropagable extends Serializable
 
 	/**
 	 * performs a forward propagation.
+	 * (caches results for backpropagation)
 	 */
 	public void propagate();
 
 	/**
+	 * performs a forward propagation.
+	 * !!!does not cache results for backpropagation!!!
+	 */
+	public void ghostpropagate();
+
+	/**
 	 * performs a backpropagation.
 	 * resets caches automatically.
+	 * @pre propagation of all nodes has been done
 	 * @param deltas the deltas from the calling node (error term)
 	 * @param learningRate the learning rate
 	 * @param numOutputs number of output nodes in the graph

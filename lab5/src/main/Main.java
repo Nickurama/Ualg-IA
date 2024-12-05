@@ -26,11 +26,12 @@ public class Main
 
 	private static void playground() throws IOException, ClassNotFoundException
 	{
-		String prefix = "../";
+		// String prefix = "../";
+		String prefix = "";
 		String separator = ",";
 		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
 		// RandomNumberGenerator.setSeed(7296176720875951778L); // learning rate = 0.7, trainingRatio = 0.8
-		// RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
+		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
 		// tuning parameters
 		int iterations = 100;
@@ -181,8 +182,8 @@ public class Main
 
 		// network read
 		File readFile = new File(loadNetworkFromFile);
-		if (readFile.exists())
-			network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
+		// if (readFile.exists())
+		// 	network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
 
 		System.out.println("EVALUATION (1): " + network.evaluate(trying));
 		System.out.println("EVALUATION (0): " + network.evaluate(trying2));
