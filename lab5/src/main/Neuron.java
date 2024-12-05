@@ -7,6 +7,9 @@ import java.util.function.Function;
  */
 public class Neuron implements IPropagable
 {
+	// serializable
+	private static final long serialVersionUID = 139L;
+
 	// naming
 	private static final String IDENTIFIER = "n";
 	private static int count = 1;

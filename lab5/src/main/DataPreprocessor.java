@@ -1,9 +1,14 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -15,12 +20,10 @@ import java.util.Random;
 public class DataPreprocessor
 {
 	/**
-	 * normalizes data from a file, and places it onto another file
-	 * @pre dataMinValue cannot be equal to dataMaxValue
+	 * normalizes data from a file, and places it onto another file.
+	 * automatically takes the highest and lowest value from the data.
 	 * @param dataFile the file to read the data from
 	 * @param normalizedFile the file to write the normalized data to
-	 * @param dataMinValue the minimum value in the data set
-	 * @param dataMaxValue the maximum value in the data set
 	 * @param separator the string that separates the values to normalize in each line
 	 */
 	public static void normalize(String dataFile, String normalizedFile, String separator) throws IOException
@@ -76,6 +79,10 @@ public class DataPreprocessor
 		writer.close();
 	}
 
+	/**
+	 * shuffles the rows of a double[][] matrix.
+	 * @param matrix the matrix to shuffle (inplace)
+	 */
 	public static void shuffleRows(double[][] matrix)
 	{
 		double[][] result = new double[matrix.length][];
@@ -99,6 +106,13 @@ public class DataPreprocessor
 		// return result;
 	}
 
+	/**
+	 * shuffles two matrix, preserving the relationship between their rows.
+	 * for example, if the 7th row in the original matrix is placed in index 5,
+	 * the 7th row of the other matrix will also be placed inn index 5.
+	 * @param matrix0 the first matrix to shuffle (inplace)
+	 * @param matrix1 the second matrix to shuffle (inplace)
+	 */
 	public static void shuffleRowsPreserve(double[][] matrix0, double[][] matrix1)
 	{
 		if (matrix0.length != matrix1.length)
@@ -129,10 +143,15 @@ public class DataPreprocessor
 			matrix0[i] = result[i];
 			matrix1[i] = corresponding[i];
 		}
-
-		// return result;
 	}
 
+	/**
+	 * reads a double[][] matrix from a file where each line is a row.
+	 * @param file the file to read the matrix from
+	 * @param separator the column separator in the file
+	 * @return the matrix read
+	 * @throws IOException when an IO error occurs
+	 */
 	public static double[][] readMatrix(String file, String separator) throws IOException
 	{
 		File f = new File(file);
@@ -155,6 +174,12 @@ public class DataPreprocessor
 		return result;
 	}
 
+	/**
+	 * gets the number of lines from a file.
+	 * @param file the file to get the number of lines from
+	 * @return the number of lines from a file
+	 * @throws IOException when an IO error occurs.
+	 */
 	public static int getNumLines(String file) throws IOException
 	{
 		File f = new File(file);

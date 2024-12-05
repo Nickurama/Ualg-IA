@@ -4,14 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Scanner;
 import java.util.function.Function;
 
 /**
  * Represents a matrix.
  */
-public class Matrix //<T extends Number>
+public class Matrix /* <T extends Number> */ implements Serializable
 {
+	// serializable
+	private static final long serialVersionUID = 138L;
+
 	private double matrix[][];
 	private int columns;
 	private int rows;

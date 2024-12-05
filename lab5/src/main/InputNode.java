@@ -5,6 +5,9 @@ import java.util.ArrayList;
  */
 public class InputNode implements IPropagable
 {
+	// serializable
+	private static final long serialVersionUID = 140L;
+
 	private static final String IDENTIFIER = "x";
 	private static int count = 1;
 	private String name;

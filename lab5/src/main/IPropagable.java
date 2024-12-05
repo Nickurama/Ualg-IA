@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.io.Serializable;
 
 /**
  * Class representative of a node that can propagate a matrix
@@ -6,7 +7,7 @@ import java.util.ArrayList;
  * The main purpose is to be used as a node/neuron in a
  * machine learning neural network.
  */
-public interface IPropagable
+public interface IPropagable extends Serializable
 {
 	/**
 	 * @return the output of the current node

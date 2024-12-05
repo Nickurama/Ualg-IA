@@ -1,5 +1,12 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,8 +15,11 @@ import java.util.Scanner;
 /**
  * Represents a neural network
  */
-public class NeuralNetwork
+public class NeuralNetwork implements Serializable
 {
+	// serializable
+	private static final long serialVersionUID = 137L;
+
 	// constants
 	private static final String OUT_FILE = "errorData.csv";
 
@@ -130,6 +140,39 @@ public class NeuralNetwork
 		this.targetOutputRowsCache = new ArrayList<Matrix>();
 		for (int i = 0; i < targetOutput.rows(); i++)
 			this.targetOutputRowsCache.add(targetOutput.getRow(i));
+	}
+
+	/**
+	 * loads a NeuralNetwork from a file.
+	 * @param file the file path to load the network from
+	 * @return the network read from the file
+	 * @throws IOException when an IO error occurs
+	 * @throws FileNotFoundException when the file was not found
+	 * @throws ClassNotFoundException when it was not possible to de-serialize the class
+	 */
+	public static NeuralNetwork loadFromFile(String file) throws IOException, FileNotFoundException, ClassNotFoundException
+	{
+		File readFile = new File(file);
+		FileInputStream fileInStream = new FileInputStream(readFile);
+		ObjectInputStream objInStream = new ObjectInputStream(fileInStream);
+		NeuralNetwork network = (NeuralNetwork)objInStream.readObject();
+		objInStream.close();
+		return network;
+	}
+
+	/**
+	 * saves/serializes a NeuralNetwork to a file.
+	 * @param file the file to save the network to
+	 * @throws IOException when an IO error occurs
+	 */
+	public void saveToFile(String file) throws IOException
+	{
+		File outFile = new File(file);
+		FileOutputStream fileOutStream = new FileOutputStream(outFile);
+		ObjectOutputStream objOutStream = new ObjectOutputStream(fileOutStream);
+		objOutStream.writeObject(this);
+		objOutStream.flush();
+		objOutStream.close();
 	}
 
 	/**
@@ -421,14 +464,9 @@ public class NeuralNetwork
 	 */
 	public Matrix output()
 	{
-		// double[][] out = new double[this.outputNeurons.size()][this.trainingSet.columns()];
 		Matrix result = this.outputNeurons.get(0).output();
 		for (int i = 1; i < this.outputNeurons.size(); i++)
 			result.appendAsRows(this.outputNeurons.get(i).output());
-		// for (int i = 0; i < this.trainingSet.columns(); i++)
-		// 	for (int j = 0; j < this.outputNeurons.size(); j++)
-		// 		out[j][i] = this.outputNeurons.get(j).output().get(0, i);
-		// return new Matrix(out);
 		return result;
 	}
 
@@ -477,22 +515,57 @@ public class NeuralNetwork
 		return error;
 	}
 
-	private void setInputNodes(Matrix inputs)
-	{
-		for (int i = 0; i < this.inputNodes.size(); i++)
-			this.inputNodes.get(i).set(inputs.getRow(i));
-	}
-
+	/**
+	 * @return the error of the test sets
+	 */
 	public double getTestingError()
 	{
 		if (this.testingSet == null || this.testingTargetOutputs == null)
-			throw new IllegalArgumentException("Testing data not set!");
+			throw new IllegalAccessError("Testing data not set!");
 
 		if (!this.cachedTestErrorBeforeBackpropagation)
 			this.cachedTestError = getError(this.testingSet, this.testingTargetOutputs);
 
 		this.cachedTestErrorBeforeBackpropagation = true;
 		return this.cachedTestError;
+	}
+
+	/**
+	 * assumes the network is a binary classifier
+	 * @pre has 1 output
+	 * @return the accuracy of the testing set
+	 */
+	public double getAccuracy()
+	{
+		if (this.outputNeurons.size() > 1)
+			throw new IllegalAccessError("Cannot get accuracy for non-binary networks (should have only 1 output neuron).");
+		if (this.testingSet == null || this.testingTargetOutputs == null)
+			throw new IllegalAccessError("Testing data not set!");
+	}
+
+	public double getPrecision()
+	{
+
+	}
+
+	public double getRecall()
+	{
+
+	}
+
+	public double getKappa()
+	{
+
+	}
+
+	/**
+	 * sets the input nodes to the given matrix
+	 * @param inputs the matrix to set the input nodes to
+	 */
+	private void setInputNodes(Matrix inputs)
+	{
+		for (int i = 0; i < this.inputNodes.size(); i++)
+			this.inputNodes.get(i).set(inputs.getRow(i));
 	}
 
 	/**
