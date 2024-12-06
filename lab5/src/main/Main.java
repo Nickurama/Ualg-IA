@@ -21,8 +21,8 @@ public class Main
 			// 	System.out.println(f.getName());
 			// mooshak();
 			// mooshak2();
-			mooshak3();
-			// trainingLab3();
+			// mooshak3();
+			trainingLab3();
 			// trainingLab2();
 			// trainingLab();
 		}
@@ -129,7 +129,7 @@ public class Main
 		// System.out.println(evaluation);
 	}
 
-	private static void mooshak() throws IOException, ClassNotFoundException
+	public static boolean mooshak() throws IOException, ClassNotFoundException
 	{
 		// parameters
 		final String networkFile = "mooshak/mooshak_network.ser";
@@ -149,8 +149,10 @@ public class Main
 
 		// evaluation
 		double evaluation = network.evaluate(input).parse();
+		boolean result = evaluation >= 0.5 ? true : false;
 		System.out.println(evaluation >= 0.5 ? "1" : "0");
 		// System.out.println(evaluation);
+		return result;
 	}
 
 	private static void trainingLab3() throws IOException, ClassNotFoundException
@@ -218,6 +220,8 @@ public class Main
 		int i = 100;
 
 
+		System.out.println("testing error: " + network.getTestingError());
+		System.out.println("error: " + network.getError());
 		while(i-- > 0)
 		{
 			network.train(iterations, learningRate);
