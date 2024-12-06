@@ -20,7 +20,9 @@ public class Main
 			// for (File f : filesList)
 			// 	System.out.println(f.getName());
 			// mooshak();
-			mooshak2();
+			// mooshak2();
+			mooshak3();
+			// trainingLab3();
 			// trainingLab2();
 			// trainingLab();
 		}
@@ -37,6 +39,58 @@ public class Main
 		// runXOR();
 
 		// learningRateSamples();
+	}
+
+	private static void mooshak3() throws IOException, ClassNotFoundException
+	{
+		// parameters
+		final String networkFile = "mooshak/mooshak_network_v5.ser";
+		// final String networkFile = "src/main/mooshak_network_v5.ser";
+		final String separator = ",";
+		final int rows = 20;
+		final int cols = 20;
+		final int inputSize = rows * cols;
+		final int cutSize = 2;
+
+		// setup
+		NeuralNetwork network = NeuralNetwork.loadFromFile(networkFile);
+		int numInputs = (rows - 2 * cutSize) * (cols - 2 * cutSize); // crop
+		numInputs /= 2; // dithering
+		double[] inputRow = new double[numInputs];
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = reader.readLine();
+		reader.close();
+		String[] tokens = line.split(separator);
+		int curr = 0;
+		for (int i = cutSize; i < rows - cutSize; i++)
+		{
+			for (int j = cutSize; j < cols - cutSize; j++)
+			{
+				int currIndex = i * cols + j;
+				if (curr % 2 == 0)
+					inputRow[curr / 2] = Double.parseDouble(tokens[currIndex]);
+				curr++;
+			}
+		}
+
+		// dithering 2
+		double[] inputRow_2 = new double[numInputs / 2];
+		for (int i = 0; i < numInputs / 2; i++)
+			if (i % 2 == 0)
+				inputRow_2[i / 2] = inputRow[i];
+
+		// double[] inputRow_4 = new double[numInputs / 4];
+		// dithering 4
+		// for (int i = 0; i < numInputs / 4; i++)
+		// 	if (i % 2 == 0)
+		// 		inputRow_4[i / 2] = inputRow_2[i];
+
+		Matrix input = new Matrix(new double[][] { inputRow_2 }).transpose();
+
+		// evaluation
+		double evaluation = network.evaluate(input).parse();
+		System.out.println(evaluation >= 0.5 ? "1" : "0");
+		System.out.println(evaluation);
 	}
 
 	private static void mooshak2() throws IOException, ClassNotFoundException
@@ -97,6 +151,81 @@ public class Main
 		double evaluation = network.evaluate(input).parse();
 		System.out.println(evaluation >= 0.5 ? "1" : "0");
 		// System.out.println(evaluation);
+	}
+
+	private static void trainingLab3() throws IOException, ClassNotFoundException
+	{
+		// String prefix = "../";
+		String prefix = "";
+		String separator = ",";
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		// DataPreprocessor.ditheringNoise("dataset/cropped_dataset.csv", "dataset/dithered_dataset.csv", separator);
+		// DataPreprocessor.ditheringNoise("dataset/dithered_dataset.csv", "dataset/dithered_dataset_2.csv", separator);
+		// DataPreprocessor.ditheringNoise("dataset/dithered_dataset_2.csv", "dataset/dithered_dataset_4.csv", separator);
+		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
+		// RandomNumberGenerator.setSeed(1944655000342707615L); // learning rate = 0.1, trainingRatio = 0.66
+
+		// tuning parameters
+		int iterations = 100;
+		double learningRate = 0.70;
+		double trainingToTestingRatio = 0.66;
+
+		// Read from file
+		String saveNetworkToFile = prefix + "src/main/mooshak_network_v5.ser";
+		String loadNetworkFromFile = saveNetworkToFile;
+		// String inSetFile = prefix + "dataset/normalized_dataset.csv";
+		String inSetFile = prefix + "dataset/dithered_dataset_2.csv";
+		String targetOutFile = prefix + "dataset/labels.csv";
+		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
+		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
+
+		// split by training to test ratio
+		Matrix[] targetOutputSets = new Matrix(outputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix[] inputSets = new Matrix(inputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
+
+		Matrix trainingSet = inputSets[0].transpose();
+		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
+		Matrix testingSet = inputSets[1].transpose();
+		Matrix testingTargetOutput = targetOutputSets[1].transpose();
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(64, 1, trainingSet, trainingTargetOutput, layerSizes);
+
+		// read if exists
+		File readFile = new File(loadNetworkFromFile);
+		if (readFile.exists())
+			network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
+		network.setTrainingData(trainingSet, trainingTargetOutput);
+		network.setTestingSet(testingSet, testingTargetOutput);
+		// read if exists
+
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(false);
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		int i = 100;
+
+
+		while(i-- > 0)
+		{
+			network.train(iterations, learningRate);
+			network.saveToFile(saveNetworkToFile);
+
+			reader.readLine();
+		}
+		reader.close();
 	}
 
 	private static void trainingLab2() throws IOException, ClassNotFoundException

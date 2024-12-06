@@ -74,7 +74,6 @@ public class DataPreprocessor
 		StringBuilder builder = new StringBuilder();
 
 		ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
-		ArrayList<ArrayList<Double>> croppedValues = new ArrayList<>();
 		int cols = values.get(0).size() / rows;
 		for (int i = 0; i < values.size(); i++)
 		{
@@ -85,6 +84,33 @@ public class DataPreprocessor
 					int currIndex = j * cols + k;
 					double value = values.get(i).get(currIndex);
 					builder.append(value);
+					builder.append(separator);
+				}
+			}
+			builder.setLength(builder.length() - 1);
+			builder.append("\n");
+		}
+
+		writer.write(builder.toString());
+		writer.flush();
+		writer.close();
+	}
+
+	public static void ditheringNoise(String datafile, String writefile, String separator) throws IOException
+	{
+		File writeFile = new File(writefile);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+		StringBuilder builder = new StringBuilder();
+
+		ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
+		ArrayList<ArrayList<Double>> croppedValues = new ArrayList<>();
+		for (int i = 0; i < values.size(); i++)
+		{
+			for (int j = 0; j < values.get(i).size(); j++)
+			{
+				if (j % 2 == 0)
+				{
+					builder.append(values.get(i).get(j));
 					builder.append(separator);
 				}
 			}
