@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -8,7 +13,7 @@ public class InputNode implements IPropagable
 	// serializable
 	private static final long serialVersionUID = 140L;
 
-	private static final String IDENTIFIER = "x";
+	public static final String IDENTIFIER = "x";
 	private static int count = 1;
 	private String name;
 	private ArrayList<IPropagable> forwardNeurons;
@@ -21,9 +26,33 @@ public class InputNode implements IPropagable
 	 */
 	public InputNode(Matrix in)
 	{
-		this.forwardNeurons = new ArrayList<>();
+		init(new ArrayList<>(), in, null, getDefaultName());
 		set(in);
-		setDefaultName();
+	}
+
+	/**
+	 * initializes an input node
+	 * @param forwardNeurons the forward connections
+	 * @param in the input matrix it holds
+	 * @param ghostIn the ghost input matrix it holds (can be null)
+	 * @param name the name of the neuron
+	 */
+	private final void init(ArrayList<IPropagable> forwardNeurons, Matrix in, Matrix ghostIn, String name)
+	{
+		this.forwardNeurons = forwardNeurons;
+		this.input = in;
+		this.ghostInput = ghostIn;
+		this.name = name;
+	}
+
+	public InputNode(String name)
+	{
+		init(new ArrayList<>(), new Matrix(new double[][]{{}}), null, name);
+	}
+
+	public InputNode()
+	{
+		init(new ArrayList<>(), new Matrix(new double[][]{{}}), null, getDefaultName());
 	}
 
 	/**
@@ -93,7 +122,7 @@ public class InputNode implements IPropagable
 	}
 
 	@Override
-	public void resetCaches()
+	public final void resetCaches()
 	{
 		for (IPropagable p : forwardNeurons)
 			p.resetCaches();
@@ -121,7 +150,7 @@ public class InputNode implements IPropagable
 	 * changes the input matrix of this node.
 	 * @param in the new input matrix.
 	 */
-	public void set(Matrix in)
+	public final void set(Matrix in)
 	{
 		if (in.rows() > 1)
 			throw new IllegalArgumentException("Input should have only 1 row.");
@@ -145,10 +174,11 @@ public class InputNode implements IPropagable
 	/**
 	 * generates a default name for the node
 	 */
-	private void setDefaultName()
+	private String getDefaultName()
 	{
-		this.name = IDENTIFIER + count;
+		String name = IDENTIFIER + count;
 		count++;
+		return name;
 	}
 
 	@Override
@@ -164,4 +194,18 @@ public class InputNode implements IPropagable
 			p.getWeightInfo(previousInfo);
 		return previousInfo;
 	}
+
+	// private void writeObject(ObjectOutputStream out) throws IOException
+	// {
+	// 	out.writeObject(this.forwardNeurons);
+	// 	out.writeObject(this.input);
+	// 	out.writeObject(this.ghostInput);
+	// 	out.writeObject(this.name);
+	// }
+	//
+	// @SuppressWarnings("unchecked")
+	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
+	// {
+	// 	this.init((ArrayList<IPropagable>)in.readObject(), (Matrix)in.readObject(), (Matrix)in.readObject(), (String)in.readObject());
+	// }
 }

@@ -11,10 +11,23 @@ import java.util.Scanner;
 
 public class Main
 {
-	public static void main(String[] args) throws IOException, ClassNotFoundException
+	public static void main(String[] args)
 	{
+		try
+		{
+			// File curr = new File(".");
+			// File[] filesList = curr.listFiles();
+			// for (File f : filesList)
+			// 	System.out.println(f.getName());
+			// mooshak();
+			trainingLab();
+		}
+		catch (Exception e)
+		{
+			System.out.println("An error occurred: " + e.getMessage());
+			e.printStackTrace();
+		}
 		// testXOR();
-		playground();
 
 		// twoBitAdderNetwork();
 		// trainingNetworkXOR();
@@ -24,7 +37,32 @@ public class Main
 		// learningRateSamples();
 	}
 
-	private static void playground() throws IOException, ClassNotFoundException
+	private static void mooshak() throws IOException, ClassNotFoundException
+	{
+		//0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,1,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8
+		// parameters
+		final String networkFile = "mooshak/mooshak_network.ser";
+		final String separator = ",";
+		final int inputSize = 400;
+
+		// setup
+		NeuralNetwork network = NeuralNetwork.loadFromFile(networkFile);
+		double[] inputRow = new double[inputSize];
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = reader.readLine();
+		String[] tokens = line.split(separator);
+		for (int i = 0; i < inputSize; i++)
+			inputRow[i] = Double.parseDouble(tokens[i]);
+		reader.close();
+		Matrix input = new Matrix(new double[][] { inputRow }).transpose();
+
+		// evaluation
+		double evaluation = network.evaluate(input).parse();
+		System.out.println(evaluation >= 0.5 ? "1" : "0");
+		// System.out.println(evaluation);
+	}
+
+	private static void trainingLab() throws IOException, ClassNotFoundException
 	{
 		// String prefix = "../";
 		String prefix = "";
@@ -40,7 +78,8 @@ public class Main
 
 		// Read from file
 		// String inSetFile = "dataset/dataset.csv";
-		String saveNetworkToFile = prefix + "saved_networks/network.ser";
+		// String saveNetworkToFile = prefix + "saved_networks/network.ser";
+		String saveNetworkToFile = prefix + "src/main/mooshak_network.ser";
 		String loadNetworkFromFile = saveNetworkToFile;
 		String inSetFile = prefix + "dataset/normalized_dataset.csv";
 		String targetOutFile = prefix + "dataset/labels.csv";
@@ -167,7 +206,15 @@ public class Main
 		// layerSizes.add(5);
 
 		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
+
+		// read if exists
+		File readFile = new File(loadNetworkFromFile);
+		if (readFile.exists())
+			network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
+		network.setTrainingData(trainingSet, trainingTargetOutput);
 		network.setTestingSet(testingSet, testingTargetOutput);
+		// read if exists
+
 		network.setEarlyStopping(true);
 		network.setPrintingTestingError(true);
 
@@ -180,16 +227,13 @@ public class Main
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int i = 100;
 
-		// network read
-		File readFile = new File(loadNetworkFromFile);
-		// if (readFile.exists())
-		// 	network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
 
 		System.out.println("EVALUATION (1): " + network.evaluate(trying));
 		System.out.println("EVALUATION (0): " + network.evaluate(trying2));
 		System.out.println("EVALUATION (1): " + network.evaluate(trying3));
 		System.out.println("EVALUATION (1): " + network.evaluate(trying4));
 		System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
+		// network.printWeights();
 		while(i-- > 0)
 		{
 			network.train(iterations, learningRate);
@@ -200,6 +244,7 @@ public class Main
 			System.out.println("EVALUATION (1): " + network.evaluate(trying3));
 			System.out.println("EVALUATION (1): " + network.evaluate(trying4));
 			System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
+			// network.printWeights();
 			reader.readLine();
 		}
 		reader.close();

@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.Function;
@@ -11,7 +16,9 @@ public class Neuron implements IPropagable
 	private static final long serialVersionUID = 139L;
 
 	// naming
-	private static final String IDENTIFIER = "n";
+	public static final String IDENTIFIER = "n";
+	public static final String CONNECTION_IDENTIFIER = " -> ";
+	public static final String WEIGHT_IDENTIFIER = " : ";
 	private static int count = 1;
 	private String name;
 	private boolean hasGivenInfo;
@@ -42,12 +49,23 @@ public class Neuron implements IPropagable
 	 */
 	public Neuron(double bias, String neuronName)
 	{
-		this.weights = new Matrix(new double[][]{{ bias }});
-		this.forwardNeurons = new ArrayList<>();
-		this.backwardNeurons = new ArrayList<>();
+		this.init(new Matrix(new double[][]{{ bias }}), new ArrayList<>(), new ArrayList<>(), neuronName);
+	}
 
+	/**
+	 * initializes the values for a neuron
+	 * @param weights the neuron's backwards connections weights
+	 * @param forwardNeurons the neuron's forward connections
+	 * @param backwardNeurons the neuron's backward connections
+	 * @param name the neuron's name
+	 */
+	private void init(Matrix weights, ArrayList<IPropagable> forwardNeurons, ArrayList<IPropagable> backwardNeurons, String name)
+	{
+		this.weights = weights;
+		this.forwardNeurons = forwardNeurons;
+		this.backwardNeurons = backwardNeurons;
 		this.resetValues();
-		this.name = neuronName;
+		this.name = name;
 	}
 
 	/**
@@ -249,7 +267,7 @@ public class Neuron implements IPropagable
 	/**
 	 * @return true if the neuron is an output neuron.
 	 */
-	private boolean isOutputNeuron()
+	public boolean isOutputNeuron()
 	{
 		return this.forwardNeurons.isEmpty();
 	}
@@ -278,7 +296,7 @@ public class Neuron implements IPropagable
 	 */
 	private boolean isClear()
 	{
-		return numInputs + backpropInputs == 0;
+		return numInputs + backpropInputs == 0 && hasGivenInfo == false;
 	}
 
 	/**
@@ -375,4 +393,18 @@ public class Neuron implements IPropagable
 			previousInfo = p.getWeightInfo(previousInfo);
 		return previousInfo;
 	}
+
+	// private void writeObject(ObjectOutputStream out) throws IOException
+	// {
+	// 	out.writeObject(this.weights);
+	// 	out.writeObject(this.forwardNeurons);
+	// 	out.writeObject(this.backwardNeurons);
+	// 	out.writeObject(this.name);
+	// }
+	//
+	// @SuppressWarnings("unchecked")
+	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
+	// {
+	// 	this.init((Matrix)in.readObject(), (ArrayList<IPropagable>)in.readObject(), (ArrayList<IPropagable>)in.readObject(), (String)in.readObject());
+	// }
 }

@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -7,7 +10,7 @@ import java.io.Serializable;
  * The main purpose is to be used as a node/neuron in a
  * machine learning neural network.
  */
-public interface IPropagable extends Serializable
+public interface IPropagable
 {
 	/**
 	 * @return the output of the current node

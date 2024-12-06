@@ -1,9 +1,14 @@
 import java.io.BufferedReader;
+import java.io.Externalizable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -11,7 +16,7 @@ import java.util.function.Function;
 /**
  * Represents a matrix.
  */
-public class Matrix /* <T extends Number> */ implements Serializable
+public class Matrix /* <T extends Number> */
 {
 	// serializable
 	private static final long serialVersionUID = 138L;
@@ -51,6 +56,15 @@ public class Matrix /* <T extends Number> */ implements Serializable
 	 * @param matrix the array to initialize the matrix from
 	 */
 	public Matrix(double matrix[][])
+	{
+		this.init(matrix);
+	}
+
+	/**
+	 * initializes a matrix
+	 * @param matrix the two-dimentional array to initialize the matrix from
+	 */
+	private final void init(double matrix[][])
 	{
 		this.rows = matrix.length;
 		if (matrix.length == 0)
@@ -152,6 +166,12 @@ public class Matrix /* <T extends Number> */ implements Serializable
 				if (this.matrix[row][col] != that.matrix[row][col])
 					return false;
 		return true;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -416,4 +436,14 @@ public class Matrix /* <T extends Number> */ implements Serializable
 	{
 		return this.columns;
 	}
+
+	// private void writeObject(ObjectOutputStream out) throws IOException
+	// {
+	// 	out.writeObject(this.matrix);
+	// }
+	//
+	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
+	// {
+	// 	this.init((double[][])in.readObject());
+	// }
 }

@@ -5,6 +5,10 @@
 - O make mooshak program that loads network, reads input from stdin, normalizes it, loads it through the network, gets the output, prints the evaluation
 
 
+# TODO bugs
+- printing the trainingSet has a row at full 0s?
+
+
 # TODO report
 - O make an analysis of the network using random samples as training/testing and check testing values
 - O get training metrics (precision, accuracy)

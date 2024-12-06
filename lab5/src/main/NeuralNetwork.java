@@ -1,21 +1,27 @@
+import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 /**
  * Represents a neural network
  */
-public class NeuralNetwork implements Serializable
+public class NeuralNetwork implements Externalizable
 {
 	// serializable
 	private static final long serialVersionUID = 137L;
@@ -26,8 +32,8 @@ public class NeuralNetwork implements Serializable
 	// member variables
 	private ArrayList<InputNode> inputNodes;
 	private ArrayList<Neuron> outputNeurons;
-	private Matrix trainingSet;
-	private Matrix targetOutput;
+	transient private Matrix trainingSet;
+	transient private Matrix targetOutput;
 	private ArrayList<Matrix> targetOutputRowsCache;
 	private ArrayList<Matrix> targetTestOutputRowsCache;
 
@@ -37,8 +43,8 @@ public class NeuralNetwork implements Serializable
 	private boolean areNeuronsPropagated;
 
 	// early stopping and testing
-	private Matrix testingSet; // can be null
-	private Matrix testingTargetOutputs; // can be null
+	transient private Matrix testingSet; // can be null
+	transient private Matrix testingTargetOutputs; // can be null
 	private boolean earlyStopping;
 	private double minimumTestingError;
 	private boolean cachedTestErrorBeforeBackpropagation;
@@ -51,10 +57,10 @@ public class NeuralNetwork implements Serializable
 	private boolean shouldPrintOutputs;
 	private boolean shouldPrint;
 	private boolean shouldPrintTestingError;
+	private boolean shouldExport;
 
 	// exporting
-	private FileWriter fWriter;
-	private boolean shouldExport;
+	transient private FileWriter fWriter;
 
 	/**
 	 * instantiates a neural network.
@@ -67,11 +73,46 @@ public class NeuralNetwork implements Serializable
 	 */
 	public NeuralNetwork(ArrayList<InputNode> inputNodes, ArrayList<Neuron> outputNeurons, Matrix trainingSet, Matrix targetOutput)
 	{
+		init(inputNodes, outputNeurons, trainingSet, targetOutput);
+		// this.inputNodes = inputNodes;
+		// this.outputNeurons = outputNeurons;
+		// this.trainingSet = trainingSet;
+		// this.targetOutput = targetOutput;
+		// cacheTargetOutputRows(targetOutput);
+		// this.areNeuronsPropagated = false;
+		// this.earlyStopping = false;
+		// this.cachedTestErrorBeforeBackpropagation = false;
+		// this.minimumTestingError = 1.0;
+		// this.cachedTestError = 0.0;
+		// // nodeInfoCache = new ArrayList<String>();
+		// this.shouldPrint = true;
+		// this.shouldPrintOutputs = true;
+		// this.prettyPrinting = false;
+		// this.shouldPrintWhileTraining = false;
+		// this.shouldPrintWeights = false;
+		// this.shouldExport = false;
+		// this.iterationsDone = 0;
+	}
+
+	public NeuralNetwork() {}; // for externalization
+
+	public NeuralNetwork(ArrayList<InputNode> inputNodes, ArrayList<Neuron> outputNeurons)
+	{
+		init(inputNodes, outputNeurons);
+	}
+
+	private final void init(ArrayList<InputNode> inputNodes, ArrayList<Neuron> outputNeurons, Matrix trainingSet, Matrix targetOutput)
+	{
+		init(inputNodes, outputNeurons);
+		setTrainingData(trainingSet, targetOutput);
+	}
+
+	private final void init(ArrayList<InputNode> inputNodes, ArrayList<Neuron> outputNeurons)
+	{
 		this.inputNodes = inputNodes;
 		this.outputNeurons = outputNeurons;
-		this.trainingSet = trainingSet;
-		this.targetOutput = targetOutput;
-		cacheTargetOutputRows(targetOutput);
+		this.trainingSet = null;
+		this.targetOutput = null;
 		this.areNeuronsPropagated = false;
 		this.earlyStopping = false;
 		this.cachedTestErrorBeforeBackpropagation = false;
@@ -101,10 +142,10 @@ public class NeuralNetwork implements Serializable
 		ArrayList<InputNode> inputLayer = new ArrayList<>();
 		for (int i = 0; i < numInputs; i++)
 			inputLayer.add(new InputNode(trainingSet.getRow(i)));
-		ArrayList<Neuron> outputLayer = new ArrayList<>();
 
 		// int numOutputBackwardConn = layerSizes.isEmpty() ? numInputs : layerSizes.getLast();
 		// double outputWeightRange = 1.0 / (double)numOutputBackwardConn;
+		ArrayList<Neuron> outputLayer = new ArrayList<>();
 		for (int i = 0; i < numOutputs; i++)
 			outputLayer.add(new Neuron());
 		NeuralNetwork network = new NeuralNetwork(inputLayer, outputLayer, trainingSet, targetOutput);
@@ -156,8 +197,10 @@ public class NeuralNetwork implements Serializable
 		File readFile = new File(file);
 		FileInputStream fileInStream = new FileInputStream(readFile);
 		ObjectInputStream objInStream = new ObjectInputStream(fileInStream);
-		NeuralNetwork network = (NeuralNetwork)objInStream.readObject();
+		NeuralNetwork network = new NeuralNetwork();
+		network.readExternal(objInStream);
 		objInStream.close();
+		fileInStream.close();
 		return network;
 	}
 
@@ -171,9 +214,11 @@ public class NeuralNetwork implements Serializable
 		File outFile = new File(file);
 		FileOutputStream fileOutStream = new FileOutputStream(outFile);
 		ObjectOutputStream objOutStream = new ObjectOutputStream(fileOutStream);
-		objOutStream.writeObject(this);
+		// objOutStream.writeObject(this);
+		this.writeExternal(objOutStream);
 		objOutStream.flush();
 		objOutStream.close();
+		fileOutStream.close();
 	}
 
 	/**
@@ -188,6 +233,7 @@ public class NeuralNetwork implements Serializable
 		if (this.shouldExport)
 			initFileWriter();
 
+		forcePropagation();
 		printStats(iterations, maxError, learningRate);
 		tryExportError();
 		tryPrintState();
@@ -289,7 +335,7 @@ public class NeuralNetwork implements Serializable
 	/**
 	 * initializes the class file writer.
 	 */
-	private void initFileWriter()
+	private final void initFileWriter()
 	{
 		try
 		{
@@ -394,16 +440,13 @@ public class NeuralNetwork implements Serializable
 
 	public Matrix evaluate(Matrix input)
 	{
-		// setInputNodes(input);
-		// forcePropagation();
 		setGhostInputs(input);
 		ghostpropagate();
 
 		Matrix result = ghostOutput();
 
-		setGhostInputs(this.trainingSet);
-		// setInputNodes(this.trainingSet); // is in correct order
-		// forcePropagation();
+		if (this.testingSet != null)
+			setGhostInputs(this.testingSet);
 		return result;
 	}
 
@@ -609,8 +652,18 @@ public class NeuralNetwork implements Serializable
 	 */
 	public void printWeights()
 	{
+		System.out.print(getWeightInfo());
+	}
+
+	/**
+	 * @return the weight info
+	 */
+	public String getWeightInfo()
+	{
+		StringBuilder builder = new StringBuilder();
 		ArrayList<String> info = new ArrayList<String>();
 
+		resetCache();
 		for (IPropagable p : inputNodes)
 			info = p.getWeightInfo(info);
 
@@ -622,7 +675,11 @@ public class NeuralNetwork implements Serializable
 			this.nodeInfoCache = info;
 
 		for (String s : info)
-			System.out.println(s);
+		{
+			builder.append(s);
+			builder.append('\n');
+		}
+		return builder.toString();
 	}
 
 	/**
@@ -781,5 +838,150 @@ public class NeuralNetwork implements Serializable
 	public int iterationsDone()
 	{
 		return this.iterationsDone;
+	}
+
+	public final void setTrainingData(Matrix trainingSet, Matrix targetOutput)
+	{
+		for (int i = 0; i < this.inputNodes.size(); i++)
+			this.inputNodes.get(i).set(trainingSet.getRow(i));
+		this.trainingSet = trainingSet;
+		this.targetOutput = targetOutput;
+		cacheTargetOutputRows(targetOutput);
+	}
+
+	// private void writeObject(ObjectOutputStream out) throws IOException
+	// {
+	// 	out.writeObject(this.inputNodes);
+	// 	out.writeObject(this.outputNeurons);
+	// 	// out.writeObject(this.trainingSet);
+	// 	// out.writeObject(this.targetOutput);
+	//
+	// 	// out.writeObject(this.testingSet);
+	// 	// out.writeObject(this.testingTargetOutputs);
+	// 	// out.writeBoolean(this.earlyStopping);
+	// 	// out.writeDouble(this.minimumTestingError);
+	// }
+	//
+	// @SuppressWarnings("unchecked")
+	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
+	// {
+	// 	ArrayList<InputNode> inputNodes = (ArrayList<InputNode>)in.readObject();
+	// 	ArrayList<Neuron> outputNeurons = (ArrayList<Neuron>)in.readObject();
+	// 	// Matrix trainingSet = (Matrix)in.readObject();
+	// 	// Matrix targetOutput = (Matrix)in.readObject();
+	// 	this.init(inputNodes, outputNeurons);
+	//
+	// 	// this.testingSet = (Matrix)in.readObject();
+	// 	// this.testingTargetOutputs = (Matrix)in.readObject();
+	// 	// this.earlyStopping = (boolean)in.readBoolean();
+	// 	// this.minimumTestingError = (double)in.readDouble();
+	// }
+
+	public void writeExternal(ObjectOutput out) throws IOException
+	{
+		out.writeUTF(getWeightInfo());
+		// out.writeInt(this.inputNodes.size());
+		// for (InputNode n : this.inputNodes)
+		// {
+			// n.ge
+			// n.writeExternal(out);
+		// }
+		
+		// out.writeInt(this.inputNodes.size());
+		// for (InputNode n : this.inputNodes)
+		// 	n.writeExternal(out);
+		// out.writeInt(this.outputNeurons.size());
+		// for (Neuron n : this.outputNeurons)
+		// 	n.writeExternal(out);
+	}
+
+	private class Connection
+	{
+		private String from;
+		private String to;
+		private double weight;
+
+		public Connection(String str)
+		{
+
+			String[] tokens = str.split(Neuron.WEIGHT_IDENTIFIER);
+			if (str.contains(Neuron.CONNECTION_IDENTIFIER))
+			{
+				String[] connectionTokens = tokens[0].split(Neuron.CONNECTION_IDENTIFIER);
+				from = connectionTokens[0];
+				to = connectionTokens[1];
+			}
+			else
+			{
+				from = tokens[0];
+				to = null;
+			}
+			weight = Double.parseDouble(tokens[1]);
+		}
+
+		public boolean isBias() { return to == null; };
+	}
+
+	public void readExternal(ObjectInput in) throws ClassNotFoundException, IOException
+	{
+		ArrayList<Connection> connections = new ArrayList<>();
+		ArrayList<Connection> biases = new ArrayList<>();
+		HashMap<String, IPropagable> nodesHash = new HashMap<>();
+
+		// read file
+		String s = in.readUTF();
+		String[] lines = s.split("\\r?\\n|\\r");
+		for (String line : lines)
+		{
+			Connection conn = new Connection(line);
+			if (conn.isBias())
+				biases.add(conn);
+			else
+				connections.add(conn);
+		}
+
+		// add neurons
+		ArrayList<Neuron> neurons = new ArrayList<>();
+		for (Connection c : biases) // can only be neurons
+		{
+			Neuron n = new Neuron(c.weight, c.from);
+			neurons.add(n);
+			nodesHash.put(c.from, n);
+		}
+
+		// add inputNodes and connections
+		ArrayList<InputNode> inputNodes = new ArrayList<>();
+		for (Connection c : connections)
+		{
+			IPropagable n;
+			if (!nodesHash.containsKey(c.from)) // must be InputNode
+			{
+				InputNode iNode = new InputNode(c.from);
+				inputNodes.add(iNode);
+				n = iNode;
+				nodesHash.put(c.from, iNode);
+			}
+			else
+			{
+				n = nodesHash.get(c.from);
+			}
+			n.connect(nodesHash.get(c.to), c.weight);
+		}
+
+		inputNodes.sort((x, y) -> {
+			return Integer.parseInt(x.name().substring(InputNode.IDENTIFIER.length())) - Integer.parseInt(y.name().substring(InputNode.IDENTIFIER.length()));
+		});
+
+		// identify outputNeurons (after connecting everything)
+		ArrayList<Neuron> outputNeurons = new ArrayList<>();
+		for (Neuron n : neurons)
+			if (n.isOutputNeuron())
+				outputNeurons.add(n);
+
+		outputNeurons.sort((x, y) -> {
+			return Integer.parseInt(x.name().substring(Neuron.IDENTIFIER.length())) - Integer.parseInt(y.name().substring(Neuron.IDENTIFIER.length()));
+		});
+
+		init(inputNodes, outputNeurons);
 	}
 }
