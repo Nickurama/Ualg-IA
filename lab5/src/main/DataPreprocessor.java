@@ -28,34 +28,24 @@ public class DataPreprocessor
 	 */
 	public static void normalize(String dataFile, String normalizedFile, String separator) throws IOException
 	{
-		File readFile = new File(dataFile);
 		File writeFile = new File(normalizedFile);
-		BufferedReader reader = new BufferedReader(new FileReader(readFile));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
-		String line;
 
 		double minValue = Double.MAX_VALUE;
 		double maxValue = Double.MIN_VALUE;
 
-		ArrayList<ArrayList<Double>> values = new ArrayList<ArrayList<Double>>();
-
-		while ((line = reader.readLine()) != null)
+		ArrayList<ArrayList<Double>> values = getValuesFromFile(dataFile, separator);
+		for (int i = 0; i < values.size(); i++)
 		{
-			String[] tokens = line.split(separator);
-			values.add(new ArrayList<Double>());
-
-			for (int i = 0; i < tokens.length; i++)
+			for (int j = 0; j < values.get(i).size(); j++)
 			{
-				double value = Double.parseDouble(tokens[i]);
-				values.get(values.size() - 1).add(value);
+				double value = values.get(i).get(j);
 				if (value > maxValue)
 					maxValue = value;
 				if (value < minValue)
 					minValue = value;
 			}
 		}
-		// System.out.println("min: " + minValue);
-		// System.out.println("max: " + maxValue);
 
 		double dataDifference = maxValue - minValue;
 		StringBuilder builder = new StringBuilder();
@@ -74,9 +64,61 @@ public class DataPreprocessor
 		}
 		writer.write(builder.toString());
 		writer.flush();
+		writer.close();
+	}
+
+	public static void cropEdges(String datafile, String writefile, String separator, int rows, int ammount) throws IOException
+	{
+		File writeFile = new File(writefile);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+		StringBuilder builder = new StringBuilder();
+
+		ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
+		ArrayList<ArrayList<Double>> croppedValues = new ArrayList<>();
+		int cols = values.get(0).size() / rows;
+		for (int i = 0; i < values.size(); i++)
+		{
+			for (int j = ammount; j < rows - ammount; j++)
+			{
+				for (int k = ammount; k < cols - ammount; k++)
+				{
+					int currIndex = j * cols + k;
+					double value = values.get(i).get(currIndex);
+					builder.append(value);
+					builder.append(separator);
+				}
+			}
+			builder.setLength(builder.length() - 1);
+			builder.append("\n");
+		}
+
+		writer.write(builder.toString());
+		writer.flush();
+		writer.close();
+	}
+
+	public static ArrayList<ArrayList<Double>> getValuesFromFile(String file, String separator) throws IOException
+	{
+		File readFile = new File(file);
+		BufferedReader reader = new BufferedReader(new FileReader(readFile));
+		String line;
+
+		ArrayList<ArrayList<Double>> values = new ArrayList<ArrayList<Double>>();
+
+		while ((line = reader.readLine()) != null)
+		{
+			String[] tokens = line.split(separator);
+			values.add(new ArrayList<Double>());
+
+			for (int i = 0; i < tokens.length; i++)
+			{
+				double value = Double.parseDouble(tokens[i]);
+				values.get(values.size() - 1).add(value);
+			}
+		}
 
 		reader.close();
-		writer.close();
+		return values;
 	}
 
 	/**
