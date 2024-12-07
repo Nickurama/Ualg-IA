@@ -67,6 +67,16 @@ public class DataPreprocessor
 		writer.close();
 	}
 
+	/**
+	 * crops the edges of images saved in a file and saves the output into a file.
+	 * each image should be a row in the file, and each value in a line should be a single pixel
+	 * @param datafile the file path of the image to crop
+	 * @param writefile the file path of where the output should be saved to
+	 * @param separator the separator of each pixel in a row
+	 * @param rows how many rows of pixels each image has (NOT HOW MANY IMAGES THERE ARE)
+	 * @param ammount the ammount of pixels to crop (on every side)
+	 * @throws IOException if an IO error occurs.
+	 */
 	public static void cropEdges(String datafile, String writefile, String separator, int rows, int ammount) throws IOException
 	{
 		File writeFile = new File(writefile);
@@ -96,6 +106,13 @@ public class DataPreprocessor
 		writer.close();
 	}
 
+	/**
+	 * Performs a dithering-like noise to each image on a file, deleting every other pixel
+	 * @param datafile the file path where the images are encoded in (each row should contain an image)
+	 * @param writefile the file to save the output to
+	 * @param separator the separator between each pixel for each image
+	 * @throws IOException if an IO error occurs
+	 */
 	public static void ditheringNoise(String datafile, String writefile, String separator) throws IOException
 	{
 		File writeFile = new File(writefile);
@@ -123,6 +140,13 @@ public class DataPreprocessor
 		writer.close();
 	}
 
+	/**
+	 * Gets all the (double) values from a file, the outer list contains each row, the inner list contains each element of a row
+	 * @param file the file path where the values are
+	 * @param separator the separator of each element on a given row of the file
+	 * @return the values on the file
+	 * @throws IOException if an IO error occurs
+	 */
 	public static ArrayList<ArrayList<Double>> getValuesFromFile(String file, String separator) throws IOException
 	{
 		File readFile = new File(file);

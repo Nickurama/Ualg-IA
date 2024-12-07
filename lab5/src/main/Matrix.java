@@ -1,16 +1,3 @@
-import java.io.BufferedReader;
-import java.io.Externalizable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Scanner;
 import java.util.function.Function;
 
 /**
@@ -91,32 +78,6 @@ public class Matrix /* <T extends Number> */
 		this(copy.rows, copy.columns);
 		copy(copy.matrix, this.matrix, rows, columns);
 	}
-
-	/**
-	 * Instantiates a matrix from a file where each line is a row
-	 * @param file the file path
-	 * @param separator the separator for each column
-	 * @return the matrix created from the file data
-	 */
-	// public static Matrix parseFromFile(String file, String separator) throws IOException
-	// {
-	// 	Matrix result = new Matrix(new double[][]{{}});
-	// 	File f = new File(file);
-	// 	BufferedReader reader = new BufferedReader(new FileReader(f));
-	//
-	// 	String line;
-	// 	while ((line = reader.readLine()) != null)
-	// 	{
-	// 		String[] tokens = line.split(separator);
-	// 		double[] row = new double[tokens.length];
-	// 		for (int i = 0; i < tokens.length; i++)
-	// 			row[i] = Double.parseDouble(tokens[i]);
-	// 		result = result.addRow(row);
-	// 	}
-	//
-	// 	reader.close();
-	// 	return result;
-	// }
 
 	/**
 	 * copies a section of a two dimentional array into another, starting at the origin
@@ -328,6 +289,11 @@ public class Matrix /* <T extends Number> */
 	 */
 	public Matrix appendAsRows(Matrix that)
 	{
+		if (this.columns == 0)
+			return that;
+		if (that.columns == 0)
+			return this;
+
 		if (this.columns != that.columns)
 			throw new IllegalArgumentException("Impossible to append by rows, matrices do not have the same ammount of columns.");
 
@@ -436,14 +402,4 @@ public class Matrix /* <T extends Number> */
 	{
 		return this.columns;
 	}
-
-	// private void writeObject(ObjectOutputStream out) throws IOException
-	// {
-	// 	out.writeObject(this.matrix);
-	// }
-	//
-	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
-	// {
-	// 	this.init((double[][])in.readObject());
-	// }
 }

@@ -45,11 +45,18 @@ public class InputNode implements IPropagable
 		this.name = name;
 	}
 
+	/**
+	 * instantiates an input node with a name
+	 * @param name the name of the input node
+	 */
 	public InputNode(String name)
 	{
 		init(new ArrayList<>(), new Matrix(new double[][]{{}}), null, name);
 	}
 
+	/**
+	 * instantiates an input nodes with default name
+	 */
 	public InputNode()
 	{
 		init(new ArrayList<>(), new Matrix(new double[][]{{}}), null, getDefaultName());
@@ -194,18 +201,4 @@ public class InputNode implements IPropagable
 			p.getWeightInfo(previousInfo);
 		return previousInfo;
 	}
-
-	// private void writeObject(ObjectOutputStream out) throws IOException
-	// {
-	// 	out.writeObject(this.forwardNeurons);
-	// 	out.writeObject(this.input);
-	// 	out.writeObject(this.ghostInput);
-	// 	out.writeObject(this.name);
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
-	// {
-	// 	this.init((ArrayList<IPropagable>)in.readObject(), (Matrix)in.readObject(), (Matrix)in.readObject(), (String)in.readObject());
-	// }
 }

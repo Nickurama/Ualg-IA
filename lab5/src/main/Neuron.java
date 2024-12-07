@@ -393,18 +393,4 @@ public class Neuron implements IPropagable
 			previousInfo = p.getWeightInfo(previousInfo);
 		return previousInfo;
 	}
-
-	// private void writeObject(ObjectOutputStream out) throws IOException
-	// {
-	// 	out.writeObject(this.weights);
-	// 	out.writeObject(this.forwardNeurons);
-	// 	out.writeObject(this.backwardNeurons);
-	// 	out.writeObject(this.name);
-	// }
-	//
-	// @SuppressWarnings("unchecked")
-	// private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
-	// {
-	// 	this.init((Matrix)in.readObject(), (ArrayList<IPropagable>)in.readObject(), (ArrayList<IPropagable>)in.readObject(), (String)in.readObject());
-	// }
 }

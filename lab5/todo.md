@@ -1,18 +1,21 @@
 # TODO mooshak
-- normalize mooshak input
-- make mooshak tests but locally
-- k-fold cross validation
 
 
 # TODO bugs
-- printing the trainingSet has a row at full 0s?
+- printing the trainingSet has a row at full 0s? (black pixel at bottom right)
 
 
 # TODO report
+- explain there's a lack of unit tests
+- explain the code isn't refined
+- document all code
+- generate javadoc
+- generate UML
 - make an analysis of the network using random samples as training/testing and check testing values
+- k-fold cross validation
 - training metrics
 - plot MSE
-- do report
+- report done
 
 
 # TODO competition
@@ -22,3 +25,15 @@
 
 # TODO efficiency
 - O implement momenturm term
+
+
+# TODO if time
+- normalize mooshak input for v2+
+
+
+
+
+# DONE
+- k-fold cross validation
+- normalize mooshak input
+- make mooshak tests but locally

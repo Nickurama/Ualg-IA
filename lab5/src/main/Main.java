@@ -15,14 +15,11 @@ public class Main
 	{
 		try
 		{
-			// File curr = new File(".");
-			// File[] filesList = curr.listFiles();
-			// for (File f : filesList)
-			// 	System.out.println(f.getName());
+			runKFolds();
 			// mooshak();
 			// mooshak2();
 			// mooshak3();
-			trainingLab3();
+			// trainingLab3();
 			// trainingLab2();
 			// trainingLab();
 		}
@@ -41,7 +38,38 @@ public class Main
 		// learningRateSamples();
 	}
 
-	private static void mooshak3() throws IOException, ClassNotFoundException
+	public static boolean mooshak() throws IOException, ClassNotFoundException
+	{
+		return mooshak1();
+	}
+
+	private static void runKFolds() throws IOException, ClassNotFoundException
+	{
+		// setup
+		RandomNumberGenerator.setSeed(2479559307156667474L);
+		String separator = ",";
+		String prefix = "";
+		String datasetFile = prefix + "dataset/normalized_dataset.csv";
+		String labelsFile = prefix + "dataset/labels.csv";
+		String networkFile = prefix + "saved_networks/mooshak_network_v3.ser";
+
+		// Read from file
+		double[][] dataset = DataPreprocessor.readMatrix(datasetFile, separator);
+		double[][] labels = DataPreprocessor.readMatrix(labelsFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(dataset, labels);
+		Matrix inputMatrix = new Matrix(dataset);
+		Matrix targetOutputMatrix = new Matrix(labels);
+
+		// tuning parameters
+		int folds = 10;
+		int maxIter = 100;
+		double learningRate = 0.70;
+
+		// split by training to test ratio
+		NeuralNetwork.runKFolds(folds, inputMatrix.transpose(), targetOutputMatrix.transpose(), maxIter, learningRate, networkFile);
+	}
+
+	private static boolean mooshak3() throws IOException, ClassNotFoundException
 	{
 		// parameters
 		final String networkFile = "mooshak/mooshak_network_v5.ser";
@@ -89,15 +117,17 @@ public class Main
 
 		// evaluation
 		double evaluation = network.evaluate(input).parse();
+		boolean result = evaluation >= 0.5 ? true : false;
 		System.out.println(evaluation >= 0.5 ? "1" : "0");
-		System.out.println(evaluation);
+		// System.out.println(evaluation);
+		return result;
 	}
 
-	private static void mooshak2() throws IOException, ClassNotFoundException
+	private static boolean mooshak2() throws IOException, ClassNotFoundException
 	{
 		// parameters
-		final String networkFile = "mooshak/mooshak_network_v2.ser";
-		// final String networkFile = "src/main/mooshak_network_v2.ser";
+		// final String networkFile = "mooshak/mooshak_network_v2.ser";
+		final String networkFile = "saved_networks/mooshak_network_v2.ser";
 		final String separator = ",";
 		final int rows = 20;
 		final int cols = 20;
@@ -125,26 +155,45 @@ public class Main
 
 		// evaluation
 		double evaluation = network.evaluate(input).parse();
+		boolean result = evaluation >= 0.5 ? true : false;
 		System.out.println(evaluation >= 0.5 ? "1" : "0");
 		// System.out.println(evaluation);
+		return result;
 	}
 
-	public static boolean mooshak() throws IOException, ClassNotFoundException
+	private static boolean mooshak1() throws IOException, ClassNotFoundException
 	{
 		// parameters
-		final String networkFile = "mooshak/mooshak_network.ser";
+		// final String networkFile = "mooshak/mooshak_network.ser";
+		final String networkFile = "saved_networks/mooshak_network_v1.ser";
 		final String separator = ",";
 		final int inputSize = 400;
 
 		// setup
 		NeuralNetwork network = NeuralNetwork.loadFromFile(networkFile);
+
+		// read
+		double max = Double.MIN_VALUE;
+		double min = Double.MAX_VALUE;
 		double[] inputRow = new double[inputSize];
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String line = reader.readLine();
 		String[] tokens = line.split(separator);
 		for (int i = 0; i < inputSize; i++)
-			inputRow[i] = Double.parseDouble(tokens[i]);
+		{
+			double curr = Double.parseDouble(tokens[i]);
+			inputRow[i] = curr;
+			if (curr > max)
+				max = curr;
+			if (curr < min)
+				min = curr;
+		}
 		reader.close();
+
+		// normalize
+		double diff = max - min;
+		for (int i = 0; i < inputSize; i++)
+			inputRow[i] = (inputRow[i] - min) / diff;
 		Matrix input = new Matrix(new double[][] { inputRow }).transpose();
 
 		// evaluation
@@ -184,8 +233,10 @@ public class Main
 		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
 
 		// split by training to test ratio
-		Matrix[] targetOutputSets = new Matrix(outputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
-		Matrix[] inputSets = new Matrix(inputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix targetOutputMatrix = new Matrix(outputs);
+		Matrix inputMatrix = new Matrix(inputs);
+		Matrix[] targetOutputSets = targetOutputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix[] inputSets = inputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
 
 		Matrix trainingSet = inputSets[0].transpose();
 		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
@@ -215,6 +266,11 @@ public class Main
 		network.setPrintOutputs(false);
 		network.setShouldPrintWhileTraining(false);
 		network.setShouldPrintWeights(false);
+
+		// System.out.println(inputMatrix.rows());
+		// System.out.println(inputMatrix.columns());
+		// System.out.println(targetOutputMatrix.rows());
+		// System.out.println(targetOutputMatrix.columns());
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int i = 100;

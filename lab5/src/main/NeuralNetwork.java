@@ -1,22 +1,8 @@
-import java.io.Externalizable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 /**
  * Represents a neural network
@@ -187,10 +173,8 @@ public class NeuralNetwork
 	 * @param file the file path to load the network from
 	 * @return the network read from the file
 	 * @throws IOException when an IO error occurs
-	 * @throws FileNotFoundException when the file was not found
-	 * @throws ClassNotFoundException when it was not possible to de-serialize the class
 	 */
-	public static NeuralNetwork loadFromFile(String file) throws IOException, FileNotFoundException, ClassNotFoundException
+	public static NeuralNetwork loadFromFile(String file) throws IOException
 	{
 		return NeuralNetworkSerializer.loadNetwork(file);
 	}
@@ -378,14 +362,20 @@ public class NeuralNetwork
 		if (this.shouldPrintTestingError)
 		{
 			System.out.println("testing error: " + getTestingError());
-			System.out.println("testing precision: " + formatDouble(getPrecision(true)));
-			System.out.println("testing accuracy: " + formatDouble(getAccuracy(true)));
-			System.out.println("testing kappa: " + formatDouble(getKappa(true)));
+			if (isBinaryClassifier())
+			{
+				System.out.println("testing precision: " + formatDouble(getPrecision(true)));
+				System.out.println("testing accuracy: " + formatDouble(getAccuracy(true)));
+				System.out.println("testing kappa: " + formatDouble(getKappa(true)));
+			}
 		}
-		System.out.println("error: " + getError());
-		System.out.println("precision: " + formatDouble(getPrecision(false)));
-		System.out.println("accuracy: " + formatDouble(getAccuracy(false)));
-		System.out.println("kappa: " + formatDouble(getKappa(false)));
+		if (isBinaryClassifier())
+		{
+			System.out.println("error: " + getError());
+			System.out.println("precision: " + formatDouble(getPrecision(false)));
+			System.out.println("accuracy: " + formatDouble(getAccuracy(false)));
+			System.out.println("kappa: " + formatDouble(getKappa(false)));
+		}
 	}
 
 	/**
@@ -947,5 +937,85 @@ public class NeuralNetwork
 		this.trainingSet = trainingSet;
 		this.targetOutput = targetOutput;
 		cacheTargetOutputRows(targetOutput);
+	}
+
+	/**
+	 * runs the k-folds cross validation.
+	 * @param folds the number of folds (divisions)
+	 * @param samples all the data sets to train and test the network on. (each column is a different input, and each row is each part of one input)
+	 * @param targetOutputs the target output for the data sets
+	 * @param maxIter the number of max iterations before stopping each training
+	 * @param learningRate the learning rate to learn at
+	 * @param neuralNetworkFile the file path containing the network to test (not trained)
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void runKFolds(int folds, Matrix samples, Matrix targetOutputs, int maxIter, double learningRate, String neuralNetworkFile)
+		throws IOException
+	{
+		if (folds < 2)
+			throw new IllegalArgumentException("k-folds must have 2 folds or more.");
+
+		samples = samples.transpose();
+		targetOutputs = targetOutputs.transpose();
+		double divisionPercent = 1.0 / (double)folds;
+		double startDivision = 0.0;
+		double endDivision = divisionPercent;
+
+		double avgErr = 0;
+		double avgPrec = 0;
+		double avgAcc = 0;
+		double avgKap = 0;
+
+		NeuralNetwork nn = null;
+		for (int i = 0; i < folds; i++)
+		{
+			Matrix trainingStart = samples.splitByRows(startDivision)[0];
+			Matrix trainingEnd = samples.splitByRows(endDivision)[1];
+			Matrix trainingSet = trainingStart.appendAsRows(trainingEnd);
+			Matrix testingSet = samples.subMatrix(trainingStart.rows(), samples.rows() - trainingEnd.rows() - 1, 0, samples.columns() - 1);
+
+			Matrix trainingOutStart = targetOutputs.splitByRows(startDivision)[0];
+			Matrix trainingOutEnd = targetOutputs.splitByRows(endDivision)[1];
+			Matrix trainingOutSet = trainingOutStart.appendAsRows(trainingOutEnd);
+			Matrix testingOutSet = targetOutputs.subMatrix(trainingOutStart.rows(), targetOutputs.rows() - trainingOutEnd.rows() - 1, 0, targetOutputs.columns() - 1);
+
+			nn = NeuralNetwork.loadFromFile(neuralNetworkFile);
+			nn.setTrainingData(trainingSet.transpose(), trainingOutSet.transpose());
+			nn.setTestingSet(testingSet.transpose(), testingOutSet.transpose());
+
+			nn.setPrinting(false);
+			nn.train(maxIter, learningRate);
+			nn.setPrinting(true);
+
+			// testing stats only
+			System.out.println("--- " + i + "-fold stats ---");
+			double currErr = nn.getTestingError();
+			System.out.println("error: " + currErr);
+			avgErr += currErr * divisionPercent;
+			if (nn.isBinaryClassifier())
+			{
+				double currPrec = nn.getPrecision(true);
+				avgPrec += currPrec * divisionPercent;
+				double currAcc = nn.getAccuracy(true);
+				avgAcc += currAcc * divisionPercent;
+				double currKap = nn.getKappa(true);
+				avgKap += currKap * divisionPercent;
+				System.out.println("precision: " + nn.formatDouble(currPrec));
+				System.out.println("accuracy: " + nn.formatDouble(currAcc));
+				System.out.println("kappa: " + nn.formatDouble(currKap));
+			}
+
+			startDivision += divisionPercent;
+			endDivision = Math.min(1.0, endDivision + divisionPercent);
+		}
+
+		System.out.println("------ K-fold end ------");
+		System.out.println("avg error: " + avgErr);
+		if (nn.isBinaryClassifier())
+		{
+			System.out.println("avg precision: " + nn.formatDouble(avgPrec));
+			System.out.println("avg accuracy: " + nn.formatDouble(avgAcc));
+			System.out.println("avg kappa: " + nn.formatDouble(avgKap));
+		}
 	}
 }
