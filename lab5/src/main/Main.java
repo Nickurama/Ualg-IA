@@ -15,7 +15,10 @@ public class Main
 	{
 		try
 		{
-			runKFolds();
+			// report1();
+			// report2();
+			report3();
+			// runKFolds();
 			// mooshak();
 			// mooshak2();
 			// mooshak3();
@@ -46,12 +49,12 @@ public class Main
 	private static void runKFolds() throws IOException, ClassNotFoundException
 	{
 		// setup
-		RandomNumberGenerator.setSeed(2479559307156667474L);
+		// RandomNumberGenerator.setSeed(2479559307156667474L);
 		String separator = ",";
 		String prefix = "";
-		String datasetFile = prefix + "dataset/normalized_dataset.csv";
+		String datasetFile = prefix + "dataset/dithered_dataset.csv";
 		String labelsFile = prefix + "dataset/labels.csv";
-		String networkFile = prefix + "saved_networks/mooshak_network_v3.ser";
+		String networkFile = prefix + "src/main/mooshak_network_v3.ser";
 
 		// Read from file
 		double[][] dataset = DataPreprocessor.readMatrix(datasetFile, separator);
@@ -61,8 +64,8 @@ public class Main
 		Matrix targetOutputMatrix = new Matrix(labels);
 
 		// tuning parameters
-		int folds = 10;
-		int maxIter = 100;
+		int folds = 5;
+		int maxIter = 1000;
 		double learningRate = 0.70;
 
 		// split by training to test ratio
@@ -72,8 +75,8 @@ public class Main
 	private static boolean mooshak3() throws IOException, ClassNotFoundException
 	{
 		// parameters
-		final String networkFile = "mooshak/mooshak_network_v5.ser";
-		// final String networkFile = "src/main/mooshak_network_v5.ser";
+		// final String networkFile = "mooshak/mooshak_network_v5.ser";
+		final String networkFile = "src/main/mooshak_network_v3.ser";
 		final String separator = ",";
 		final int rows = 20;
 		final int cols = 20;
@@ -101,19 +104,21 @@ public class Main
 			}
 		}
 
-		// dithering 2
-		double[] inputRow_2 = new double[numInputs / 2];
-		for (int i = 0; i < numInputs / 2; i++)
-			if (i % 2 == 0)
-				inputRow_2[i / 2] = inputRow[i];
+		double max = Double.MIN_VALUE;
+		double min = Double.MAX_VALUE;
+		for (int i = 0; i < inputRow.length; i++)
+		{
+			double currValue = inputRow[i];
+			if (currValue > max)
+				max = currValue;
+			if (currValue < min)
+				min = currValue;
+		}
+		double diff = max - min;
+		for (int i = 0; i < inputRow.length; i++)
+			inputRow[i] = (inputRow[i] - min) / diff;
 
-		// double[] inputRow_4 = new double[numInputs / 4];
-		// dithering 4
-		// for (int i = 0; i < numInputs / 4; i++)
-		// 	if (i % 2 == 0)
-		// 		inputRow_4[i / 2] = inputRow_2[i];
-
-		Matrix input = new Matrix(new double[][] { inputRow_2 }).transpose();
+		Matrix input = new Matrix(new double[][] { inputRow }).transpose();
 
 		// evaluation
 		double evaluation = network.evaluate(input).parse();
@@ -127,7 +132,8 @@ public class Main
 	{
 		// parameters
 		// final String networkFile = "mooshak/mooshak_network_v2.ser";
-		final String networkFile = "saved_networks/mooshak_network_v2.ser";
+		// final String networkFile = "saved_networks/mooshak_network_v2.ser";
+		final String networkFile = "src/main/mooshak_network_v2.ser";
 		final String separator = ",";
 		final int rows = 20;
 		final int cols = 20;
@@ -151,6 +157,21 @@ public class Main
 				inputRow[curr++] = Double.parseDouble(tokens[currIndex]);
 			}
 		}
+
+		// normalize
+		double max = Double.MIN_VALUE;
+		double min = Double.MAX_VALUE;
+		for (int i = 0; i < inputRow.length; i++)
+		{
+			double currValue = inputRow[i];
+			if (currValue > max)
+				max = currValue;
+			if (currValue < min)
+				min = currValue;
+		}
+		double diff = max - min;
+		for (int i = 0; i < inputRow.length; i++)
+			inputRow[i] = (inputRow[i] - min) / diff;
 		Matrix input = new Matrix(new double[][] { inputRow }).transpose();
 
 		// evaluation
@@ -165,7 +186,8 @@ public class Main
 	{
 		// parameters
 		// final String networkFile = "mooshak/mooshak_network.ser";
-		final String networkFile = "saved_networks/mooshak_network_v1.ser";
+		// final String networkFile = "saved_networks/mooshak_network_v1.ser";
+		final String networkFile = "src/main/mooshak_network.ser";
 		final String separator = ",";
 		final int inputSize = 400;
 
@@ -209,11 +231,7 @@ public class Main
 		// String prefix = "../";
 		String prefix = "";
 		String separator = ",";
-		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
-		// DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
-		// DataPreprocessor.ditheringNoise("dataset/cropped_dataset.csv", "dataset/dithered_dataset.csv", separator);
-		// DataPreprocessor.ditheringNoise("dataset/dithered_dataset.csv", "dataset/dithered_dataset_2.csv", separator);
-		// DataPreprocessor.ditheringNoise("dataset/dithered_dataset_2.csv", "dataset/dithered_dataset_4.csv", separator);
+		// DataPreprocessor.ditheringNoise("dataset/cropped_dataset_2.csv", "dataset/dithered_dataset_2_2.csv", separator);
 		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 		// RandomNumberGenerator.setSeed(1944655000342707615L); // learning rate = 0.1, trainingRatio = 0.66
 
@@ -223,32 +241,28 @@ public class Main
 		double trainingToTestingRatio = 0.66;
 
 		// Read from file
-		String saveNetworkToFile = prefix + "src/main/mooshak_network_v5.ser";
+		String saveNetworkToFile = prefix + "src/main/mooshak_network_v3.ser";
 		String loadNetworkFromFile = saveNetworkToFile;
 		// String inSetFile = prefix + "dataset/normalized_dataset.csv";
-		String inSetFile = prefix + "dataset/dithered_dataset_2.csv";
+		String inSetFile = prefix + "dataset/dithered_dataset_2_2.csv";
 		String targetOutFile = prefix + "dataset/labels.csv";
 		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
 		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
 		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
 
 		// split by training to test ratio
-		Matrix targetOutputMatrix = new Matrix(outputs);
-		Matrix inputMatrix = new Matrix(inputs);
-		Matrix[] targetOutputSets = targetOutputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
-		Matrix[] inputSets = inputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
-
-		Matrix trainingSet = inputSets[0].transpose();
-		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
-		Matrix testingSet = inputSets[1].transpose();
-		Matrix testingTargetOutput = targetOutputSets[1].transpose();
+		Matrix[] allSets = DataPreprocessor.getSplitSetsFromDataset(inputs, outputs, trainingToTestingRatio);
+		Matrix trainingSet = allSets[0];
+		Matrix trainingTargetOutput = allSets[1];
+		Matrix testingSet = allSets[2];
+		Matrix testingTargetOutput = allSets[3];
 
 		System.out.println("training size: " + trainingSet.columns());
 		System.out.println("testing size: " + testingSet.columns());
 
 		ArrayList<Integer> layerSizes = new ArrayList<>();
 
-		NeuralNetwork network = NeuralNetwork.layeredBuilder(64, 1, trainingSet, trainingTargetOutput, layerSizes);
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(128, 1, trainingSet, trainingTargetOutput, layerSizes);
 
 		// read if exists
 		File readFile = new File(loadNetworkFromFile);
@@ -266,11 +280,6 @@ public class Main
 		network.setPrintOutputs(false);
 		network.setShouldPrintWhileTraining(false);
 		network.setShouldPrintWeights(false);
-
-		// System.out.println(inputMatrix.rows());
-		// System.out.println(inputMatrix.columns());
-		// System.out.println(targetOutputMatrix.rows());
-		// System.out.println(targetOutputMatrix.columns());
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int i = 100;
@@ -294,7 +303,7 @@ public class Main
 		String prefix = "";
 		String separator = ",";
 		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
-		// DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		DataPreprocessor.cropEdges("dataset/normalized_dataset_2.csv", "dataset/cropped_dataset_2.csv", separator, 20, 2);
 		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
 		// tuning parameters
@@ -306,7 +315,7 @@ public class Main
 		String saveNetworkToFile = prefix + "src/main/mooshak_network_v2.ser";
 		String loadNetworkFromFile = saveNetworkToFile;
 		// String inSetFile = prefix + "dataset/normalized_dataset.csv";
-		String inSetFile = prefix + "dataset/cropped_dataset.csv";
+		String inSetFile = prefix + "dataset/cropped_dataset_2.csv";
 		String targetOutFile = prefix + "dataset/labels.csv";
 		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
 		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
@@ -315,49 +324,6 @@ public class Main
 		// split by training to test ratio
 		Matrix[] targetOutputSets = new Matrix(outputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
 		Matrix[] inputSets = new Matrix(inputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
-
-		//0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,1,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,1,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08,0.08
-
-		// my inputs
-		Matrix trying = new Matrix(new double[][] {{
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 1, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 
-			0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-		}});
-		trying = trying.transpose();
-
-		Matrix trying2 = new Matrix(new double[][] {{
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 1, 1, 1, 1, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 1, 1, 1, 1, 1, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-		}});
-		trying2 = trying2.transpose();
 
 		Matrix trainingSet = inputSets[0].transpose();
 		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
@@ -387,21 +353,18 @@ public class Main
 		network.setPrintOutputs(false);
 		network.setShouldPrintWhileTraining(false);
 		network.setShouldPrintWeights(false);
+		// network.saveToFile(saveNetworkToFile);
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int i = 100;
 
 
-		System.out.println("EVALUATION (1): " + network.evaluate(trying));
-		System.out.println("EVALUATION (0): " + network.evaluate(trying2));
 		// network.printWeights();
 		while(i-- > 0)
 		{
 			network.train(iterations, learningRate);
 			network.saveToFile(saveNetworkToFile);
 
-			System.out.println("EVALUATION (1): " + network.evaluate(trying));
-			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
 			reader.readLine();
 		}
 		reader.close();
@@ -412,23 +375,25 @@ public class Main
 		// String prefix = "../";
 		String prefix = "";
 		String separator = ",";
-		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset_2.csv", separator);
 		// RandomNumberGenerator.setSeed(7296176720875951778L); // learning rate = 0.7, trainingRatio = 0.8
-		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
+		// RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
+		RandomNumberGenerator.setSeed(7181436491370174476L); // learning rate = 0.1, trainingRatio = 0.66
 
 		// tuning parameters
-		int iterations = 100;
-		double learningRate = 0.70;
-		double trainingToTestingRatio = 0.66;
+		int iterations = 200;
+		double learningRate = 0.80;
+		// double trainingToTestingRatio = 0.66;
+		double trainingToTestingRatio = 0.8;
 
 		// Read from file
 		// String inSetFile = "dataset/dataset.csv";
 		// String saveNetworkToFile = prefix + "saved_networks/network.ser";
 		String saveNetworkToFile = prefix + "src/main/mooshak_network.ser";
 		String loadNetworkFromFile = saveNetworkToFile;
-		String inSetFile = prefix + "dataset/normalized_dataset.csv";
+		String inSetFile = prefix + "dataset/normalized_dataset_2.csv";
 		String targetOutFile = prefix + "dataset/labels.csv";
-		String myInputFile = prefix + "dataset/my_inputs.csv";
+		// String myInputFile = prefix + "dataset/my_inputs.csv";
 		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
 		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
 		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
@@ -436,107 +401,6 @@ public class Main
 		// split by training to test ratio
 		Matrix[] targetOutputSets = new Matrix(outputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
 		Matrix[] inputSets = new Matrix(inputs).splitByRows(trainingToTestingRatio); // needs to be transposed!
-
-		// my inputs
-		Matrix tryingFile0 = new Matrix(DataPreprocessor.readMatrix(myInputFile, ",")).transpose();
-
-		//0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,1,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,1,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8,0.8
-
-		Matrix trying = new Matrix(new double[][] {{
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-		}});
-		trying = trying.transpose();
-
-		Matrix trying2 = new Matrix(new double[][] {{
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 1, 1, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 1, 1, 1, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-			0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8,
-		}});
-		trying2 = trying2.transpose();
-
-		Matrix trying3 = new Matrix(new double[][] {{
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 1, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 1, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 1, 1, 0.08, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 0.0, 0.0, 0.0, 0.0, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 0.0, 0.0, 0.0, 1, 0.0, 1, 1, 1, 1, 0.0, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 1, 1, 1, 1, 1, 1, 1, 0.08, 0.0, 0.0, 0.0, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.0, 0.0, 0.0, 0.0, 0.0, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-			0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08, 0.08,
-		}});
-		trying3 = trying3.transpose();
-
-		Matrix trying4 = new Matrix(new double[][] {{
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		}});
-		trying4 = trying4.transpose();
 
 		Matrix trainingSet = inputSets[0].transpose();
 		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
@@ -570,34 +434,204 @@ public class Main
 		network.setPrintOutputs(false);
 		network.setShouldPrintWhileTraining(false);
 		network.setShouldPrintWeights(false);
+		network.saveToFile(saveNetworkToFile);
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		int i = 100;
 
-
-		System.out.println("EVALUATION (1): " + network.evaluate(trying));
-		System.out.println("EVALUATION (0): " + network.evaluate(trying2));
-		System.out.println("EVALUATION (1): " + network.evaluate(trying3));
-		System.out.println("EVALUATION (1): " + network.evaluate(trying4));
-		System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
-		// network.printWeights();
 		while(i-- > 0)
 		{
 			network.train(iterations, learningRate);
 			network.saveToFile(saveNetworkToFile);
 
-			System.out.println("EVALUATION (1): " + network.evaluate(trying));
-			System.out.println("EVALUATION (0): " + network.evaluate(trying2));
-			System.out.println("EVALUATION (1): " + network.evaluate(trying3));
-			System.out.println("EVALUATION (1): " + network.evaluate(trying4));
-			System.out.println("EVALUATION EXTRA (1): " + network.evaluate(tryingFile0));
-			// network.printWeights();
 			reader.readLine();
 		}
 		reader.close();
 	}
 
+	private static void report3() throws IOException, ClassNotFoundException
+	{
+		String separator = ",";
+		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		DataPreprocessor.ditheringNoise("dataset/cropped_dataset.csv", "dataset/dithered_dataset.csv", separator);
+		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
+		// tuning parameters
+		int iterations = 5000;
+		double learningRate = 0.70;
+		double trainingToTestingRatio = 0.66;
+
+		// Read from file
+		String saveNetworkToFile = "src/main/mooshak_network_v3.ser";
+		String loadNetworkFromFile = saveNetworkToFile;
+		String inSetFile = "dataset/dithered_dataset.csv";
+		String targetOutFile = "dataset/labels.csv";
+		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
+		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
+
+		// split by training to test ratio
+		Matrix[] allSets = DataPreprocessor.getSplitSetsFromDataset(inputs, outputs, trainingToTestingRatio);
+		Matrix trainingSet = allSets[0];
+		Matrix trainingTargetOutput = allSets[1];
+		Matrix testingSet = allSets[2];
+		Matrix testingTargetOutput = allSets[3];
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		// hidden layers (none)
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+
+		// build network
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(128, 1, trainingSet, trainingTargetOutput, layerSizes);
+
+		// read if exists
+		File readFile = new File(loadNetworkFromFile);
+		if (readFile.exists())
+			network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
+		network.setTrainingData(trainingSet, trainingTargetOutput);
+		network.setTestingSet(testingSet, testingTargetOutput);
+
+		// set flags
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(false);
+
+		// train
+		network.train(iterations, learningRate);
+
+		// save network
+		network.saveToFile(saveNetworkToFile);
+	}
+
+	private static void report2() throws IOException, ClassNotFoundException
+	{
+		String separator = ",";
+		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		RandomNumberGenerator.setSeed(2479559307156667474L);
+
+		// tuning parameters
+		int iterations = 5000;
+		double learningRate = 0.70;
+		double trainingToTestingRatio = 0.66;
+
+		// Read from file
+		String saveNetworkToFile = "src/main/mooshak_network_v2.ser";
+		String loadNetworkFromFile = saveNetworkToFile;
+		String inSetFile = "dataset/cropped_dataset.csv";
+		String targetOutFile = "dataset/labels.csv";
+		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
+		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
+
+		// split by training to test ratio
+		Matrix[] allSets = DataPreprocessor.getSplitSetsFromDataset(inputs, outputs, trainingToTestingRatio);
+		Matrix trainingSet = allSets[0];
+		Matrix trainingTargetOutput = allSets[1];
+		Matrix testingSet = allSets[2];
+		Matrix testingTargetOutput = allSets[3];
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		// hidden layers (none)
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+
+		// build network
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(256, 1, trainingSet, trainingTargetOutput, layerSizes);
+
+		// read if exists
+		File readFile = new File(loadNetworkFromFile);
+		if (readFile.exists())
+			network = NeuralNetwork.loadFromFile(loadNetworkFromFile);
+		network.setTrainingData(trainingSet, trainingTargetOutput);
+		network.setTestingSet(testingSet, testingTargetOutput);
+
+		// set flags
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(false);
+
+		// train
+		network.train(iterations, learningRate);
+
+		// save network
+		network.saveToFile(saveNetworkToFile);
+	}
+
+	private static void report1() throws IOException, ClassNotFoundException
+	{
+		String separator = ",";
+		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		RandomNumberGenerator.setSeed(7181436491370174476L);
+		// RandomNumberGenerator.setSeed(2479559307156667474L);
+
+		// tuning parameters
+		int iterations = 20000;
+		double learningRate = 0.05;
+		double trainingToTestingRatio = 0.66;
+
+		// Read from file
+		String saveFile = "src/main/mooshak_network.ser";
+		String loadFile = saveFile;
+		String inSetFile = "dataset/normalized_dataset.csv";
+		String targetOutFile = "dataset/labels.csv";
+		double[][] outputs = DataPreprocessor.readMatrix(targetOutFile, separator);
+		double[][] inputs = DataPreprocessor.readMatrix(inSetFile, separator);
+		DataPreprocessor.shuffleRowsPreserve(inputs, outputs);
+
+		// split by training to test ratio
+		Matrix[] allSets = DataPreprocessor.getSplitSetsFromDataset(inputs, outputs, trainingToTestingRatio);
+		Matrix trainingSet = allSets[0];
+		Matrix trainingTargetOutput = allSets[1];
+		Matrix testingSet = allSets[2];
+		Matrix testingTargetOutput = allSets[3];
+
+		System.out.println("training size: " + trainingSet.columns());
+		System.out.println("testing size: " + testingSet.columns());
+
+		// hidden layers (none)
+		ArrayList<Integer> layerSizes = new ArrayList<>();
+
+		// build network
+		NeuralNetwork network = NeuralNetwork.layeredBuilder(400, 1, trainingSet, trainingTargetOutput, layerSizes);
+
+		// read if exists
+		File readFile = new File(loadFile);
+		if (readFile.exists())
+			network = NeuralNetwork.loadFromFile(loadFile);
+		network.setTrainingData(trainingSet, trainingTargetOutput);
+		network.setTestingSet(testingSet, testingTargetOutput);
+
+		// set flags
+		network.setEarlyStopping(true);
+		network.setPrintingTestingError(true);
+
+		network.setExportingLoss(false);
+		network.setPrettyPrint(true);
+		network.setPrintOutputs(false);
+		network.setShouldPrintWhileTraining(false);
+		network.setShouldPrintWeights(false);
+
+		// train
+		network.train(iterations, learningRate);
+
+		// save network
+		network.saveToFile(saveFile);
+	}
 
 	private static NeuralNetwork testXOR() { return testXOR(0); }
 	private static NeuralNetwork testXOR(double learningRate)

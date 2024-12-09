@@ -332,14 +332,19 @@ public class NeuralNetwork
 	}
 
 	/**
-	 * writes the current loss function output to a file
+	 * writes the current loss function output to a file.
+	 * writes the testing loss function output if a testing set has been given
 	 * @pre file writer has been initialized
 	 */
 	private void exportError()
 	{
 		try
 		{
-			this.fWriter.write(Double.toString(this.iterationsDone) + ';' + getError() + '\n');
+			String line = Integer.toString(this.iterationsDone) + ';' + getError();
+			if (this.hasTestingSet())
+				line += ";" + getTestingError();
+			line += '\n';
+			this.fWriter.write(line);
 		}
 		catch (IOException e)
 		{
@@ -941,6 +946,7 @@ public class NeuralNetwork
 
 	/**
 	 * runs the k-folds cross validation.
+	 * @pre the network should not be trained
 	 * @param folds the number of folds (divisions)
 	 * @param samples all the data sets to train and test the network on. (each column is a different input, and each row is each part of one input)
 	 * @param targetOutputs the target output for the data sets
@@ -961,10 +967,10 @@ public class NeuralNetwork
 		double startDivision = 0.0;
 		double endDivision = divisionPercent;
 
-		double avgErr = 0;
-		double avgPrec = 0;
-		double avgAcc = 0;
-		double avgKap = 0;
+		double totErr = 0;
+		double totPrec = 0;
+		double totAcc = 0;
+		double totKap = 0;
 
 		NeuralNetwork nn = null;
 		for (int i = 0; i < folds; i++)
@@ -982,6 +988,7 @@ public class NeuralNetwork
 			nn = NeuralNetwork.loadFromFile(neuralNetworkFile);
 			nn.setTrainingData(trainingSet.transpose(), trainingOutSet.transpose());
 			nn.setTestingSet(testingSet.transpose(), testingOutSet.transpose());
+			nn.setEarlyStopping(true);
 
 			nn.setPrinting(false);
 			nn.train(maxIter, learningRate);
@@ -991,15 +998,15 @@ public class NeuralNetwork
 			System.out.println("--- " + i + "-fold stats ---");
 			double currErr = nn.getTestingError();
 			System.out.println("error: " + currErr);
-			avgErr += currErr * divisionPercent;
+			totErr += currErr;
 			if (nn.isBinaryClassifier())
 			{
 				double currPrec = nn.getPrecision(true);
-				avgPrec += currPrec * divisionPercent;
+				totPrec += currPrec;
 				double currAcc = nn.getAccuracy(true);
-				avgAcc += currAcc * divisionPercent;
+				totAcc += currAcc;
 				double currKap = nn.getKappa(true);
-				avgKap += currKap * divisionPercent;
+				totKap += currKap;
 				System.out.println("precision: " + nn.formatDouble(currPrec));
 				System.out.println("accuracy: " + nn.formatDouble(currAcc));
 				System.out.println("kappa: " + nn.formatDouble(currKap));
@@ -1010,12 +1017,12 @@ public class NeuralNetwork
 		}
 
 		System.out.println("------ K-fold end ------");
-		System.out.println("avg error: " + avgErr);
+		System.out.println("avg error: " + totErr / folds);
 		if (nn.isBinaryClassifier())
 		{
-			System.out.println("avg precision: " + nn.formatDouble(avgPrec));
-			System.out.println("avg accuracy: " + nn.formatDouble(avgAcc));
-			System.out.println("avg kappa: " + nn.formatDouble(avgKap));
+			System.out.println("avg precision: " + nn.formatDouble(totPrec / folds));
+			System.out.println("avg accuracy: " + nn.formatDouble(totAcc / folds));
+			System.out.println("avg kappa: " + nn.formatDouble(totKap / folds));
 		}
 	}
 }

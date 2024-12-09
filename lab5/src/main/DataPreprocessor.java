@@ -21,7 +21,6 @@ public class DataPreprocessor
 {
 	/**
 	 * normalizes data from a file, and places it onto another file.
-	 * automatically takes the highest and lowest value from the data.
 	 * @param dataFile the file to read the data from
 	 * @param normalizedFile the file to write the normalized data to
 	 * @param separator the string that separates the values to normalize in each line
@@ -31,12 +30,17 @@ public class DataPreprocessor
 		File writeFile = new File(normalizedFile);
 		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
 
-		double minValue = Double.MAX_VALUE;
-		double maxValue = Double.MIN_VALUE;
+		// double minValue = Double.MAX_VALUE;
+		// double maxValue = Double.MIN_VALUE;
+		int rows = getNumLines(dataFile);
+		double[] minValues = new double[rows];
+		double[] maxValues = new double[rows];
 
 		ArrayList<ArrayList<Double>> values = getValuesFromFile(dataFile, separator);
 		for (int i = 0; i < values.size(); i++)
 		{
+			double minValue = values.get(i).get(0);
+			double maxValue = values.get(i).get(0);
 			for (int j = 0; j < values.get(i).size(); j++)
 			{
 				double value = values.get(i).get(j);
@@ -45,17 +49,19 @@ public class DataPreprocessor
 				if (value < minValue)
 					minValue = value;
 			}
+			minValues[i] = minValue;
+			maxValues[i] = maxValue;
 		}
 
-		double dataDifference = maxValue - minValue;
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < values.size(); i++)
 		{
+			double dataDifference = maxValues[i] - minValues[i];
 			ArrayList<Double> currLine = values.get(i);
 			for (int j = 0; j < currLine.size() - 1; j++)
 			{
 				double oldValue = currLine.get(j);
-				double normalized = (oldValue - minValue) / dataDifference;
+				double normalized = (oldValue - minValues[i]) / dataDifference;
 	 			builder.append(normalized);
 				builder.append(separator);
 			}
@@ -281,5 +287,33 @@ public class DataPreprocessor
 			lines++;
 		reader.close();
 		return lines;
+	}
+
+	/**
+	 * gets the inputs / target outputs (dataset) and splits it according
+	 * to the trainingToTestingRatio.
+	 * @param inputs the inputs of the neural network (each row is an input, is column is an element of the input)
+	 * @param outputs the outputs of the neural network (each row in a target output, a column is an element of the output)
+	 * @param trainingToTestingRatio the ratio of training to testing (should be between 0 and 1)
+	 * @return an array with 4 elements: [0 = training set], [1 = training set target output], [2 - testing set], [3 - testing set target output]
+	 */
+	public static Matrix[] getSplitSetsFromDataset(double[][] inputs, double[][] outputs, double trainingToTestingRatio)
+	{
+		Matrix targetOutputMatrix = new Matrix(outputs);
+		Matrix inputMatrix = new Matrix(inputs);
+		Matrix[] targetOutputSets = targetOutputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
+		Matrix[] inputSets = inputMatrix.splitByRows(trainingToTestingRatio); // needs to be transposed!
+
+		Matrix trainingSet = inputSets[0].transpose();
+		Matrix trainingTargetOutput = targetOutputSets[0].transpose();
+		Matrix testingSet = inputSets[1].transpose();
+		Matrix testingTargetOutput = targetOutputSets[1].transpose();
+
+		Matrix[] result = new Matrix[4];
+		result[0] = trainingSet;
+		result[1] = trainingTargetOutput;
+		result[2] = testingSet;
+		result[3] = testingTargetOutput;
+		return result;
 	}
 }
