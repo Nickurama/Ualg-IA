@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.function.Function;
 
 /**
  * Represents a neural network
@@ -24,6 +25,8 @@ public class NeuralNetwork
 	private ArrayList<String> nodeInfoCache;
 	private int iterationsDone;
 	private boolean areNeuronsPropagated;
+	private Matrix gaussianNoiseTraining; // cache for input with gaussian noise
+	private static final Function<Double, Double> GAUSSIAN_NOISE = z -> gaussianNoise(z);
 
 	// early stopping and testing
 	transient private Matrix testingSet; // can be null
@@ -43,6 +46,7 @@ public class NeuralNetwork
 	private boolean shouldPrint;
 	private boolean shouldPrintTestingError;
 	private boolean shouldExport;
+	private boolean shouldApplyGaussianNoise;
 
 	// exporting
 	transient private FileWriter fWriter;
@@ -265,6 +269,12 @@ public class NeuralNetwork
 	 */
 	private void trainOneEpoch(double learningRate)
 	{
+		if (this.shouldApplyGaussianNoise) // does not support turning off gaussian noise
+		{
+			this.gaussianNoiseTraining = this.trainingSet.apply(GAUSSIAN_NOISE);
+			setInputNodes(this.gaussianNoiseTraining);
+		}
+
 		if (!this.areNeuronsPropagated)
 			propagateWithStats();
 		backpropagate(learningRate);
@@ -735,6 +745,7 @@ public class NeuralNetwork
 	{
 		for (int i = 0; i < this.inputNodes.size(); i++)
 			this.inputNodes.get(i).set(inputs.getRow(i));
+		forcePropagation(); // inefficient
 	}
 
 	/**
@@ -1024,5 +1035,24 @@ public class NeuralNetwork
 			System.out.println("avg accuracy: " + nn.formatDouble(totAcc / folds));
 			System.out.println("avg kappa: " + nn.formatDouble(totKap / folds));
 		}
+	}
+
+	/**
+	 * @param value if gaussian noise should be applied while training
+	 */
+	public void setApplyGaussianNoise(boolean value)
+	{
+		this.shouldApplyGaussianNoise = value;
+	}
+
+	/**
+	 * Adds noise to parameter z
+	 * @pre z should be normalized
+	 * @param z the normalized value to add noise to
+	 * @return z with noise
+	 */
+	private static double gaussianNoise(double z)
+	{
+		return z + RandomNumberGenerator.get().nextGaussian(0.0, 0.1);
 	}
 }

@@ -1,13 +1,8 @@
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Main
 {
@@ -15,16 +10,17 @@ public class Main
 	{
 		try
 		{
+			TrainingLabs.train1();
 			// report1();
 			// report2();
-			report3();
-			// runKFolds();
+			// report3();
 			// mooshak();
 			// mooshak2();
 			// mooshak3();
 			// trainingLab3();
 			// trainingLab2();
 			// trainingLab();
+			// runKFolds();
 		}
 		catch (Exception e)
 		{
@@ -187,7 +183,7 @@ public class Main
 		// parameters
 		// final String networkFile = "mooshak/mooshak_network.ser";
 		// final String networkFile = "saved_networks/mooshak_network_v1.ser";
-		final String networkFile = "src/main/mooshak_network.ser";
+		final String networkFile = "src/main/testing1.ser";
 		final String separator = ",";
 		final int inputSize = 400;
 
@@ -222,7 +218,7 @@ public class Main
 		double evaluation = network.evaluate(input).parse();
 		boolean result = evaluation >= 0.5 ? true : false;
 		System.out.println(evaluation >= 0.5 ? "1" : "0");
-		// System.out.println(evaluation);
+		System.out.println(evaluation);
 		return result;
 	}
 

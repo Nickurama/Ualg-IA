@@ -53,13 +53,12 @@ public class NeuralNetworkSerializer
 	public static void saveNetwork(NeuralNetwork nn, String file) throws IOException
 	{
 		File outFile = new File(file);
-		FileOutputStream fileOutStream = new FileOutputStream(outFile);
-		ObjectOutputStream objOutStream = new ObjectOutputStream(fileOutStream);
-		// this.writeExternal(objOutStream);
-		writeNetwork(nn, objOutStream);
-		objOutStream.flush();
-		objOutStream.close();
-		fileOutStream.close();
+		FileWriter fWriter = new FileWriter(outFile);
+		BufferedWriter writer = new BufferedWriter(fWriter);
+		writeNetwork(nn, writer);
+		writer.flush();
+		writer.close();
+		fWriter.close();
 	}
 
 	/**
@@ -68,9 +67,10 @@ public class NeuralNetworkSerializer
 	 * @param out the stream to write to
 	 * @throws IOException if an IO error ocurrs
 	 */
-	private static void writeNetwork(NeuralNetwork nn, ObjectOutputStream out) throws IOException
+	private static void writeNetwork(NeuralNetwork nn, BufferedWriter out) throws IOException
 	{
-		out.writeUTF(nn.getWeightInfo());
+		String s = nn.getWeightInfo();
+		out.write(s);
 	}
 
 	/**
@@ -82,11 +82,16 @@ public class NeuralNetworkSerializer
 	public static NeuralNetwork loadNetwork(String file) throws IOException
 	{
 		File readFile = new File(file);
-		FileInputStream fileInStream = new FileInputStream(readFile);
-		ObjectInputStream objInStream = new ObjectInputStream(fileInStream);
-		NeuralNetwork network = readNetwork(objInStream);
-		objInStream.close();
-		fileInStream.close();
+		// FileInputStream fileInStream = new FileInputStream(readFile);
+		// ObjectInputStream objInStream = new ObjectInputStream(fileInStream);
+		FileReader fReader = new FileReader(readFile);
+		BufferedReader reader = new BufferedReader(fReader);
+		NeuralNetwork network = readNetwork(reader);
+		// NeuralNetwork network = readNetwork(objInStream);
+		reader.close();
+		fReader.close();
+		// objInStream.close();
+		// fileInStream.close();
 		return network;
 	}
 
@@ -96,15 +101,19 @@ public class NeuralNetworkSerializer
 	 * @return the network read
 	 * @throws IOException if an IO error occurs
 	 */
-	private static NeuralNetwork readNetwork(ObjectInputStream in) throws IOException
+	private static NeuralNetwork readNetwork(BufferedReader in) throws IOException
 	{
 		ArrayList<Connection> connections = new ArrayList<>();
 		ArrayList<Connection> biases = new ArrayList<>();
 		HashMap<String, IPropagable> nodesHash = new HashMap<>();
 
 		// read file
-		String s = in.readUTF();
-		String[] lines = s.split("\\r?\\n|\\r");
+		// String s = in.readUTF();
+		// String[] lines = s.split("\\r?\\n|\\r");
+		ArrayList<String> lines = new ArrayList<String>();
+		while (in.ready())
+			lines.add(in.readLine());
+
 		for (String line : lines)
 		{
 			Connection conn = new Connection(line);
