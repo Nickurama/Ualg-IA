@@ -63,7 +63,10 @@ public class BinaryClassifierStats
 	 */
 	public static double calcAccuracy(int tPos, int tNeg, int fPos, int fNeg)
 	{
-		return (double)(tPos + tNeg) / (double)(tPos + tNeg + fPos + fNeg);
+		double denominator = (double)(tPos + tNeg + fPos + fNeg);
+		if (denominator == 0.0)
+			return 0.0;
+		return (double)(tPos + tNeg) / denominator;
 	}
 
 	/**
@@ -74,7 +77,10 @@ public class BinaryClassifierStats
 	 */
 	public static double calcPrecision(int tPos, int fPos)
 	{
-		return (double)tPos / (double)(tPos + fPos);
+		double denominator = (double)(tPos + fPos);
+		if (denominator == 0.0)
+			return 0.0;
+		return (double)tPos / denominator;
 	}
 
 	/**
@@ -90,7 +96,10 @@ public class BinaryClassifierStats
 	 */
 	public static double calcKappa(int tPos, int tNeg, int fPos, int fNeg)
 	{
-		return (2.0 * (double)(tPos * tNeg - fNeg * fPos)) / (double)((tPos + fPos)*(fPos + tNeg) + (tPos + fNeg)*(fNeg + tNeg));
+		double denominator = (double)((tPos + fPos)*(fPos + tNeg) + (tPos + fNeg)*(fNeg + tNeg));
+		if (denominator == 0.0)
+			return 0.0;
+		return (2.0 * (double)(tPos * tNeg - fNeg * fPos)) / denominator;
 	}
 
 	/**

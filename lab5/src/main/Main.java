@@ -299,7 +299,7 @@ public class Main
 		String prefix = "";
 		String separator = ",";
 		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
-		DataPreprocessor.cropEdges("dataset/normalized_dataset_2.csv", "dataset/cropped_dataset_2.csv", separator, 20, 2);
+		// DataPreprocessor.cropEdges("dataset/normalized_dataset_2.csv", "dataset/cropped_dataset_2.csv", separator, 20, 2);
 		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
 		// tuning parameters
@@ -448,9 +448,9 @@ public class Main
 	private static void report3() throws IOException, ClassNotFoundException
 	{
 		String separator = ",";
-		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
-		DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
-		DataPreprocessor.ditheringNoise("dataset/cropped_dataset.csv", "dataset/dithered_dataset.csv", separator);
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		// DataPreprocessor.ditheringNoise("dataset/cropped_dataset.csv", "dataset/dithered_dataset.csv", separator);
 		RandomNumberGenerator.setSeed(2479559307156667474L); // learning rate = 0.1, trainingRatio = 0.66
 
 		// tuning parameters
@@ -510,8 +510,8 @@ public class Main
 	private static void report2() throws IOException, ClassNotFoundException
 	{
 		String separator = ",";
-		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
-		DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// DataPreprocessor.cropEdges("dataset/normalized_dataset.csv", "dataset/cropped_dataset.csv", separator, 20, 2);
 		RandomNumberGenerator.setSeed(2479559307156667474L);
 
 		// tuning parameters
@@ -571,7 +571,7 @@ public class Main
 	private static void report1() throws IOException, ClassNotFoundException
 	{
 		String separator = ",";
-		DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
+		// DataPreprocessor.normalize("dataset/dataset.csv", "dataset/normalized_dataset.csv", separator);
 		RandomNumberGenerator.setSeed(7181436491370174476L);
 		// RandomNumberGenerator.setSeed(2479559307156667474L);
 

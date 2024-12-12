@@ -25,52 +25,127 @@ public class DataPreprocessor
 	 * @param normalizedFile the file to write the normalized data to
 	 * @param separator the string that separates the values to normalize in each line
 	 */
-	public static void normalize(String dataFile, String normalizedFile, String separator) throws IOException
+	// public static void normalize(String dataFile, String normalizedFile, String separator) throws IOException
+	// {
+	// 	File writeFile = new File(normalizedFile);
+	// 	BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+	//
+	// 	// double minValue = Double.MAX_VALUE;
+	// 	// double maxValue = Double.MIN_VALUE;
+	// 	int rows = getNumLines(dataFile);
+	// 	double[] minValues = new double[rows];
+	// 	double[] maxValues = new double[rows];
+	//
+	// 	ArrayList<ArrayList<Double>> values = getValuesFromFile(dataFile, separator);
+	// 	for (int i = 0; i < values.size(); i++)
+	// 	{
+	// 		double minValue = values.get(i).get(0);
+	// 		double maxValue = values.get(i).get(0);
+	// 		for (int j = 0; j < values.get(i).size(); j++)
+	// 		{
+	// 			double value = values.get(i).get(j);
+	// 			if (value > maxValue)
+	// 				maxValue = value;
+	// 			if (value < minValue)
+	// 				minValue = value;
+	// 		}
+	// 		minValues[i] = minValue;
+	// 		maxValues[i] = maxValue;
+	// 	}
+	//
+	// 	StringBuilder builder = new StringBuilder();
+	// 	for (int i = 0; i < values.size(); i++)
+	// 	{
+	// 		double dataDifference = maxValues[i] - minValues[i];
+	// 		ArrayList<Double> currLine = values.get(i);
+	// 		for (int j = 0; j < currLine.size() - 1; j++)
+	// 		{
+	// 			double oldValue = currLine.get(j);
+	// 			double normalized = (oldValue - minValues[i]) / dataDifference;
+	//  			builder.append(normalized);
+	// 			builder.append(separator);
+	// 		}
+	// 		builder.append(currLine.get(currLine.size() - 1));
+	// 		builder.append('\n');
+	// 	}
+	// 	writer.write(builder.toString());
+	// 	writer.flush();
+	// 	writer.close();
+	// }
+
+	/**
+	 * normalizes each row linearly
+	 * @param data the array that holds the arrays to normalize
+	 * @return an array of individually normalized arrays
+	 */
+	public static double[][] normalize(double[][] data)
 	{
-		File writeFile = new File(normalizedFile);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = normalize(data[i]);
+		return result;
+	}
 
-		// double minValue = Double.MAX_VALUE;
-		// double maxValue = Double.MIN_VALUE;
-		int rows = getNumLines(dataFile);
-		double[] minValues = new double[rows];
-		double[] maxValues = new double[rows];
+	/**
+	 * normalizes the elements linearly
+	 * @param data the numbers to normalize
+	 * @return the normalized values
+	 */
+	public static double[] normalize(double[] data)
+	{
+		double[] result = new double[data.length];
 
-		ArrayList<ArrayList<Double>> values = getValuesFromFile(dataFile, separator);
-		for (int i = 0; i < values.size(); i++)
+		double min = data[0];
+		double max = data[0];
+		for (int i = 0; i < data.length; i++)
 		{
-			double minValue = values.get(i).get(0);
-			double maxValue = values.get(i).get(0);
-			for (int j = 0; j < values.get(i).size(); j++)
-			{
-				double value = values.get(i).get(j);
-				if (value > maxValue)
-					maxValue = value;
-				if (value < minValue)
-					minValue = value;
-			}
-			minValues[i] = minValue;
-			maxValues[i] = maxValue;
+			double curr = data[i];
+			if (curr < min)
+				min = curr;
+			if (curr > max)
+				max = curr;
 		}
 
+		double diff = max - min;
+		for (int i = 0; i < data.length; i++)
+			result[i] = (data[i] - min) / diff;
+
+		return result;
+	}
+
+	/**
+	 * gets the (double/numeric) values from a string
+	 * @param data the string with the values
+	 * @param separator the separator of the values
+	 * @return the values within the string
+	 */
+	public static double[] getValues(String data, String separator)
+	{
+		String[] tokens = data.split(separator);
+		double[] values = new double[tokens.length];
+		for (int i = 0; i < tokens.length; i++)
+			values[i] = Double.parseDouble(tokens[i]);
+		return values;
+	}
+
+	/**
+	 * makes a string with the values, separated by the given string
+	 * @param values the values to insert in the string
+	 * @param separator the separation of each value
+	 * @return a string with the values separated by the given string
+	 */
+	public static String makeString(double[] values, String separator)
+	{
 		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < values.size(); i++)
+
+		for (int i = 0; i < values.length - 1; i++)
 		{
-			double dataDifference = maxValues[i] - minValues[i];
-			ArrayList<Double> currLine = values.get(i);
-			for (int j = 0; j < currLine.size() - 1; j++)
-			{
-				double oldValue = currLine.get(j);
-				double normalized = (oldValue - minValues[i]) / dataDifference;
-	 			builder.append(normalized);
-				builder.append(separator);
-			}
-			builder.append(currLine.get(currLine.size() - 1));
-			builder.append('\n');
+			builder.append(values[i]);
+			builder.append(separator);
 		}
-		writer.write(builder.toString());
-		writer.flush();
-		writer.close();
+		builder.append(values[values.length - 1]);
+
+		return builder.toString();
 	}
 
 	/**
@@ -83,33 +158,67 @@ public class DataPreprocessor
 	 * @param ammount the ammount of pixels to crop (on every side)
 	 * @throws IOException if an IO error occurs.
 	 */
-	public static void cropEdges(String datafile, String writefile, String separator, int rows, int ammount) throws IOException
-	{
-		File writeFile = new File(writefile);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
-		StringBuilder builder = new StringBuilder();
+	// public static void cropEdges(String datafile, String writefile, String separator, int rows, int ammount) throws IOException
+	// {
+	// 	File writeFile = new File(writefile);
+	// 	BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+	// 	StringBuilder builder = new StringBuilder();
+	//
+	// 	ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
+	// 	int cols = values.get(0).size() / rows;
+	// 	for (int i = 0; i < values.size(); i++)
+	// 	{
+	// 		for (int j = ammount; j < rows - ammount; j++)
+	// 		{
+	// 			for (int k = ammount; k < cols - ammount; k++)
+	// 			{
+	// 				int currIndex = j * cols + k;
+	// 				double value = values.get(i).get(currIndex);
+	// 				builder.append(value);
+	// 				builder.append(separator);
+	// 			}
+	// 		}
+	// 		builder.setLength(builder.length() - 1);
+	// 		builder.append("\n");
+	// 	}
+	//
+	// 	writer.write(builder.toString());
+	// 	writer.flush();
+	// 	writer.close();
+	// }
 
-		ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
-		int cols = values.get(0).size() / rows;
-		for (int i = 0; i < values.size(); i++)
+	public static double[][] cropEdges(double[][] data, int rows, int ammount)
+	{
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = cropEdges(data[i], rows, ammount);
+		return result;
+	}
+
+	/**
+	 * crops the edges of a flattened image
+	 * @param data the flattened image
+	 * @param rows how many rows the image should have (pixel height)
+	 * @param ammount the ammount of pixels to crop from EACH SIDE
+	 * @return the cropped image flattened
+	 */
+	public static double[] cropEdges(double[] data, int rows, int ammount)
+	{
+		int cols = data.length / rows;
+		int newSize = (rows - 2 * ammount) * (cols - 2 * ammount);
+		double[] result = new double[newSize];
+
+		int curr = 0;
+		for (int i = ammount; i < rows - ammount; i++)
 		{
-			for (int j = ammount; j < rows - ammount; j++)
+			for (int j = ammount; j < cols - ammount; j++)
 			{
-				for (int k = ammount; k < cols - ammount; k++)
-				{
-					int currIndex = j * cols + k;
-					double value = values.get(i).get(currIndex);
-					builder.append(value);
-					builder.append(separator);
-				}
+				int currIndex = i * cols + j;
+				result[curr++] = data[currIndex];
 			}
-			builder.setLength(builder.length() - 1);
-			builder.append("\n");
 		}
 
-		writer.write(builder.toString());
-		writer.flush();
-		writer.close();
+		return result;
 	}
 
 	/**
@@ -119,32 +228,32 @@ public class DataPreprocessor
 	 * @param separator the separator between each pixel for each image
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void ditheringNoise(String datafile, String writefile, String separator) throws IOException
-	{
-		File writeFile = new File(writefile);
-		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
-		StringBuilder builder = new StringBuilder();
-
-		ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
-		ArrayList<ArrayList<Double>> croppedValues = new ArrayList<>();
-		for (int i = 0; i < values.size(); i++)
-		{
-			for (int j = 0; j < values.get(i).size(); j++)
-			{
-				if (j % 2 == 0)
-				{
-					builder.append(values.get(i).get(j));
-					builder.append(separator);
-				}
-			}
-			builder.setLength(builder.length() - 1);
-			builder.append("\n");
-		}
-
-		writer.write(builder.toString());
-		writer.flush();
-		writer.close();
-	}
+	// public static void ditheringNoise(String datafile, String writefile, String separator) throws IOException
+	// {
+	// 	File writeFile = new File(writefile);
+	// 	BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+	// 	StringBuilder builder = new StringBuilder();
+	//
+	// 	ArrayList<ArrayList<Double>> values = getValuesFromFile(datafile, separator);
+	// 	ArrayList<ArrayList<Double>> croppedValues = new ArrayList<>();
+	// 	for (int i = 0; i < values.size(); i++)
+	// 	{
+	// 		for (int j = 0; j < values.get(i).size(); j++)
+	// 		{
+	// 			if (j % 2 == 0)
+	// 			{
+	// 				builder.append(values.get(i).get(j));
+	// 				builder.append(separator);
+	// 			}
+	// 		}
+	// 		builder.setLength(builder.length() - 1);
+	// 		builder.append("\n");
+	// 	}
+	//
+	// 	writer.write(builder.toString());
+	// 	writer.flush();
+	// 	writer.close();
+	// }
 
 	/**
 	 * Gets all the (double) values from a file, the outer list contains each row, the inner list contains each element of a row
@@ -178,7 +287,7 @@ public class DataPreprocessor
 	}
 
 	/**
-	 * shuffles the rows of a double[][] matrix.
+	 * shuffles the rows of a double[][] matrix (inplace).
 	 * @param matrix the matrix to shuffle (inplace)
 	 */
 	public static void shuffleRows(double[][] matrix)
@@ -259,16 +368,9 @@ public class DataPreprocessor
 		String line;
 		int row_num = 0;
 		while ((line = reader.readLine()) != null)
-		{
-			String[] tokens = line.split(separator);
-			double[] row = new double[tokens.length];
-			for (int i = 0; i < tokens.length; i++)
-				row[i] = Double.parseDouble(tokens[i]);
-			result[row_num] = row;
-			row_num++;
-		}
-		reader.close();
+			result[row_num++] = getValues(line, separator);
 
+		reader.close();
 		return result;
 	}
 
@@ -292,6 +394,7 @@ public class DataPreprocessor
 	/**
 	 * gets the inputs / target outputs (dataset) and splits it according
 	 * to the trainingToTestingRatio.
+	 * (automatically transposes)
 	 * @param inputs the inputs of the neural network (each row is an input, is column is an element of the input)
 	 * @param outputs the outputs of the neural network (each row in a target output, a column is an element of the output)
 	 * @param trainingToTestingRatio the ratio of training to testing (should be between 0 and 1)
