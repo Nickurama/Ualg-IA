@@ -366,6 +366,22 @@ public class Matrix /* <T extends Number> */
 		return result;
 	}
 
+	public Matrix clamp(double min, double max)
+	{
+		Matrix result = new Matrix(this);
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < columns; j++)
+			{
+				if (result.matrix[i][j] > max)
+					result.matrix[i][j] = max;
+				if (result.matrix[i][j] < min)
+					result.matrix[i][j] = min;
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * returns the specified number on the matrix
 	 * @param row the row of the number

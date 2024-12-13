@@ -6,9 +6,6 @@ import java.util.function.Function;
  */
 public class Neuron implements IPropagable
 {
-	// serializable
-	private static final long serialVersionUID = 139L;
-
 	// naming
 	public static final String IDENTIFIER = "n";
 	public static final String CONNECTION_IDENTIFIER = " -> ";
@@ -53,7 +50,7 @@ public class Neuron implements IPropagable
 	 * @param backwardNeurons the neuron's backward connections
 	 * @param name the neuron's name
 	 */
-	private void init(Matrix weights, ArrayList<IPropagable> forwardNeurons, ArrayList<IPropagable> backwardNeurons, String name)
+	private final void init(Matrix weights, ArrayList<IPropagable> forwardNeurons, ArrayList<IPropagable> backwardNeurons, String name)
 	{
 		this.weights = weights;
 		this.forwardNeurons = forwardNeurons;
@@ -296,7 +293,7 @@ public class Neuron implements IPropagable
 	/**
 	 * resets the variables to their default state.
 	 */
-	private void resetValues()
+	private final void resetValues()
 	{
 		this.hasGivenInfo = false;
 		this.backpropInputs = 0;

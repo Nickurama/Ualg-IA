@@ -19,12 +19,12 @@ import java.util.Random;
  */
 public class DataPreprocessor
 {
-	/**
-	 * normalizes data from a file, and places it onto another file.
-	 * @param dataFile the file to read the data from
-	 * @param normalizedFile the file to write the normalized data to
-	 * @param separator the string that separates the values to normalize in each line
-	 */
+	// /**
+	//  * normalizes data from a file, and places it onto another file.
+	//  * @param dataFile the file to read the data from
+	//  * @param normalizedFile the file to write the normalized data to
+	//  * @param separator the string that separates the values to normalize in each line
+	//  */
 	// public static void normalize(String dataFile, String normalizedFile, String separator) throws IOException
 	// {
 	// 	File writeFile = new File(normalizedFile);
@@ -148,16 +148,38 @@ public class DataPreprocessor
 		return builder.toString();
 	}
 
-	/**
-	 * crops the edges of images saved in a file and saves the output into a file.
-	 * each image should be a row in the file, and each value in a line should be a single pixel
-	 * @param datafile the file path of the image to crop
-	 * @param writefile the file path of where the output should be saved to
-	 * @param separator the separator of each pixel in a row
-	 * @param rows how many rows of pixels each image has (NOT HOW MANY IMAGES THERE ARE)
-	 * @param ammount the ammount of pixels to crop (on every side)
-	 * @throws IOException if an IO error occurs.
-	 */
+	public static String makeString(double[][] values, String separator)
+	{
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < values.length - 1; i++)
+		{
+			builder.append(makeString(values[i], separator));
+			builder.append('\n');
+		}
+		builder.append(makeString(values[values.length - 1], separator));
+
+		return builder.toString();
+	}
+
+	public static void writeToFile(String str, String file) throws IOException
+	{
+		File writeFile = new File(file);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile));
+		writer.write(str);
+		writer.flush();
+		writer.close();
+	}
+
+	// /**
+	//  * crops the edges of images saved in a file and saves the output into a file.
+	//  * each image should be a row in the file, and each value in a line should be a single pixel
+	//  * @param datafile the file path of the image to crop
+	//  * @param writefile the file path of where the output should be saved to
+	//  * @param separator the separator of each pixel in a row
+	//  * @param rows how many rows of pixels each image has (NOT HOW MANY IMAGES THERE ARE)
+	//  * @param ammount the ammount of pixels to crop (on every side)
+	//  * @throws IOException if an IO error occurs.
+	//  */
 	// public static void cropEdges(String datafile, String writefile, String separator, int rows, int ammount) throws IOException
 	// {
 	// 	File writeFile = new File(writefile);
@@ -221,13 +243,123 @@ public class DataPreprocessor
 		return result;
 	}
 
+	public static double[][] binaryThreshold(double[][] data)
+	{
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = binaryThreshold(data[i]);
+		return result;
+	}
+
 	/**
-	 * Performs a dithering-like noise to each image on a file, deleting every other pixel
-	 * @param datafile the file path where the images are encoded in (each row should contain an image)
-	 * @param writefile the file to save the output to
-	 * @param separator the separator between each pixel for each image
-	 * @throws IOException if an IO error occurs
+	 * turns a normalized gradient into a binary output
+	 * @param data the normalized data to apply binary threshold
+	 * @return the binary output
 	 */
+	public static double[] binaryThreshold(double[] data)
+	{
+		double[] result = new double[data.length];
+
+		for (int i = 0; i < data.length; i++)
+			result[i] = data[i] >= 0.5 ? 1 : 0;
+
+		return result;
+	}
+
+	public static double[][] downscaleAverages(double[][] data, int rows)
+	{
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = downscaleAverages(data[i], rows);
+		return result;
+	}
+
+	public static double[] downscaleAverages(double[] data, int rows)
+	{
+		int size = data.length / 4;
+		int cols = data.length / rows;
+		double[] result = new double[size];
+
+		int currRow = 0;
+		for (int i = 1; i < rows; i += 2)
+		{
+			for (int j = 1; j < cols; j += 2)
+			{
+				int curr = i * cols + j;
+				int bottomLeft = curr - 1;
+				int topRight = curr - cols;
+				int topLeft = curr - cols - 1;
+				double avg = (data[curr] + data[bottomLeft] + data[topRight] + data[topLeft]) / 4.0;
+				result[currRow++] = avg;
+			}
+		}
+
+		return result;
+	}
+
+	public static double[][] rotate90(double[][] data, int rows)
+	{
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = rotate90(data[i], rows);
+		return result;
+	}
+
+	public static double[] rotate90(double[] data, int rows)
+	{
+		int cols = data.length / rows;
+		double[] result = new double[data.length];
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				int curr = i * cols + j;
+				int translatedRow = cols - j - 1;
+				int translatedCol = i;
+				int translatedCurr = translatedRow * cols + translatedCol;
+				result[curr] = data[translatedCurr];
+			}
+		}
+
+		return result;
+	}
+
+	public static double[][] rotate90Back(double[][] data, int rows)
+	{
+		double[][] result = new double[data.length][];
+		for (int i = 0; i < data.length; i++)
+			result[i] = rotate90Back(data[i], rows);
+		return result;
+	}
+
+	public static double[] rotate90Back(double[] data, int rows)
+	{
+		int cols = data.length / rows;
+		double[] result = new double[data.length];
+
+		for (int i = 0; i < rows; i++)
+		{
+			for (int j = 0; j < cols; j++)
+			{
+				int curr = i * cols + j;
+				int translatedRow = j;
+				int translatedCol = cols - i - 1;
+				int translatedCurr = translatedRow * cols + translatedCol;
+				result[curr] = data[translatedCurr];
+			}
+		}
+
+		return result;
+	}
+
+	// /**
+	//  * Performs a dithering-like noise to each image on a file, deleting every other pixel
+	//  * @param datafile the file path where the images are encoded in (each row should contain an image)
+	//  * @param writefile the file to save the output to
+	//  * @param separator the separator between each pixel for each image
+	//  * @throws IOException if an IO error occurs
+	//  */
 	// public static void ditheringNoise(String datafile, String writefile, String separator) throws IOException
 	// {
 	// 	File writeFile = new File(writefile);

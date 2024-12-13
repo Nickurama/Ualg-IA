@@ -165,7 +165,7 @@ public class NeuralNetwork
 	 * caches the target output rows, separating each row for individual use.
 	 * @param targetOutput the target output matrix
 	 */
-	private void cacheTargetOutputRows(Matrix targetOutput)
+	private final void cacheTargetOutputRows(Matrix targetOutput)
 	{
 		this.targetOutputRowsCache = new ArrayList<Matrix>();
 		for (int i = 0; i < targetOutput.rows(); i++)
@@ -272,6 +272,7 @@ public class NeuralNetwork
 		if (this.shouldApplyGaussianNoise) // does not support turning off gaussian noise
 		{
 			this.gaussianNoiseTraining = this.trainingSet.apply(GAUSSIAN_NOISE);
+			// this.gaussianNoiseTraining = this.gaussianNoiseTraining.clamp(0.0, 1.0); // FIXME assumes normalization
 			setInputNodes(this.gaussianNoiseTraining);
 		}
 
@@ -1051,8 +1052,14 @@ public class NeuralNetwork
 	 * @param z the normalized value to add noise to
 	 * @return z with noise
 	 */
-	private static double gaussianNoise(double z)
+	private static double gaussianNoise(double z) // FIXME normalizes
 	{
-		return z + RandomNumberGenerator.get().nextGaussian(0.0, 0.1);
+		double result = z + RandomNumberGenerator.get().nextGaussian() * 0.1 + 0.0; // FIXME use the bottom one
+		// double result = z + RandomNumberGenerator.get().nextGaussian(0.0, 0.1);
+		if (result > 1.0)
+			z = 1.0;
+		if (result < 0.0)
+			z = 0.0;
+		return result;
 	}
 }

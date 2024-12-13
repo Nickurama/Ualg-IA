@@ -61,7 +61,7 @@ public class BinaryClassifierStats
 	 * @param fNeg false negatives
 	 * @return the accuracy
 	 */
-	public static double calcAccuracy(int tPos, int tNeg, int fPos, int fNeg)
+	public static final double calcAccuracy(int tPos, int tNeg, int fPos, int fNeg)
 	{
 		double denominator = (double)(tPos + tNeg + fPos + fNeg);
 		if (denominator == 0.0)
@@ -75,7 +75,7 @@ public class BinaryClassifierStats
 	 * @param fPos false positives
 	 * @return the precision
 	 */
-	public static double calcPrecision(int tPos, int fPos)
+	public static final double calcPrecision(int tPos, int fPos)
 	{
 		double denominator = (double)(tPos + fPos);
 		if (denominator == 0.0)
@@ -94,7 +94,7 @@ public class BinaryClassifierStats
 	 * @param fNeg false negatives
 	 * @return the kappa
 	 */
-	public static double calcKappa(int tPos, int tNeg, int fPos, int fNeg)
+	public static final double calcKappa(int tPos, int tNeg, int fPos, int fNeg)
 	{
 		double denominator = (double)((tPos + fPos)*(fPos + tNeg) + (tPos + fNeg)*(fNeg + tNeg));
 		if (denominator == 0.0)
@@ -108,7 +108,7 @@ public class BinaryClassifierStats
 	 * @param fNeg false negative
 	 * @return the recall
 	 */
-	public static double calcRecall(int tPos, int fNeg)
+	public static final double calcRecall(int tPos, int fNeg)
 	{
 		return (double)tPos / (double)(tPos + fNeg);
 	}
